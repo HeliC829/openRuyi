@@ -1,0 +1,89 @@
+# SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
+# SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileContributor: Sun Yuechi <sunyuechi@iscas.ac.cn>
+# SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+#
+# SPDX-License-Identifier: MulanPSL-2.0
+
+%global version_suffix %{lua: \
+  local v = rpm.expand("%{version}") \
+  local _, count = v:gsub("%.", "") \
+  print(count > 1 and "-stable" or "") \
+}
+
+Name:           dpdk
+Version:        25.07
+Release:        %autorelease
+Summary:        Set of libraries and drivers for fast packet processing
+URL:            http://dpdk.org
+#!RemoteAsset
+Source:         https://fast.dpdk.org/rel/dpdk-%{version}.tar.xz
+
+BuildSystem:    meson
+
+BuildOption(prep):  -p1 -n dpdk%{version_suffix}-%{version}
+BuildOption(conf):  -Dmachine=generic
+
+BuildRequires:  meson
+BuildRequires:  python3-pyelftools
+BuildRequires:  gcc
+BuildRequires:  linux-headers
+BuildRequires:  libpcap-devel
+BuildRequires:  zlib-devel
+BuildRequires:  numactl-devel
+BuildRequires:  openssl-devel
+
+# Note that, while this is dual licensed, all code that is included with this
+# Pakcage are BSD licensed. The only files that aren't licensed via BSD is the
+# kni kernel module which is dual LGPLv2/BSD.
+License:        LicenseRef-Callaway-BSD AND LicenseRef-Callaway-LGPLv2 AND GPL-2.0-only
+
+%description
+The Data Plane Development Kit is a set of libraries and drivers for
+fast packet processing in the user space.
+
+%package        devel
+Summary:        Data Plane Development Kit development files
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
+%description    devel
+This package contains the headers and other files needed for developing
+applications with the Data Plane Development Kit.
+
+%package        tools
+Summary:        Tools for setting up Data Plane Development Kit environment
+Requires:       %{name} = %{version}-%{release}
+Requires:       kmod
+Requires:       pciutils
+Requires:       iproute2
+Requires:       python3-pyelftools
+
+%description    tools
+%{summary}
+
+%files
+%{_bindir}/dpdk-testpmd
+%{_bindir}/dpdk-proc-info
+%{_libdir}/*.so.*
+%{_libdir}/dpdk/pmds-*/*.so.*
+
+%files devel
+%{_includedir}/
+%{_datadir}/%{name}
+%{_libdir}/*.so
+%{_libdir}/dpdk/pmds-*/*.so
+%exclude %{_libdir}/*.a
+%{_libdir}/pkgconfig/libdpdk.pc
+%{_libdir}/pkgconfig/libdpdk-libs.pc
+
+%files tools
+%exclude %{_bindir}/dpdk-*.py
+%{_bindir}/dpdk-dumpcap
+%{_bindir}/dpdk-pdump
+%{_bindir}/dpdk-graph
+%{_bindir}/dpdk-test
+%{_bindir}/dpdk-test-*
+%{_bindir}/dpdk-*.py
+
+%changelog
+%{?autochangelog}

@@ -1,0 +1,13 @@
+--- a/tests/commands.at
++++ b/tests/commands.at
+@@ -1039,6 +1039,7 @@ dnl	nice
+ dnl
+ 
+ AT_SETUP([nice])
++AT_SKIP_IF([test 'whoami' != 'root'])
+ AT_KEYWORDS([commands])
+ 
+ dnl Nothing really tested
+-- 
+1.8.3.1
+

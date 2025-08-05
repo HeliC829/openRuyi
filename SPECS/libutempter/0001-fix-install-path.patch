@@ -1,0 +1,15 @@
+diff --git a/libutempter/Makefile b/libutempter/Makefile
+index 256f1f8..cce4619 100644
+--- a/libutempter/Makefile
++++ b/libutempter/Makefile
+@@ -30,8 +30,8 @@ MAP = lib$(PROJECT).map
+ TARGETS = $(PROJECT) $(SHAREDLIB)
+ 
+ INSTALL = install
+-libdir = /usr/lib
+-libexecdir = /usr/lib
++libdir ?= /usr/lib
++libexecdir ?= /usr/lib
+ includedir = /usr/include
+ mandir = /usr/share/man
+ man3dir = $(mandir)/man3

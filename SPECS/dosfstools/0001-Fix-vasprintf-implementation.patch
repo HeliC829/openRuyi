@@ -1,0 +1,27 @@
+From 5564db86e9c082ef6d0f26cb23c92a0bcdc2b14a Mon Sep 17 00:00:00 2001
+From: wuyifeng <wuyifeng10@huawei.com>
+Date: Wed, 31 Jul 2024 15:17:04 +0800
+Subject: [PATCH] Fix vasprintf implementation
+
+A va_copy call must be followed by a va_end call.
+---
+ src/common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/common.c b/src/common.c
+index 6a2e396..c33cbea 100644
+--- a/src/common.c
++++ b/src/common.c
+@@ -123,8 +123,8 @@ static int vasprintf(char **strp, const char *fmt, va_list va)
+     va_list vacopy;
+ 
+     va_copy(vacopy, va);
+-
+     length = vsnprintf(NULL, 0, fmt, vacopy);
++    va_end(vacopy);
+     if (length < 0)
+ 	return length;
+ 
+-- 
+2.33.0
+

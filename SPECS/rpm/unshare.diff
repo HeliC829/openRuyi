@@ -1,0 +1,28 @@
+--- plugins/unshare.c.orig	2025-02-19 15:29:33.000000000 +0000
++++ plugins/unshare.c	2025-03-07 13:21:21.145450130 +0000
+@@ -15,6 +15,16 @@
+ static ARGV_t private_mounts = NULL;
+ static int unshare_flags = 0;
+ 
++static int in_chroot()
++{
++    struct stat sta, stb;
++    if (stat("/", &sta))
++	return 0;
++    if (stat("/proc/1/root", &stb))
++	return 1;       /* proc not mounted, assume chroot */
++    return sta.st_dev == stb.st_dev && sta.st_ino == stb.st_ino ? 0 : 1;
++}
++
+ static rpmRC unshare_init(rpmPlugin plugin, rpmts ts)
+ {
+     char *paths = rpmExpand("%{?__transaction_unshare_paths}", NULL);
+@@ -24,7 +34,7 @@ static rpmRC unshare_init(rpmPlugin plug
+ 	 * Changing mount propagation from inside a chroot fails if the root
+ 	 * is not also a mount point, disable for now.
+ 	 */
+-	if (strcmp(rpmtsRootDir(ts), "/")) {
++	if (strcmp(rpmtsRootDir(ts), "/") || in_chroot()) {
+ 	    rpmlog(RPMLOG_WARNING,
+ 			"private mounts in chroot not implemented\n");
+ 	} else {

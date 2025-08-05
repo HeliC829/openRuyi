@@ -1,0 +1,39 @@
+# 0001-fix-xstat-prototype.patch
+# Fix xstat prototype mismatch: include <sys/stat.h> and use consistent function-pointer prototype
+# - Add <sys/stat.h> to src/extern.h so 'struct stat' is visible
+# - Change extern declaration in src/extern.h to use (const char *, struct stat *)
+# - Change definition in src/global.c to use (const char *, struct stat *)
+# This prevents "conflicting types for 'xstat'" and "too many arguments to function 'xstat'" errors
+# when compiling with stricter compilers (e.g. GCC 15+).
+#
+--- a/src/extern.h
++++ b/src/extern.h
+@@ -20,6 +20,7 @@
+ #include "quotearg.h"
+ #include "quote.h"
+ #include "inttostr.h"
++struct stat;
+ 
+ enum archive_format
+ {
+@@ -97,7 +98,7 @@
+ extern char output_is_special;
+ extern char input_is_seekable;
+ extern char output_is_seekable;
+-extern int (*xstat) ();
++extern int (*xstat) (const char *path, struct stat *buf);
+ extern void (*copy_function) ();
+ extern char *change_directory_option;
+ 
+
+--- a/src/global.c
++++ b/src/global.c
+@@ -185,7 +185,7 @@
+ 
+ /* A pointer to either lstat or stat, depending on whether
+    dereferencing of symlinks is done for input files.  */
+-int (*xstat) ();
++int (*xstat) (const char *, struct stat *);
+ 
+ /* Which copy operation to perform. (-i, -o, -p) */
+ void (*copy_function) () = 0;

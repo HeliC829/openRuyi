@@ -1,0 +1,13 @@
+diff --git a/test/poll.c b/test/poll.c
+index 660f384..cd5ff90 100644
+--- a/test/poll.c
++++ b/test/poll.c
+@@ -14,7 +14,7 @@ static struct burn_drive_info *drives;
+ static unsigned int n_drives;
+ int NEXT;
+ 
+-static void catch_int ()
++static void catch_int (int signum)
+ {
+ 	NEXT = 1;
+ }

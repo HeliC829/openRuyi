@@ -1,0 +1,2921 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index d806dff..46c7c1b 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -37,15 +37,11 @@
+ #   elapsed time.
+ #
+ # Todos:
+-# - [ ] Linux: Add native ARM runner.
+ # - [ ] Linux: Add native ARM64 runner.
+ # - [ ] Linux: Add native PPC64LE runner.
+ # - [ ] Linux: Add native S390X runner.
+-# - [ ] Windows: Add VS2013.
+-# - [ ] Windows: Add VS2015.
+ # - [ ] Windows: Add clang for msys2.
+-# - [ ] Windows: Add native or emulated ARM runner.
+-# - [ ] Windows: Add native or emulated ARM64 runner.
++# - [ ] Windows: Add native or emulated ARM64 runner (note: currently unreliable)
+ 
+ 
+ # Name of the workflow is also displayed as a SVG badge
+@@ -79,26 +75,23 @@ jobs:
+ 
+           # gcc
+           { pkgs: '',                                  cc: gcc,       cxx: g++,         os: ubuntu-latest, },
+-          # { pkgs: 'gcc-13  g++-13  lib32gcc-13-dev',   cc: gcc-13,    cxx: g++-13,      os: ubuntu-22.04,  }, # currently failing
++          { pkgs: 'gcc-14  g++-14  lib32gcc-14-dev',   cc: gcc-14,    cxx: g++-14,      os: ubuntu-24.04,  },
++          { pkgs: 'gcc-13  g++-13  lib32gcc-13-dev',   cc: gcc-13,    cxx: g++-13,      os: ubuntu-24.04,  },
+           { pkgs: 'gcc-12  g++-12  lib32gcc-12-dev',   cc: gcc-12,    cxx: g++-12,      os: ubuntu-22.04,  },
+           { pkgs: 'gcc-11  g++-11  lib32gcc-11-dev',   cc: gcc-11,    cxx: g++-11,      os: ubuntu-22.04,  },
+           { pkgs: 'gcc-10  g++-10  lib32gcc-10-dev',   cc: gcc-10,    cxx: g++-10,      os: ubuntu-22.04,  },
+           { pkgs: 'gcc-9   g++-9   lib32gcc-9-dev',    cc: gcc-9,     cxx: g++-9,       os: ubuntu-22.04,  },
+-          { pkgs: 'gcc-8   g++-8   lib32gcc-8-dev',    cc: gcc-8,     cxx: g++-8,       os: ubuntu-20.04,  },
+-          { pkgs: 'gcc-7   g++-7   lib32gcc-7-dev',    cc: gcc-7,     cxx: g++-7,       os: ubuntu-20.04,  },
+ 
+           # clang
+           { pkgs: '',                                  cc: clang,     cxx: clang++,     os: ubuntu-latest, },
++          { pkgs: 'clang-18',                          cc: clang-18,  cxx: clang++-18,  os: ubuntu-24.04,  },
++          { pkgs: 'clang-17',                          cc: clang-17,  cxx: clang++-17,  os: ubuntu-24.04,  },
++          { pkgs: 'clang-16',                          cc: clang-16,  cxx: clang++-16,  os: ubuntu-24.04,  },
+           { pkgs: 'clang-15',                          cc: clang-15,  cxx: clang++-15,  os: ubuntu-22.04,  },
+           { pkgs: 'clang-14',                          cc: clang-14,  cxx: clang++-14,  os: ubuntu-22.04,  },
+           { pkgs: 'clang-13',                          cc: clang-13,  cxx: clang++-13,  os: ubuntu-22.04,  },
+           { pkgs: 'clang-12',                          cc: clang-12,  cxx: clang++-12,  os: ubuntu-22.04,  },
+           { pkgs: 'clang-11',                          cc: clang-11,  cxx: clang++-11,  os: ubuntu-22.04,  },
+-          { pkgs: 'clang-10',                          cc: clang-10,  cxx: clang++-10,  os: ubuntu-20.04,  },
+-          { pkgs: 'clang-9',                           cc: clang-9,   cxx: clang++-9,   os: ubuntu-20.04,  },
+-          { pkgs: 'clang-8',                           cc: clang-8,   cxx: clang++-8,   os: ubuntu-20.04,  },
+-          { pkgs: 'clang-7',                           cc: clang-7,   cxx: clang++-7,   os: ubuntu-20.04,  },
+-          { pkgs: 'clang-6.0',                         cc: clang-6.0, cxx: clang++-6.0, os: ubuntu-20.04,  },
+         ]
+ 
+     runs-on: ${{ matrix.os }}
+@@ -149,17 +142,17 @@ jobs:
+       run: |
+         CFLAGS="-Os -DXXH_SIZE_OPT=2 -Wall -Wextra -Werror" make clean xxhsum
+ 
+-    - name: noxxh3test
++    - name: XXH_NO_XXH3
+       if: always()
+       run: |
+         # check library can be compiled with XXH_NO_XXH3, resulting in no XXH3_* symbol
+         make clean noxxh3test
+ 
+-    - name: nostreamtest
++    - name: XXH_NO_STREAM
+       if: always()
+       run: |
+         # check library can be compiled with XXH_NO_STREAM, resulting in no streaming symbols
+-        make clean noxxh3test
++        make clean nostreamtest
+ 
+     - name: make avx512f
+       run: |
+@@ -170,6 +163,11 @@ jobs:
+       run: |
+         make clean test-all
+ 
++    - name: test-alias
++      run: |
++        make clean
++        make -C tests test_alias
++
+ 
+   ubuntu-consistency:
+     name: Linux x64 check results consistency
+@@ -323,46 +321,77 @@ jobs:
+         echo && make -v
+         echo && cat /proc/cpuinfo || echo /proc/cpuinfo is not present
+ 
+-    - name: cmake
++    - name: Configure, build & stage (CMake)
+       run: |
+-        cd cmake_unofficial
+-        cmake -Bbuild
+-        cd build
+-        CFLAGS=-Werror make
+-        mkdir -p test_install_dir
+-        DESTDIR=test_install_dir cmake --install .
++        BUILD_DIR="${{ github.workspace }}/cmakebuild"
++
++        # 1) configure
++        cmake -S build/cmake -B "$BUILD_DIR" \
++              -DCMAKE_C_FLAGS="-Werror" \
++              -DCMAKE_INSTALL_PREFIX=/usr  # real prefix inside DESTDIR
++
++        # 2) build (uses default Makefile generator on Linux runners)
++        cmake --build "$BUILD_DIR" --parallel
+ 
+-    - name: cmake pkgconfig generation
++        # 3) staged install
++        DESTDIR="$BUILD_DIR/stage" cmake --install "$BUILD_DIR" --prefix /usr
++
++    - name: Generate & validate libxxhash.pc (CMake)
+       run: |
+-        cd cmake_unofficial
+-        pwd
+-        ls
+-        rm -rf build
+-        cmake -Bbuild -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_INCLUDEDIR=/usr/include -DCMAKE_INSTALL_LIBDIR=/usr/lib
+-        echo "checking content of libxxhash.pc"
+-        cat build/libxxhash.pc | grep "libdir=/usr/lib"
+-        cat build/libxxhash.pc | grep "includedir=/usr/include"
++        SRC_DIR=build/cmake
++        BUILD_PKG_DIR="${{ github.workspace }}/cmakebuildpkg"
++
++        # 1) configure an out‑of‑tree build that writes the .pc file
++        cmake -S "$SRC_DIR" -B "$BUILD_PKG_DIR" \
++              -DCMAKE_INSTALL_PREFIX=/usr \
++              -DCMAKE_INSTALL_INCLUDEDIR=/usr/include \
++              -DCMAKE_INSTALL_LIBDIR=/usr/lib
++
++        # 2) sanity‑check the resulting pkg‑config file
++        PC_FILE="$BUILD_PKG_DIR/libxxhash.pc"
++        test -f "$PC_FILE"                            # file exists
++        grep -q '^libdir=/usr/lib$' "$PC_FILE"
++        grep -q '^includedir=/usr/include$' "$PC_FILE"
+ 
+     - name: cmake minimum version v3.10 test
+       run: |
+-        mkdir -p cmake_bins
+-        cd cmake_bins
+-        wget https://cmake.org/files/v3.10/cmake-3.10.0-Linux-x86_64.tar.gz
+-        tar xzf cmake-3.10.0-Linux-x86_64.tar.gz
+-        cd ../cmake_unofficial
+-        rm -rf build
+-        pwd
+-        ls
+-        mkdir -p build
+-        cd build
+-        ../../cmake_bins/cmake-3.10.0-Linux-x86_64/bin/cmake --version
+-        ../../cmake_bins/cmake-3.10.0-Linux-x86_64/bin/cmake ..
+-        ../../cmake_bins/cmake-3.10.0-Linux-x86_64/bin/cmake --build .
+-        mkdir -p test_install_dir
+-        DESTDIR=test_install_dir ../../cmake_bins/cmake-3.10.0-Linux-x86_64/bin/cmake --install .
+-        rm -rf *
+-        ../../cmake_bins/cmake-3.10.0-Linux-x86_64/bin/cmake -DCMAKE_BUILD_TYPE=Debug ..
+-        ../../cmake_bins/cmake-3.10.0-Linux-x86_64/bin/cmake --build .
++        CMAKE_VERSION="3.10.0"
++        CMAKE_MAJOR_MINOR="3.10"
++        BASE_DIR="$(pwd)"
++        DOWNLOAD_DIR="${BASE_DIR}/cmake_download"
++        CMAKE_BIN_DIR="${DOWNLOAD_DIR}/cmake-${CMAKE_VERSION}-Linux-x86_64"
++        CMAKE_BIN="${CMAKE_BIN_DIR}/bin/cmake"
++        BUILD_DIR="${BASE_DIR}/cmake_build"
++        INSTALL_TEST_DIR="${BASE_DIR}/cmake_install_test"
++
++        # Create necessary directories
++        mkdir -p "${DOWNLOAD_DIR}" "${BUILD_DIR}" "${INSTALL_TEST_DIR}"
++
++        # Download and extract CMake
++        echo "Downloading CMake ${CMAKE_VERSION}..."
++        wget "https://cmake.org/files/v${CMAKE_MAJOR_MINOR}/cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz" -P "${DOWNLOAD_DIR}"
++        tar xzf "${DOWNLOAD_DIR}/cmake-${CMAKE_VERSION}-Linux-x86_64.tar.gz" -C "${DOWNLOAD_DIR}"
++
++        # Verify CMake version
++        echo "Using CMake version:"
++        "${CMAKE_BIN}" --version
++
++        # Configure the build
++        echo "Configuring build..."
++        (cd "${BUILD_DIR}" && "${CMAKE_BIN}" "${BASE_DIR}/build/cmake")
++
++        # Build the project
++        echo "Building project..."
++        "${CMAKE_BIN}" --build "${BUILD_DIR}"
++
++        # Install to test directory
++        echo "Installing to test directory..."
++        DESTDIR="${INSTALL_TEST_DIR}" "${CMAKE_BIN}" --build "${BUILD_DIR}" --target install
++
++        echo "Test completed successfully with cmake ${CMAKE_VERSION}"
++
++        # cleaning
++        rm -rf "${DOWNLOAD_DIR}" "${BUILD_DIR}" "${INSTALL_TEST_DIR}"
+ 
+ 
+ 
+@@ -384,33 +413,8 @@ jobs:
+           { name: 'MIPS',            xcc_pkg: gcc-mips-linux-gnu,           xcc: mips-linux-gnu-gcc,           xemu_pkg: qemu-system-mips,   xemu: qemu-mips-static,    os: ubuntu-latest, },
+           { name: 'M68K',            xcc_pkg: gcc-m68k-linux-gnu,           xcc: m68k-linux-gnu-gcc,           xemu_pkg: qemu-system-m68k,   xemu: qemu-m68k-static,    os: ubuntu-latest, },
+           { name: 'RISC-V',          xcc_pkg: gcc-riscv64-linux-gnu,        xcc: riscv64-linux-gnu-gcc,        xemu_pkg: qemu-system-riscv64,xemu: qemu-riscv64-static, os: ubuntu-latest, },
+-          # SPARC64 qemu emulation seems broken on Ubuntu-22
+-          { name: 'SPARC',           xcc_pkg: gcc-sparc64-linux-gnu,        xcc: sparc64-linux-gnu-gcc,        xemu_pkg: qemu-system-sparc,  xemu: qemu-sparc64-static, os: ubuntu-20.04, },
+-          { name: 'LoongArch',       xcc_pkg: gcc-14-loongarch64-linux-gnu,    xcc: loongarch64-linux-gnu-gcc-14, xemu_pkg: qemu-system-loongarch64, xemu: qemu-loongarch64-static, os: ubuntu-24.04, },
+-
+-          { name: 'ARM, gcc-10',     xcc_pkg: gcc-10-arm-linux-gnueabi,     xcc: arm-linux-gnueabi-gcc-10,     xemu_pkg: qemu-system-arm,   xemu: qemu-arm-static,     os: ubuntu-20.04, },
+-          { name: 'AARCH64, gcc-10', xcc_pkg: gcc-10-aarch64-linux-gnu,     xcc: aarch64-linux-gnu-gcc-10,     xemu_pkg: qemu-system-arm,   xemu: qemu-aarch64-static, os: ubuntu-20.04, },
+-          { name: 'PPC64LE, gcc-10', xcc_pkg: gcc-10-powerpc64le-linux-gnu, xcc: powerpc64le-linux-gnu-gcc-10, xemu_pkg: qemu-system-ppc,   xemu: qemu-ppc64le-static, os: ubuntu-20.04, },
+-          { name: 'PPC64, gcc-10',   xcc_pkg: gcc-10-powerpc64-linux-gnu,   xcc: powerpc64-linux-gnu-gcc-10,   xemu_pkg: qemu-system-ppc,   xemu: qemu-ppc64-static,   os: ubuntu-20.04, },
+-          { name: 'S390X, gcc-10',   xcc_pkg: gcc-10-s390x-linux-gnu,       xcc: s390x-linux-gnu-gcc-10,       xemu_pkg: qemu-system-s390x, xemu: qemu-s390x-static,   os: ubuntu-20.04, },
+-          { name: 'MIPS, gcc-10',    xcc_pkg: gcc-10-mips-linux-gnu,        xcc: mips-linux-gnu-gcc-10,        xemu_pkg: qemu-system-mips,  xemu: qemu-mips-static,    os: ubuntu-20.04, },
+-
+-          { name: 'ARM, gcc-9',      xcc_pkg: gcc-9-arm-linux-gnueabi,      xcc: arm-linux-gnueabi-gcc-9,      xemu_pkg: qemu-system-arm,   xemu: qemu-arm-static,     os: ubuntu-20.04, },
+-          # SVE tests require at least gcc-10.1
+-          # { name: 'AARCH64, gcc-9',  xcc_pkg: gcc-9-aarch64-linux-gnu,      xcc: aarch64-linux-gnu-gcc-9,      xemu_pkg: qemu-system-arm,   xemu: qemu-aarch64-static, os: ubuntu-20.04, },
+-          { name: 'PPC64LE, gcc-9',  xcc_pkg: gcc-9-powerpc64le-linux-gnu,  xcc: powerpc64le-linux-gnu-gcc-9,  xemu_pkg: qemu-system-ppc,   xemu: qemu-ppc64le-static, os: ubuntu-20.04, },
+-          { name: 'PPC64, gcc-9',    xcc_pkg: gcc-9-powerpc64-linux-gnu,    xcc: powerpc64-linux-gnu-gcc-9,    xemu_pkg: qemu-system-ppc,   xemu: qemu-ppc64-static,   os: ubuntu-20.04, },
+-          { name: 'S390X, gcc-9',    xcc_pkg: gcc-9-s390x-linux-gnu,        xcc: s390x-linux-gnu-gcc-9,        xemu_pkg: qemu-system-s390x, xemu: qemu-s390x-static,   os: ubuntu-20.04, },
+-          { name: 'MIPS, gcc-9',     xcc_pkg: gcc-9-mips-linux-gnu,         xcc: mips-linux-gnu-gcc-9,         xemu_pkg: qemu-system-mips,  xemu: qemu-mips-static,    os: ubuntu-20.04, },
+-
+-          { name: 'ARM, gcc-8',      xcc_pkg: gcc-8-arm-linux-gnueabi,      xcc: arm-linux-gnueabi-gcc-8,      xemu_pkg: qemu-system-arm,   xemu: qemu-arm-static,     os: ubuntu-20.04, },
+-          # aarch64-linux-gnu-gcc-8 linker has an issue for LDFLAGS="-static"
+-          # { name: 'AARCH64, gcc-8',  xcc_pkg: gcc-8-aarch64-linux-gnu,      xcc: aarch64-linux-gnu-gcc-8,      xemu_pkg: qemu-system-arm,   xemu: qemu-aarch64-static, os: ubuntu-20.04, },
+-          { name: 'PPC64LE, gcc-8',  xcc_pkg: gcc-8-powerpc64le-linux-gnu,  xcc: powerpc64le-linux-gnu-gcc-8,  xemu_pkg: qemu-system-ppc,   xemu: qemu-ppc64le-static, os: ubuntu-20.04, },
+-          { name: 'PPC64, gcc-8',    xcc_pkg: gcc-8-powerpc64-linux-gnu,    xcc: powerpc64-linux-gnu-gcc-8,    xemu_pkg: qemu-system-ppc,   xemu: qemu-ppc64-static,   os: ubuntu-20.04, },
+-          { name: 'S390X, gcc-8',    xcc_pkg: gcc-8-s390x-linux-gnu,        xcc: s390x-linux-gnu-gcc-8,        xemu_pkg: qemu-system-s390x, xemu: qemu-s390x-static,   os: ubuntu-20.04, },
+-          # ubuntu-20.04 fails to retrieve gcc-8-mips-linux-gnu for some reason.
+-          # { name: 'MIPS, gcc-8',   xcc_pkg: gcc-8-mips-linux-gnu,         xcc: mips-linux-gnu-gcc-8,         xemu_pkg: qemu-system-mips,  xemu: qemu-mips-static,    os: ubuntu-20.04, },
++          { name: 'SPARC',           xcc_pkg: gcc-sparc64-linux-gnu,        xcc: sparc64-linux-gnu-gcc,        xemu_pkg: qemu-system-sparc,  xemu: qemu-sparc64-static, os: ubuntu-latest, },
++          { name: 'LoongArch',       xcc_pkg: gcc-14-loongarch64-linux-gnu, xcc: loongarch64-linux-gnu-gcc-14, xemu_pkg: qemu-system-loongarch64, xemu: qemu-loongarch64-static, os: ubuntu-24.04, },
+         ]
+     env:                        # Set environment variables
+       XCC: ${{ matrix.xcc }}
+@@ -470,11 +474,19 @@ jobs:
+         CPPFLAGS="-DXXH_VECTOR=XXH_SCALAR" LDFLAGS="-static" CC=$XCC RUN_ENV=$XEMU make clean check
+         CPPFLAGS=-DXXH_VECTOR=XXH_VSX CFLAGS="-O3 -march=arch11 -mzvector" LDFLAGS="-static" CC=$XCC RUN_ENV=$XEMU make clean check
+ 
+-    - name: MIPS-M68K-RISCV-SPARC (XXH_VECTOR=[ scalar ])
+-      if: ${{ startsWith(matrix.name, 'MIPS') || startsWith(matrix.name, 'M68K') || startsWith(matrix.name, 'RISC-V') || startsWith(matrix.name, 'SPARC') }}
++    - name: MIPS-M68K-SPARC (XXH_VECTOR=[ scalar ])
++      if: ${{ startsWith(matrix.name, 'MIPS') || startsWith(matrix.name, 'M68K') || startsWith(matrix.name, 'SPARC') }}
+       run: |
+         make clean; LDFLAGS="-static" CC=$XCC RUN_ENV=$XEMU make check
+ 
++    - name: RISCV (XXH_VECTOR=[scalar, rvv])
++      if: ${{startsWith(matrix.name, 'RISC-V')}}
++      run: |
++        make clean; LDFLAGS="-static" CC=$XCC RUN_ENV=$XEMU make check
++        CPPFLAGS="-march=rv64gcv -O2 -DXXH_VECTOR=XXH_RVV" LDFLAGS="-static" CC=$XCC RUN_ENV="$XEMU -cpu rv64,v=true,vlen=128,rvv_ta_all_1s=on,rvv_ma_all_1s=on" make clean check
++        CPPFLAGS="-march=rv64gcv -O2 -DXXH_VECTOR=XXH_RVV" LDFLAGS="-static" CC=$XCC RUN_ENV="$XEMU -cpu rv64,v=true,vlen=256,rvv_ta_all_1s=on,rvv_ma_all_1s=on" make clean check
++        CPPFLAGS="-march=rv64gcv -O2 -DXXH_VECTOR=XXH_RVV" LDFLAGS="-static" CC=$XCC RUN_ENV="$XEMU -cpu rv64,v=true,vlen=512,rvv_ta_all_1s=on,rvv_ma_all_1s=on" make clean check
++
+     - name: LoongArch (XXH_VECTOR=[ scalar, LSX ])
+       if: ${{ startsWith(matrix.name, 'LoongArch') }}
+       run: |
+@@ -527,65 +539,81 @@ jobs:
+   windows-visualc-general:
+     name: ${{ matrix.system.vc }}, ${{ matrix.arch }}
+     runs-on: ${{ matrix.system.os }}   # Runs-on foreach value of strategy.matrix.system.os
++    env:
++      SRC_DIR: build/cmake
+     strategy:
+       fail-fast: false  # 'false' means: Don't stop matrix workflows even if some matrix failed.
+       matrix:
+         system: [
+           { os: windows-2022, vc: "VC++ 2022", clangcl: 'true', },
+-          { os: windows-2019, vc: "VC++ 2019", clangcl: 'true', },
+         ]
+         arch: [ x64, Win32, ARM64 ]
++    # make every PowerShell step start with `$ErrorActionPreference = 'Stop'`
++    defaults:
++      run:
++        shell: pwsh -NoLogo -NoProfile -Command "$ErrorActionPreference='Stop'; $PSNativeCommandUseErrorActionPreference=$true; & {0}"
+ 
+     steps:
+     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+ 
+     - name: Build ${{ matrix.system.os }}, ${{ matrix.arch }}
+       run: |
+-        cd cmake_unofficial
+-        mkdir build
+-        cd build
+-        cmake .. -DCMAKE_BUILD_TYPE=Release -A ${{ matrix.arch }} -DCMAKE_C_FLAGS="/W4 /WX"
+-        cmake --build . --config Release
++        $BUILD_DIR   = "$env:GITHUB_WORKSPACE\cmake_visual_${{ matrix.arch }}"
++        $INSTALL_DIR = "C:/install"
++
++        cmake -S $env:SRC_DIR -B $BUILD_DIR `
++              -A "${{ matrix.arch }}" `
++              -DCMAKE_C_FLAGS="/W4 /WX"
+ 
+-    - name: Test
++        cmake --build $BUILD_DIR --config Release --parallel
++        cmake --install $BUILD_DIR --config Release --prefix $INSTALL_DIR
++
++    - name: Test produced binary
+       # Run benchmark for testing only if target arch is x64 or Win32.
+       if: ${{ matrix.arch == 'x64' || matrix.arch == 'Win32' }}
+       run: |
+-        .\cmake_unofficial\build\Release\xxhsum.exe -bi1
++        C:\install\bin\xxhsum.exe -bi1
++
+ 
+     - name: Build ${{ matrix.system.os }}, ${{ matrix.arch }}, with DISPATCH
+       # DISPATCH only if target arch is x64 or Win32.
+       if: ${{ ( matrix.arch == 'x64' || matrix.arch == 'Win32' ) }}
+       run: |
+-        cd cmake_unofficial
+-        mkdir build-visual-dispatch
+-        cd build-visual-dispatch
+-        cmake .. -DCMAKE_BUILD_TYPE=Release -DDISPATCH=ON -A x64 -DCMAKE_C_FLAGS="/W4 /WX"
+-        cmake --build . --config Release
++        $BUILD_DIR = "$env:GITHUB_WORKSPACE\cmake_visual_dispatch_${{ matrix.arch }}"
++        $INSTALL_DIR = "C:/install_dispatch"
+ 
+-    - name: Runtime Test (DISPATCH)
+-      # Run benchmark for testing only if target arch is x64 or Win32.
+-      if: ${{ ( matrix.arch == 'x64' || matrix.arch == 'Win32' ) }}
+-      run: |
+-        .\cmake_unofficial\build-visual-dispatch\Release\xxhsum.exe -V | grep autoVec
+-        .\cmake_unofficial\build-visual-dispatch\Release\xxhsum.exe -bi1
++        cmake -S $env:SRC_DIR -B $BUILD_DIR `
++              -A "${{ matrix.arch }}" `
++              -DDISPATCH=ON `
++              -DCMAKE_C_FLAGS="/W4 /WX"
++
++        cmake --build $BUILD_DIR --config Release --parallel
++        cmake --install $BUILD_DIR --config Release --prefix $INSTALL_DIR
++
++        # Runtime test bundled, this they have same $arch conditions
++        $exe = "$INSTALL_DIR\bin\xxhsum.exe"
++        & "$exe" -V   | Select-String autoVec   # PowerShell’s ‘grep’
++        & "$exe" -bi1
+ 
+ 
+     - name: Build ${{ matrix.system.os }}, clang-cl, ${{ matrix.arch }}
+       if: ${{ matrix.system.clangcl == 'true' }}
+       run: |
+-        cd cmake_unofficial
+-        mkdir build-clang-cl
+-        cd build-clang-cl
+-        cmake .. -DCMAKE_BUILD_TYPE=Release -A x64 -DCMAKE_GENERATOR_TOOLSET=ClangCL
+-        cmake --build . --config Release
++        $BUILD_DIR = "$env:GITHUB_WORKSPACE\cmake_visual_cl_${{ matrix.arch }}"
++
++        cmake -S $env:SRC_DIR -B $BUILD_DIR `
++              -A "${{ matrix.arch }}" `
++              -DCMAKE_GENERATOR_TOOLSET=ClangCL `
++              -DCMAKE_C_FLAGS="/W4 /WX"
++
++        cmake --build $BUILD_DIR --config Release --parallel
++        cmake --install $BUILD_DIR --config Release --prefix "C:/install_cl"
+ 
+     - name: Test (clang-cl)
+       # Run benchmark for testing only if target arch is x64 or Win32.
+       if: ${{ matrix.system.clangcl == 'true' && ( matrix.arch == 'x64' || matrix.arch == 'Win32' ) }}
+       run: |
+-        .\cmake_unofficial\build-clang-cl\Release\xxhsum.exe -bi1
+-
++        C:\install_cl\bin\xxhsum.exe -bi1
+ 
+ 
+   # Windows, { mingw64, mingw32 }
+diff --git a/.github/workflows/scorecard.yml b/.github/workflows/scorecard.yml
+index c44e0b2..fd50bdd 100644
+--- a/.github/workflows/scorecard.yml
++++ b/.github/workflows/scorecard.yml
+@@ -37,7 +37,7 @@ jobs:
+           persist-credentials: false
+ 
+       - name: "Run analysis"
+-        uses: ossf/scorecard-action@0864cf19026789058feabb7e87baa5f140aac736 # v2.3.1
++        uses: ossf/scorecard-action@05b42c624433fc40578a4040d5cf5e36ddca8cde # v2.4.2
+         with:
+           results_file: results.sarif
+           results_format: sarif
+@@ -59,7 +59,7 @@ jobs:
+       # Upload the results as artifacts (optional). Commenting out will disable uploads of run results in SARIF
+       # format to the repository Actions tab.
+       - name: "Upload artifact"
+-        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
++        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+         with:
+           name: SARIF file
+           path: results.sarif
+diff --git a/.gitignore b/.gitignore
+index b88c1cc..d0661ef 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -21,6 +21,7 @@ dispatch
+ tests/generate_unicode_test
+ tests/sanity_test
+ tests/sanity_test_vectors_generator
++tests/test_alias
+ fuzzer
+ 
+ # Mac OS-X artefacts
+@@ -32,8 +33,10 @@ fuzzer
+ *.wasm
+ *.js
+ 
+-# CMake build directories
+-build*/
++# build artifacts
++cachedObjs/
++cmakebuild/
++
+ 
+ # project managers artifacts
+ .projectile
+diff --git a/Doxyfile b/Doxyfile
+index a2597db..d25dd1e 100644
+--- a/Doxyfile
++++ b/Doxyfile
+@@ -2,7 +2,7 @@
+ DOXYFILE_ENCODING      = UTF-8
+ 
+ PROJECT_NAME           = "xxHash"
+-PROJECT_NUMBER         = "0.8.2"
++PROJECT_NUMBER         = "0.8.3"
+ PROJECT_BRIEF          = "Extremely fast non-cryptographic hash function"
+ OUTPUT_DIRECTORY       = doxygen
+ OUTPUT_LANGUAGE        = English
+diff --git a/Makefile b/Makefile
+index 5b7b8ff..a9fa95a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -24,7 +24,6 @@
+ # ################################################################
+ # xxhsum: provides 32/64 bits hash of one or multiple files, or stdin
+ # ################################################################
+-Q = $(if $(filter 1,$(V) $(VERBOSE)),,@)
+ 
+ # Version numbers
+ SED ?= sed
+@@ -37,6 +36,7 @@ LIBVER_MINOR := $(shell echo $(LIBVER_MINOR_SCRIPT))
+ LIBVER_PATCH := $(shell echo $(LIBVER_PATCH_SCRIPT))
+ LIBVER := $(LIBVER_MAJOR).$(LIBVER_MINOR).$(LIBVER_PATCH)
+ 
++MAKEFLAGS += --no-print-directory
+ CFLAGS ?= -O3
+ DEBUGFLAGS+=-Wall -Wextra -Wconversion -Wcast-qual -Wcast-align -Wshadow \
+             -Wstrict-aliasing=1 -Wswitch-enum -Wdeclaration-after-statement \
+@@ -46,7 +46,6 @@ DEBUGFLAGS+=-Wall -Wextra -Wconversion -Wcast-qual -Wcast-align -Wshadow \
+ CFLAGS += $(DEBUGFLAGS) $(MOREFLAGS)
+ FLAGS   = $(CFLAGS) $(CPPFLAGS)
+ XXHSUM_VERSION = $(LIBVER)
+-UNAME := $(shell uname)
+ 
+ # Define *.exe as extension for Windows systems
+ ifneq (,$(filter Windows%,$(OS)))
+@@ -60,6 +59,11 @@ detect_x86_arch = $(shell $(CC) -dumpmachine | grep -E 'i[3-6]86|x86_64')
+ ifneq ($(strip $(call detect_x86_arch)),)
+     #note: can be overridden at compile time, by setting DISPATCH=0
+     DISPATCH ?= 1
++else
++    ifeq ($(DISPATCH),1)
++        $(info "Note: DISPATCH=1 is only supported on x86/x64 targets")
++    endif
++    override DISPATCH := 0
+ endif
+ 
+ ifeq ($(NODE_JS),1)
+@@ -71,6 +75,7 @@ endif
+ 
+ # OS X linker doesn't support -soname, and use different extension
+ # see: https://developer.apple.com/library/mac/documentation/DeveloperTools/Conceptual/DynamicLibraries/100-Articles/DynamicLibraryDesignGuidelines.html
++UNAME ?= $(shell uname)
+ ifeq ($(UNAME), Darwin)
+ 	SHARED_EXT = dylib
+ 	SHARED_EXT_MAJOR = $(LIBVER_MAJOR).$(SHARED_EXT)
+@@ -85,114 +90,102 @@ endif
+ 
+ LIBXXH = libxxhash.$(SHARED_EXT_VER)
+ 
+-XXHSUM_SRC_DIR = cli
+-XXHSUM_SPLIT_SRCS = $(XXHSUM_SRC_DIR)/xxhsum.c \
+-                    $(XXHSUM_SRC_DIR)/xsum_os_specific.c \
+-                    $(XXHSUM_SRC_DIR)/xsum_arch.c \
+-                    $(XXHSUM_SRC_DIR)/xsum_output.c \
+-                    $(XXHSUM_SRC_DIR)/xsum_sanity_check.c \
+-                    $(XXHSUM_SRC_DIR)/xsum_bench.c
+-XXHSUM_SPLIT_OBJS = $(XXHSUM_SPLIT_SRCS:.c=.o)
+-XXHSUM_HEADERS = $(XXHSUM_SRC_DIR)/xsum_config.h \
+-                 $(XXHSUM_SRC_DIR)/xsum_arch.h \
+-                 $(XXHSUM_SRC_DIR)/xsum_os_specific.h \
+-                 $(XXHSUM_SRC_DIR)/xsum_output.h \
+-                 $(XXHSUM_SRC_DIR)/xsum_sanity_check.h \
+-                 $(XXHSUM_SRC_DIR)/xsum_bench.h
++CLI_DIR = cli
++CLI_SRCS = $(wildcard $(CLI_DIR)/*.c)
++CLI_OBJS = $(CLI_SRCS:.c=.o)
+ 
++## define default before including multiconf.make
+ ## generate CLI and libraries in release mode (default for `make`)
+ .PHONY: default
+ default: DEBUGFLAGS=
+ default: lib xxhsum_and_links
+ 
++C_SRCDIRS = . $(CLI_DIR) fuzz
++include build/make/multiconf.make
++
+ .PHONY: all
+ all: lib xxhsum xxhsum_inlinedXXH
+ 
+ ## xxhsum is the command line interface (CLI)
+ ifeq ($(DISPATCH),1)
+ xxhsum: CPPFLAGS += -DXXHSUM_DISPATCH=1
+-xxhsum: xxh_x86dispatch.o
++XXHSUM_ADD_O = xxh_x86dispatch.o
+ endif
+-xxhsum: xxhash.o $(XXHSUM_SPLIT_OBJS)
+-	$(CC) $(FLAGS) $^ $(LDFLAGS) -o $@$(EXT)
+-
+-xxhsum32: CFLAGS += -m32  ## generate CLI in 32-bits mode
+-xxhsum32: xxhash.c $(XXHSUM_SPLIT_SRCS) ## do not generate object (avoid mixing different ABI)
+-	$(CC) $(FLAGS) $^ $(LDFLAGS) -o $@$(EXT)
+-
+-## dispatch only works for x86/x64 systems
+-dispatch: CPPFLAGS += -DXXHSUM_DISPATCH=1
+-dispatch: xxhash.o xxh_x86dispatch.o $(XXHSUM_SPLIT_SRCS)
+-	$(CC) $(FLAGS) $^ $(LDFLAGS) -o $@$(EXT)
+-
+-xxhash.o: xxhash.c xxhash.h
+-xxhsum.o: $(XXHSUM_SRC_DIR)/xxhsum.c $(XXHSUM_HEADERS) \
+-    xxhash.h xxh_x86dispatch.h
+-xxh_x86dispatch.o: xxh_x86dispatch.c xxh_x86dispatch.h xxhash.h
++$(eval $(call c_program,xxhsum,xxhash.o $(CLI_OBJS) $(XXHSUM_ADD_O)))
+ 
+ .PHONY: xxhsum_and_links
+ xxhsum_and_links: xxhsum xxh32sum xxh64sum xxh128sum xxh3sum
+ 
++LN ?= ln
++
+ xxh32sum xxh64sum xxh128sum xxh3sum: xxhsum
+-	ln -sf $<$(EXT) $@$(EXT)
++	$(LN) -sf $<$(EXT) $@$(EXT)
++
++## generate CLI in 32-bits mode
++xxhsum32: CFLAGS += -m32
++ifeq ($(DISPATCH),1)
++xxhsum32: CPPFLAGS += -DXXHSUM_DISPATCH=1
++endif
++$(eval $(call c_program,xxhsum32,xxhash.o $(CLI_OBJS) $(XXHSUM_ADD_O)))
++
++## Warning: dispatch only works for x86/x64 systems
++dispatch: CPPFLAGS += -DXXHSUM_DISPATCH=1
++$(eval $(call c_program,dispatch,xxhash.o xxh_x86dispatch.o $(CLI_OBJS)))
+ 
+ xxhsum_inlinedXXH: CPPFLAGS += -DXXH_INLINE_ALL
+-xxhsum_inlinedXXH: $(XXHSUM_SPLIT_SRCS)
+-	$(CC) $(FLAGS) $< -o $@$(EXT)
++$(eval $(call c_program,xxhsum_inlinedXXH,$(CLI_OBJS)))
+ 
+ 
++# =================================================
+ # library
+ 
+-libxxhash.a: ARFLAGS = rcs
+-libxxhash.a: xxhash.o
+-	$(AR) $(ARFLAGS) $@ $^
++libxxhash.a:
++$(eval $(call static_library,libxxhash.a,xxhash.o))
+ 
+-$(LIBXXH): LDFLAGS += -shared
++$(LIBXXH): LDFLAGS += $(SONAME_FLAGS)
+ ifeq (,$(filter Windows%,$(OS)))
+ $(LIBXXH): CFLAGS += -fPIC
+ endif
+-ifeq ($(LIBXXH_DISPATCH),1)
+-$(LIBXXH): xxh_x86dispatch.c
+-endif
+-$(LIBXXH): xxhash.c
+-	$(CC) $(FLAGS) $^ $(LDFLAGS) $(SONAME_FLAGS) -o $@
+-	ln -sf $@ libxxhash.$(SHARED_EXT_MAJOR)
+-	ln -sf $@ libxxhash.$(SHARED_EXT)
++LIBXXHASH_OBJS := xxhash.o $(if $(filter 1,$(LIBXXH_DISPATCH)),xxh_x86dispatch.o)
++$(eval $(call c_dynamic_library,$(LIBXXH),$(LIBXXHASH_OBJS)))
+ 
+-.PHONY: libxxhash
+-libxxhash:  ## generate dynamic xxhash library
+-libxxhash: $(LIBXXH)
++libxxhash.$(SHARED_EXT_MAJOR): $(LIBXXH)
++	$(LN) -sf $< $@
+ 
+-.PHONY: lib
+-lib:  ## generate static and dynamic xxhash libraries
++libxxhash.$(SHARED_EXT): libxxhash.$(SHARED_EXT_MAJOR)
++	$(LN) -sf $< $@
++
++.PHONY: libxxhash  ## generate dynamic xxhash library
++libxxhash: $(LIBXXH) libxxhash.$(SHARED_EXT_MAJOR) libxxhash.$(SHARED_EXT)
++
++.PHONY: lib  ## generate static and dynamic xxhash libraries
+ lib: libxxhash.a libxxhash
+ 
++
+ # helper targets
+ 
+-AWK  = awk
+-GREP = grep
+-SORT = sort
+-NM   = nm
++AWK  ?= awk
++GREP ?= grep
++SORT ?= sort
++NM   ?= nm
+ 
+ .PHONY: list
+ list:  ## list all Makefile targets
+-	$(Q)$(MAKE) -pRrq -f $(lastword $(MAKEFILE_LIST)) : 2>/dev/null | $(AWK) -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | $(SORT) | egrep -v -e '^[^[:alnum:]]' -e '^$@$$' | xargs
++	$(MAKE) -pRrq -f $(lastword $(MAKEFILE_LIST)) : 2>/dev/null | $(AWK) -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | $(SORT) | egrep -v -e '^[^[:alnum:]]' -e '^$@$$' | xargs
+ 
+ .PHONY: help
+ help:  ## list documented targets
+-	$(Q)$(GREP) -E '^[0-9a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
++	$(GREP) -E '^[0-9a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
+ 	$(SORT) | \
+ 	$(AWK) 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+ 
+ .PHONY: clean
+-clean:  ## remove all build artifacts
+-	$(Q)$(RM) -r *.dSYM   # Mac OS-X specific
+-	$(Q)$(RM) core *.o *.obj *.$(SHARED_EXT) *.$(SHARED_EXT).* *.a libxxhash.pc
+-	$(Q)$(RM) xxhsum$(EXT) xxhsum32$(EXT) xxhsum_inlinedXXH$(EXT) dispatch$(EXT)
+-	$(Q)$(RM) xxhsum.wasm xxhsum.js xxhsum.html
+-	$(Q)$(RM) xxh32sum$(EXT) xxh64sum$(EXT) xxh128sum$(EXT) xxh3sum$(EXT)
+-	$(Q)$(RM) fuzzer
+-	$(Q)$(RM) $(XXHSUM_SRC_DIR)/*.o $(XXHSUM_SRC_DIR)/*.obj
++clean:
++	$(RM) -r *.dSYM   # Mac OS-X specific
++	$(RM) core *.o *.obj *.$(SHARED_EXT) *.$(SHARED_EXT).* *.a libxxhash.pc
++	$(RM) xxhsum.wasm xxhsum.js xxhsum.html
++	$(RM) xxh32sum$(EXT) xxh64sum$(EXT) xxh128sum$(EXT) xxh3sum$(EXT)
++	$(RM) fuzzer
+ 	$(MAKE) -C tests clean
+ 	$(MAKE) -C tests/bench clean
+ 	$(MAKE) -C tests/collisions clean
+@@ -329,11 +322,12 @@ test-xxhsum-c: xxhsum
+ 	cat .test.filenames | $(RUN_ENV) ./xxhsum$(EXT) --filelist
+ 	@$(RM) .test.*
+ 
+-LIB_FUZZING_ENGINE?="-fsanitize=fuzzer"
+-CC_VERSION := $(shell $(CC) --version)
++CC_VERSION := $(shell $(CC) --version 2>/dev/null)
+ ifneq (,$(findstring clang,$(CC_VERSION)))
+-fuzzer: libxxhash.a fuzz/fuzzer.c
+-	$(CC) $(CFLAGS) $(LIB_FUZZING_ENGINE) -I. -o fuzzer fuzz/fuzzer.c -L. -Wl,-Bstatic -lxxhash -Wl,-Bdynamic
++fuzzer: CFLAGS += -fsanitize=fuzzer
++$(eval $(call c_program,fuzzer, fuzz/fuzzer.o xxhash.o))
++else
++fuzzer: this_target_requires_clang # intentional fail
+ endif
+ 
+ .PHONY: test-filename-escape
+@@ -349,22 +343,27 @@ test-cli-ignore-missing:
+ 	$(MAKE) -C tests test_cli_ignore_missing
+ 
+ .PHONY: armtest
+-armtest: clean
++armtest:
+ 	@echo ---- test ARM compilation ----
+ 	CC=arm-linux-gnueabi-gcc MOREFLAGS="-Werror -static" $(MAKE) xxhsum
+ 
++.PHONY: arm64test
++arm64test:
++	@echo ---- test ARM64 compilation ----
++	CC=aarch64-linux-gnu-gcc MOREFLAGS="-Werror -static" $(MAKE) xxhsum
++
+ .PHONY: clangtest
+-clangtest: clean
++clangtest:
+ 	@echo ---- test clang compilation ----
+ 	CC=clang MOREFLAGS="-Werror -Wconversion -Wno-sign-conversion" $(MAKE) all
+ 
+ .PHONY: gcc-og-test
+-gcc-og-test: clean
++gcc-og-test:
+ 	@echo ---- test gcc -Og compilation ----
+ 	CFLAGS="-Og -Wall -Wextra -Wundef -Wshadow -Wcast-align -Werror -fPIC" CPPFLAGS="-DXXH_NO_INLINE_HINTS" MOREFLAGS="-Werror" $(MAKE) all
+ 
+ .PHONY: cxxtest
+-cxxtest: clean
++cxxtest:
+ 	@echo ---- test C++ compilation ----
+ 	CC="$(CXX) -Wno-deprecated" $(MAKE) all CFLAGS="-O3 -Wall -Wextra -Wundef -Wshadow -Wcast-align -Werror -fPIC"
+ 
+@@ -420,7 +419,6 @@ usan: CC=clang
+ usan: CXX=clang++
+ usan:  ## check CLI runtime for undefined behavior, using clang's sanitizer
+ 	@echo ---- check undefined behavior - sanitize ----
+-	$(MAKE) clean
+ 	$(MAKE) test CC=$(CC) CXX=$(CXX) MOREFLAGS="-g -fsanitize=undefined -fno-sanitize-recover=all"
+ 
+ .PHONY: staticAnalyze
+@@ -439,13 +437,13 @@ cppcheck:  ## check C source files using $(CPPCHECK) static analyzer
+ namespaceTest:  ## ensure XXH_NAMESPACE redefines all public symbols
+ 	$(CC) -c xxhash.c
+ 	$(CC) -DXXH_NAMESPACE=TEST_ -c xxhash.c -o xxhash2.o
+-	$(CC) xxhash.o xxhash2.o $(XXHSUM_SPLIT_SRCS)  -o xxhsum2  # will fail if one namespace missing (symbol collision)
++	$(CC) xxhash.o xxhash2.o $(CLI_SRCS)  -o xxhsum2  # will fail if one namespace missing (symbol collision)
+ 	$(RM) *.o xxhsum2  # clean
+ 
+-MAN = $(XXHSUM_SRC_DIR)/xxhsum.1
++MAN = $(CLI_DIR)/xxhsum.1
+ MD2ROFF ?= ronn
+ MD2ROFF_FLAGS ?= --roff --warnings --manual="User Commands" --organization="xxhsum $(XXHSUM_VERSION)"
+-$(MAN): $(XXHSUM_SRC_DIR)/xxhsum.1.md xxhash.h
++$(MAN): $(CLI_DIR)/xxhsum.1.md xxhash.h
+ 	cat $< | $(MD2ROFF) $(MD2ROFF_FLAGS) | $(SED) -n '/^\.\\\".*/!p' > $@
+ 
+ .PHONY: man
+@@ -530,7 +528,7 @@ listL120:  # extract lines >= 120 characters in *.{c,h}, by Takayuki Matsuoka (n
+ 
+ .PHONY: trailingWhitespace
+ trailingWhitespace:
+-	! $(GREP) -E "`printf '[ \\t]$$'`" cli/*.c cli/*.h cli/*.1 *.c *.h LICENSE Makefile cmake_unofficial/CMakeLists.txt
++	! $(GREP) -E "`printf '[ \\t]$$'`" cli/*.c cli/*.h cli/*.1 *.c *.h LICENSE Makefile build/cmake/CMakeLists.txt
+ 
+ .PHONY: lint-unicode
+ lint-unicode:
+@@ -565,7 +563,7 @@ else
+ PKGCONFIGDIR ?= $(LIBDIR)/pkgconfig
+ endif
+ 
+-ifneq (,$(filter $(UNAME),OpenBSD FreeBSD NetBSD DragonFly SunOS))
++ifneq (,$(filter $(UNAME),OpenBSD NetBSD DragonFly SunOS))
+ MANDIR  ?= $(PREFIX)/man/man1
+ else
+ MANDIR  ?= $(man1dir)
+@@ -608,7 +606,7 @@ endif
+ 
+ libxxhash.pc: libxxhash.pc.in
+ 	@echo creating pkgconfig
+-	$(Q)$(SED) $(SED_ERE_OPT) -e 's|@PREFIX@|$(PREFIX)|' \
++	$(SED) $(SED_ERE_OPT) -e 's|@PREFIX@|$(PREFIX)|' \
+           -e 's|@EXECPREFIX@|$(PCEXECDIR)|' \
+           -e 's|@LIBDIR@|$$\{exec_prefix\}/$(PCLIBDIR)|' \
+           -e 's|@INCLUDEDIR@|$$\{prefix\}/$(PCINCDIR)|' \
+@@ -618,46 +616,46 @@ libxxhash.pc: libxxhash.pc.in
+ 
+ install_libxxhash.a: libxxhash.a
+ 	@echo Installing libxxhash.a
+-	$(Q)$(MAKE_DIR) $(DESTDIR)$(LIBDIR)
+-	$(Q)$(INSTALL_DATA) libxxhash.a $(DESTDIR)$(LIBDIR)
++	$(MAKE_DIR) $(DESTDIR)$(LIBDIR)
++	$(INSTALL_DATA) libxxhash.a $(DESTDIR)$(LIBDIR)
+ 
+ install_libxxhash: libxxhash
+ 	@echo Installing libxxhash
+-	$(Q)$(MAKE_DIR) $(DESTDIR)$(LIBDIR)
+-	$(Q)$(INSTALL_PROGRAM) $(LIBXXH) $(DESTDIR)$(LIBDIR)
+-	$(Q)ln -sf $(LIBXXH) $(DESTDIR)$(LIBDIR)/libxxhash.$(SHARED_EXT_MAJOR)
+-	$(Q)ln -sf $(LIBXXH) $(DESTDIR)$(LIBDIR)/libxxhash.$(SHARED_EXT)
++	$(MAKE_DIR) $(DESTDIR)$(LIBDIR)
++	$(INSTALL_PROGRAM) $(LIBXXH) $(DESTDIR)$(LIBDIR)
++	ln -sf $(LIBXXH) $(DESTDIR)$(LIBDIR)/libxxhash.$(SHARED_EXT_MAJOR)
++	ln -sf libxxhash.$(SHARED_EXT_MAJOR) $(DESTDIR)$(LIBDIR)/libxxhash.$(SHARED_EXT)
+ 
+ install_libxxhash.includes:
+-	$(Q)$(INSTALL) -d -m 755 $(DESTDIR)$(INCLUDEDIR)   # includes
+-	$(Q)$(INSTALL_DATA) xxhash.h $(DESTDIR)$(INCLUDEDIR)
+-	$(Q)$(INSTALL_DATA) xxh3.h $(DESTDIR)$(INCLUDEDIR) # for compatibility, will be removed in v0.9.0
++	$(INSTALL) -d -m 755 $(DESTDIR)$(INCLUDEDIR)   # includes
++	$(INSTALL_DATA) xxhash.h $(DESTDIR)$(INCLUDEDIR)
++	$(INSTALL_DATA) xxh3.h $(DESTDIR)$(INCLUDEDIR) # for compatibility, will be removed in v0.9.0
+ ifeq ($(LIBXXH_DISPATCH),1)
+-	$(Q)$(INSTALL_DATA) xxh_x86dispatch.h $(DESTDIR)$(INCLUDEDIR)
++	$(INSTALL_DATA) xxh_x86dispatch.h $(DESTDIR)$(INCLUDEDIR)
+ endif
+ 
+ install_libxxhash.pc: libxxhash.pc
+ 	@echo Installing pkgconfig
+-	$(Q)$(MAKE_DIR) $(DESTDIR)$(PKGCONFIGDIR)/
+-	$(Q)$(INSTALL_DATA) libxxhash.pc $(DESTDIR)$(PKGCONFIGDIR)/
++	$(MAKE_DIR) $(DESTDIR)$(PKGCONFIGDIR)/
++	$(INSTALL_DATA) libxxhash.pc $(DESTDIR)$(PKGCONFIGDIR)/
+ 
+ install_xxhsum: xxhsum
+ 	@echo Installing xxhsum
+-	$(Q)$(MAKE_DIR) $(DESTDIR)$(BINDIR)/
+-	$(Q)$(INSTALL_PROGRAM) xxhsum $(DESTDIR)$(BINDIR)/xxhsum
+-	$(Q)ln -sf xxhsum $(DESTDIR)$(BINDIR)/xxh32sum
+-	$(Q)ln -sf xxhsum $(DESTDIR)$(BINDIR)/xxh64sum
+-	$(Q)ln -sf xxhsum $(DESTDIR)$(BINDIR)/xxh128sum
+-	$(Q)ln -sf xxhsum $(DESTDIR)$(BINDIR)/xxh3sum
++	$(MAKE_DIR) $(DESTDIR)$(BINDIR)/
++	$(INSTALL_PROGRAM) xxhsum$(EXT) $(DESTDIR)$(BINDIR)/xxhsum$(EXT)
++	ln -sf xxhsum$(EXT) $(DESTDIR)$(BINDIR)/xxh32sum$(EXT)
++	ln -sf xxhsum$(EXT) $(DESTDIR)$(BINDIR)/xxh64sum$(EXT)
++	ln -sf xxhsum$(EXT) $(DESTDIR)$(BINDIR)/xxh128sum$(EXT)
++	ln -sf xxhsum$(EXT) $(DESTDIR)$(BINDIR)/xxh3sum$(EXT)
+ 
+ install_man:
+ 	@echo Installing man pages
+-	$(Q)$(MAKE_DIR) $(DESTDIR)$(MANDIR)/
+-	$(Q)$(INSTALL_DATA) $(MAN) $(DESTDIR)$(MANDIR)/xxhsum.1
+-	$(Q)ln -sf xxhsum.1 $(DESTDIR)$(MANDIR)/xxh32sum.1
+-	$(Q)ln -sf xxhsum.1 $(DESTDIR)$(MANDIR)/xxh64sum.1
+-	$(Q)ln -sf xxhsum.1 $(DESTDIR)$(MANDIR)/xxh128sum.1
+-	$(Q)ln -sf xxhsum.1 $(DESTDIR)$(MANDIR)/xxh3sum.1
++	$(MAKE_DIR) $(DESTDIR)$(MANDIR)/
++	$(INSTALL_DATA) $(MAN) $(DESTDIR)$(MANDIR)/xxhsum.1
++	ln -sf xxhsum.1 $(DESTDIR)$(MANDIR)/xxh32sum.1
++	ln -sf xxhsum.1 $(DESTDIR)$(MANDIR)/xxh64sum.1
++	ln -sf xxhsum.1 $(DESTDIR)$(MANDIR)/xxh128sum.1
++	ln -sf xxhsum.1 $(DESTDIR)$(MANDIR)/xxh3sum.1
+ 
+ .PHONY: install
+ ## install libraries, CLI, links and man pages
+@@ -666,24 +664,24 @@ install: install_libxxhash.a install_libxxhash install_libxxhash.includes instal
+ 
+ .PHONY: uninstall
+ uninstall:  ## uninstall libraries, CLI, links and man page
+-	$(Q)$(RM) $(DESTDIR)$(LIBDIR)/libxxhash.a
+-	$(Q)$(RM) $(DESTDIR)$(LIBDIR)/libxxhash.$(SHARED_EXT)
+-	$(Q)$(RM) $(DESTDIR)$(LIBDIR)/libxxhash.$(SHARED_EXT_MAJOR)
+-	$(Q)$(RM) $(DESTDIR)$(LIBDIR)/$(LIBXXH)
+-	$(Q)$(RM) $(DESTDIR)$(INCLUDEDIR)/xxhash.h
+-	$(Q)$(RM) $(DESTDIR)$(INCLUDEDIR)/xxh3.h
+-	$(Q)$(RM) $(DESTDIR)$(INCLUDEDIR)/xxh_x86dispatch.h
+-	$(Q)$(RM) $(DESTDIR)$(PKGCONFIGDIR)/libxxhash.pc
+-	$(Q)$(RM) $(DESTDIR)$(BINDIR)/xxh32sum
+-	$(Q)$(RM) $(DESTDIR)$(BINDIR)/xxh64sum
+-	$(Q)$(RM) $(DESTDIR)$(BINDIR)/xxh128sum
+-	$(Q)$(RM) $(DESTDIR)$(BINDIR)/xxh3sum
+-	$(Q)$(RM) $(DESTDIR)$(BINDIR)/xxhsum
+-	$(Q)$(RM) $(DESTDIR)$(MANDIR)/xxh32sum.1
+-	$(Q)$(RM) $(DESTDIR)$(MANDIR)/xxh64sum.1
+-	$(Q)$(RM) $(DESTDIR)$(MANDIR)/xxh128sum.1
+-	$(Q)$(RM) $(DESTDIR)$(MANDIR)/xxh3sum.1
+-	$(Q)$(RM) $(DESTDIR)$(MANDIR)/xxhsum.1
++	$(RM) $(DESTDIR)$(LIBDIR)/libxxhash.a
++	$(RM) $(DESTDIR)$(LIBDIR)/libxxhash.$(SHARED_EXT)
++	$(RM) $(DESTDIR)$(LIBDIR)/libxxhash.$(SHARED_EXT_MAJOR)
++	$(RM) $(DESTDIR)$(LIBDIR)/$(LIBXXH)
++	$(RM) $(DESTDIR)$(INCLUDEDIR)/xxhash.h
++	$(RM) $(DESTDIR)$(INCLUDEDIR)/xxh3.h
++	$(RM) $(DESTDIR)$(INCLUDEDIR)/xxh_x86dispatch.h
++	$(RM) $(DESTDIR)$(PKGCONFIGDIR)/libxxhash.pc
++	$(RM) $(DESTDIR)$(BINDIR)/xxh32sum
++	$(RM) $(DESTDIR)$(BINDIR)/xxh64sum
++	$(RM) $(DESTDIR)$(BINDIR)/xxh128sum
++	$(RM) $(DESTDIR)$(BINDIR)/xxh3sum
++	$(RM) $(DESTDIR)$(BINDIR)/xxhsum
++	$(RM) $(DESTDIR)$(MANDIR)/xxh32sum.1
++	$(RM) $(DESTDIR)$(MANDIR)/xxh64sum.1
++	$(RM) $(DESTDIR)$(MANDIR)/xxh128sum.1
++	$(RM) $(DESTDIR)$(MANDIR)/xxh3sum.1
++	$(RM) $(DESTDIR)$(MANDIR)/xxhsum.1
+ 	@echo xxhsum successfully uninstalled
+ 
+ endif
+diff --git a/README.md b/README.md
+index a634d1a..d376ba2 100644
+--- a/README.md
++++ b/README.md
+@@ -141,6 +141,9 @@ The following macros can be set at compilation time to modify `libxxhash`'s beha
+                    But one-shot hashing (like `XXH32()`) or streaming using statically allocated states
+                    still work as expected.
+                    This build flag is useful for embedded environments without dynamic allocation.
++- `XXH_memcpy`, `XXH_memset`, `XXH_memcmp` : redirect `memcpy()`, `memset()` and `memcmp()` to some user-selected symbol at compile time.
++                   Redirecting all 3 removes the need to include `<string.h>` standard library.
++- `XXH_NO_EXTERNC_GUARD`: When `xxhash.h` is compiled in C++ mode, removes the `extern "C" { .. }` block guard.
+ - `XXH_DEBUGLEVEL` : When set to any value >= 1, enables `assert()` statements.
+                      This (slightly) slows down execution, but may help finding bugs during debugging sessions.
+ 
+@@ -167,11 +170,13 @@ The following macros can be set at compilation time to modify `libxxhash`'s beha
+ - `XXH_PREFETCH_DIST` : select prefetching distance. For close-to-metal adaptation to specific hardware platforms. XXH3 only.
+ - `XXH_NO_PREFETCH` : disable prefetching. Some platforms or situations may perform better without prefetching. XXH3 only.
+ 
++#### Build modifiers for `xxhsum` CLI
++- `XXH_1ST_SPEED_TARGET` : select an initial speed target, expressed in MB/s, for the first speed test in benchmark mode. Benchmark will adjust the target at subsequent iterations, but the first test is made "blindly" by targeting this speed. Currently conservatively set to 10 MB/s, to support very slow (emulated) platforms.
++
+ #### Makefile variables
+ When compiling the Command Line Interface `xxhsum` using `make`, the following environment variables can also be set :
+ - `DISPATCH=1` : use `xxh_x86dispatch.c`, select at runtime between `scalar`, `sse2`, `avx2` or `avx512` instruction set. This option is only valid for `x86`/`x64` systems. It is enabled by default when target `x86`/`x64` is detected. It can be forcefully turned off using `DISPATCH=0`.
+ - `LIBXXH_DISPATCH=1` : same idea, implemented a runtime vector extension detector, but within `libxxhash`. This parameter is disabled by default. When enabled (only valid for `x86`/`x64` systems), new symbols published in `xxh_x86dispatch.h` become accessible. At the time of this writing, it's required to include `xxh_x86dispatch.h` in order to access the symbols with runtime vector extension detection.
+-- `XXH_1ST_SPEED_TARGET` : select an initial speed target, expressed in MB/s, for the first speed test in benchmark mode. Benchmark will adjust the target at subsequent iterations, but the first test is made "blindly" by targeting this speed. Currently conservatively set to 10 MB/s, to support very slow (emulated) platforms.
+ - `NODE_JS=1` : When compiling `xxhsum` for Node.js with Emscripten, this links the `NODERAWFS` library for unrestricted filesystem access and patches `isatty` to make the command line utility correctly detect the terminal. This does make the binary specific to Node.js.
+ 
+ ### Building xxHash - Using vcpkg
+diff --git a/appveyor.yml b/appveyor.yml
+index 7aef900..3ea35a1 100644
+--- a/appveyor.yml
++++ b/appveyor.yml
+@@ -1,115 +1,147 @@
+-#---------------------------------#
+-#      general configuration      #
+-#---------------------------------#
++# ==============================================================================
++#                            AppVeyor CI Configuration
++# ==============================================================================
++
+ version: 1.0.{build}
+ max_jobs: 2
+-
+-#---------------------------------#
+-#    environment configuration    #
+-#---------------------------------#
+ clone_depth: 2
++
++# ==============================================================================
++#                              Build Matrix
++# ==============================================================================
++
+ environment:
+   matrix:
+-  - COMPILER: "visual"
+-    ARCH: "x64"
+-    TEST_XXHSUM: "true"
+-  - COMPILER: "visual"
+-    ARCH: "Win32"
+-    TEST_XXHSUM: "true"
+-  - COMPILER: "visual"
+-    ARCH: "Win32"
+-    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
+-    TEST_XXHSUM: "true"
+-  - COMPILER: "visual"
+-    ARCH: "ARM"
+-# Below tests are now disabled due to redundancy.
+-# Their equivalent already runs correctly on Github Actions.
+-#  - COMPILER: "visual"
+-#    ARCH: "x64"
+-#    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+-#    TEST_XXHSUM: "true"
+-#  - COMPILER: "visual"
+-#    ARCH: "ARM64"
+-#    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+-#    # note: ARM64 is not available with Visual Studio 14 2015, which is default for Appveyor
+-
+-# The following tests were also flacky on Appveyor, for various reasons.
+-#  - COMPILER: "gcc"
+-#    PLATFORM: "mingw64"
+-#  - COMPILER: "gcc"
+-#    PLATFORM: "mingw32"
+-#  - COMPILER: "gcc"
+-#    PLATFORM: "clang"
+-
+-install:
+-  - ECHO Installing %COMPILER% %PLATFORM% %ARCH%
+-  - MKDIR bin
+-  - if [%COMPILER%]==[gcc] SET PATH_ORIGINAL=%PATH%
+-  - if [%COMPILER%]==[gcc] (
+-      SET "PATH_MINGW32=c:\MinGW\bin;c:\MinGW\usr\bin" &&
+-      SET "PATH_MINGW64=c:\msys64\mingw64\bin;c:\msys64\usr\bin" &&
+-      COPY C:\MinGW\bin\mingw32-make.exe C:\MinGW\bin\make.exe &&
+-      COPY C:\MinGW\bin\gcc.exe C:\MinGW\bin\cc.exe
+-    )
+-
+-#---------------------------------#
+-#       build configuration       #
+-#---------------------------------#
++    # Visual Studio 2017 build (not supported by GitHub Actions) - both Win32 and x64
++    - COMPILER: "visual"
++      ARCHS: "Win32,x64"
++      AVX2: "true"
++      APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2017"
++      TEST_XXHSUM: "true"
++
++    # Visual Studio 2019 build (no longer supported by GitHub Actions) - Win32 and x64
++    - COMPILER: "visual"
++      ARCHS: "Win32,x64"
++      AVX2: "true"
++      APPVEYOR_BUILD_WORKER_IMAGE: "Visual Studio 2019"
++      TEST_XXHSUM: "true"
++
++    # ARM build (no testing - cannot run on x86/x64 CI)
++    - COMPILER: "visual"
++      ARCHS: "ARM"
++      AVX2: "false"
++      TEST_XXHSUM: "false"
++
++# ==============================================================================
++#                              Build Scripts
++# ==============================================================================
++
+ build_script:
+-  - if [%PLATFORM%]==[mingw32] SET PATH=%PATH_MINGW32%;%PATH_ORIGINAL%
+-  - if [%PLATFORM%]==[mingw64] SET PATH=%PATH_MINGW64%;%PATH_ORIGINAL%
+-  - if [%PLATFORM%]==[clang]   SET PATH=%PATH_MINGW64%;%PATH_ORIGINAL%
+-  - ECHO ***
+-  - ECHO Building %COMPILER% %PLATFORM% %ARCH%
+-  - ECHO ***
+-
+-  - if [%COMPILER%]==[gcc] (
+-      if [%PLATFORM%]==[clang] (
+-        clang -v
+-      ) ELSE (
+-        gcc -v
+-      )
+-    )
+-  - if [%COMPILER%]==[gcc] (
+-      echo ----- &&
+-      make -v &&
+-      echo ----- &&
+-      if not [%PLATFORM%]==[clang] (
+-        if [%PLATFORM%]==[mingw32] ( SET CPPFLAGS=-DPOOL_MT=0 ) &&
+-        make -B clean test MOREFLAGS=-Werror
+-      ) ELSE (
+-        SET CXXFLAGS=--std=c++14 &&
+-        make -B clean test CC=clang CXX=clang++ MOREFLAGS="--target=x86_64-w64-mingw32 -Werror -Wno-pass-failed" NO_C90_TEST=true
+-      ) &&
+-      make -C tests/bench
+-    )
+-    # note 1: strict c90 tests with clang fail, due to (erroneous) presence on `inline` keyword in some included system file
+-    # note 2: multi-threading code doesn't work with mingw32, disabled through POOL_MT=0
+-    # note 3: clang requires C++14 to compile sort because its own code contains c++14-only code
+-
+-  - if [%COMPILER%]==[visual] (
+-      cd cmake_unofficial &&
+-      cmake . -DCMAKE_BUILD_TYPE=Release -A %ARCH% -DXXHASH_C_FLAGS="/WX" &&
+-      cmake --build . --config Release
+-    )
+-
+-#---------------------------------#
+-#       tests configuration       #
+-#---------------------------------#
++  - echo "========================================"
++  - echo "Building Visual Studio configurations"
++  - echo "========================================"
++
++  # Visual Studio build process
++  - ps: |
++      Set-Location "build/cmake"
++
++      # Split architectures and build each one
++      $architectures = $env:ARCHS -split ","
++
++      foreach ($arch in $architectures) {
++        $arch = $arch.Trim()
++        Write-Host "========================================"
++        Write-Host "Building for architecture: $arch"
++        Write-Host "========================================"
++
++        # Create architecture-specific build directory
++        $buildDir = "build_$arch"
++        New-Item -Path $buildDir -ItemType Directory -Force | Out-Null
++        Set-Location $buildDir
++
++        # Configure CMake for this architecture with fast Debug builds
++        cmake .. -A $arch -DXXHASH_C_FLAGS="/W4 /WX" -DCMAKE_C_FLAGS_DEBUG="/Od /Zi /MDd"
++
++        # Build Debug configuration (fast compilation, no optimizations)
++        Write-Host "Building Debug configuration for $arch..."
++        cmake --build . --config Debug
++
++        # Build Debug with SSE2 if Win32 (x64 has SSE2 by default, ARM doesn't support it)
++        if ($arch -eq "Win32") {
++          Write-Host "Building Debug configuration with SSE2 for $arch..."
++          cmake .. -A $arch -DXXHASH_C_FLAGS="/W4 /WX /arch:SSE2" -DCMAKE_C_FLAGS_DEBUG="/Od /Zi /MDd"
++          cmake --build . --config Debug
++        }
++
++        # Build Debug with AVX2 if enabled and supported
++        if ($env:AVX2 -eq "true" -and $arch -ne "ARM") {
++          Write-Host "Building Debug configuration with AVX2 for $arch..."
++          cmake .. -A $arch -DXXHASH_C_FLAGS="/W4 /WX /arch:AVX2" -DCMAKE_C_FLAGS_DEBUG="/Od /Zi /MDd"
++          cmake --build . --config Debug
++        }
++
++        # Build Release configuration
++        Write-Host "Building Release configuration for $arch..."
++        cmake --build . --config Release
++
++        # Go back to cmake directory for next architecture
++        Set-Location ..
++      }
++
++# ==============================================================================
++#                              Test Scripts
++# ==============================================================================
++
+ test_script:
+-  # note: can only run x86 and x64 binaries on Appveyor
+-  # note: if %COMPILER%==gcc, xxhsum was already tested within `make test`
+-  - if [%TEST_XXHSUM%]==[true] (
+-      ECHO ***  &&
+-      ECHO Testing %COMPILER% %PLATFORM% %ARCH%  &&
+-      ECHO ***  &&
+-      cd Release &&
+-      xxhsum.exe -bi1 &&
+-      ECHO ------- xxhsum tested -------
+-    )
+-
+-
+-#---------------------------------#
+-#      artifacts configuration    #
+-#---------------------------------#
+-# none yet
++  # Test xxhsum Release binaries (only for x86/x64 architectures that can run on CI)
++  - ps: |
++      if ($env:TEST_XXHSUM -eq "true") {
++        Set-Location "build/cmake"
++
++        # Split architectures and test each one
++        $architectures = $env:ARCHS -split ","
++
++        foreach ($arch in $architectures) {
++          $arch = $arch.Trim()
++
++          # Only test architectures that can run on CI (x86/x64)
++          if ($arch -eq "ARM") {
++            Write-Host "Skipping testing for $arch (cannot run on x86/x64 CI)"
++            continue
++          }
++
++          Write-Host "========================================"
++          Write-Host "Testing Visual Studio $arch"
++          Write-Host "========================================"
++
++          Set-Location "build_$arch"
++
++          # Test Release configuration only
++          Write-Host "Testing Release binary for $arch..."
++          Set-Location "Release"
++          cmd /c "xxhsum.exe -b99i0"
++          if ($LASTEXITCODE -ne 0) {
++            Write-Host "Release xxhsum.exe failed for $arch with exit code $LASTEXITCODE"
++            exit 1
++          }
++          Write-Host "Release binary test completed successfully for $arch"
++
++          # Go back to cmake directory for next architecture
++          Set-Location "../.."
++        }
++
++        Write-Host "------- All xxhsum testing completed successfully -------"
++      }
++
++# ==============================================================================
++#                              Artifacts
++# ==============================================================================
++# Currently no artifacts are collected
++# Future: Consider collecting built binaries for distribution
++
++# ==============================================================================
++#                              Build Notes
++# ==============================================================================
++# 1. ARM/ARM64 builds cannot be tested on x86/x64 CI infrastructure
++# 2. AppVeyor focuses on legacy Visual Studio versions (2013, 2015, 2017)
++# 3. Modern Visual Studio versions (2019, 2022) are tested on GitHub Actions
+diff --git a/cmake_unofficial/.gitignore b/build/cmake/.gitignore
+similarity index 94%
+rename from cmake_unofficial/.gitignore
+rename to build/cmake/.gitignore
+index 93d9fe4..7c0faa2 100644
+--- a/cmake_unofficial/.gitignore
++++ b/build/cmake/.gitignore
+@@ -5,6 +5,8 @@ CMakeFiles
+ Makefile
+ cmake_install.cmake
+ 
++build
++
+ 
+ # make compilation results
+ 
+diff --git a/cmake_unofficial/CMakeLists.txt b/build/cmake/CMakeLists.txt
+similarity index 99%
+rename from cmake_unofficial/CMakeLists.txt
+rename to build/cmake/CMakeLists.txt
+index 89242ec..9fdccb2 100644
+--- a/cmake_unofficial/CMakeLists.txt
++++ b/build/cmake/CMakeLists.txt
+@@ -7,7 +7,7 @@
+ 
+ cmake_minimum_required (VERSION 3.10 FATAL_ERROR)
+ 
+-set(XXHASH_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
++set(XXHASH_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../..")
+ 
+ file(STRINGS "${XXHASH_DIR}/xxhash.h" XXHASH_VERSION_MAJOR REGEX "^#define XXH_VERSION_MAJOR +([0-9]+) *$")
+ string(REGEX REPLACE "^#define XXH_VERSION_MAJOR +([0-9]+) *$" "\\1" XXHASH_VERSION_MAJOR "${XXHASH_VERSION_MAJOR}")
+diff --git a/cmake_unofficial/JoinPaths.cmake b/build/cmake/JoinPaths.cmake
+similarity index 100%
+rename from cmake_unofficial/JoinPaths.cmake
+rename to build/cmake/JoinPaths.cmake
+diff --git a/build/cmake/README.md b/build/cmake/README.md
+new file mode 100644
+index 0000000..871c894
+--- /dev/null
++++ b/build/cmake/README.md
+@@ -0,0 +1,54 @@
++
++# xxHash CMake Integration
++
++This document explains how to integrate xxHash into your CMake project. Choose the method that best fits your needs.
++
++## Method 1: Install and Import (Recommended)
++
++**Best for:** Projects that want to use xxHash as a system-wide library.
++
++### Step 1: Build and Install xxHash
++
++```bash
++cd /path/to/xxHash
++cmake -S build/cmake -B cmake_build
++cmake --build cmake_build --parallel
++cmake --install cmake_build
++```
++
++### Step 2: Use in Your Project
++
++Add to your `CMakeLists.txt`:
++
++```cmake
++find_package(xxHash 0.8 CONFIG REQUIRED)
++target_link_libraries(YourTarget PRIVATE xxHash::xxhash)
++```
++
++### Build Options
++
++Configure the build with these options:
++
++- `-DXXHASH_BUILD_XXHSUM=OFF` - Skip building the command line tool (default: ON)
++- `-DBUILD_SHARED_LIBS=OFF` - Build static library instead of shared (default: ON)
++- `-DCMAKE_INSTALL_PREFIX=/custom/path` - Install to custom location
++- `-DDISPATCH=OFF` - Disable CPU dispatch optimization (default: ON for x64)
++
++## Method 2: Add as Subdirectory
++
++**Best for:** Projects that want to bundle xxHash directly without system installation.
++
++Add to your `CMakeLists.txt`:
++
++```cmake
++# Optional: Configure xxHash before adding
++set(XXHASH_BUILD_XXHSUM OFF)        # Don't build command line tool
++option(BUILD_SHARED_LIBS OFF)       # Build static library
++
++# Add xxHash to your project
++add_subdirectory(path/to/xxHash/build/cmake xxhash_build EXCLUDE_FROM_ALL)
++
++# Link to your target
++target_link_libraries(YourTarget PRIVATE xxHash::xxhash)
++```
++
+diff --git a/cmake_unofficial/xxHashConfig.cmake.in b/build/cmake/xxHashConfig.cmake.in
+similarity index 100%
+rename from cmake_unofficial/xxHashConfig.cmake.in
+rename to build/cmake/xxHashConfig.cmake.in
+diff --git a/build/make/README.md b/build/make/README.md
+new file mode 100644
+index 0000000..fe4a177
+--- /dev/null
++++ b/build/make/README.md
+@@ -0,0 +1,71 @@
++# multiconf.make
++
++**multiconf.make** is a self-contained Makefile include that lets you build the **same targets under many different flag sets**. For example debug vs release, ASan vs UBSan, GCC vs Clang.
++Each different set of flags generates object files into its own **dedicated cache directory**, so objects compiled with one configuration are never reused by another.
++Object files from previous configurations are preserved, so swapping back to a previous configuration only requires compiling objects which have actually changed.
++
++---
++
++## Benefits at a glance
++
++| Benefit | What `multiconf.make` does |
++| --- | --- |
++| **Isolated configs** | Stores objects into `cachedObjs/<hash>/`, one directory per unique flag set. |
++| **Fast switching** | Reusing an old config is instant—link only, no recompilation. |
++| **Header deps** | Edits to headers trigger only needed rebuilds. |
++| **One-liner targets** | Macros (`c_program`, `cxx_program`, …) hide all rule boilerplate. |
++| **Parallel-ready** | Safe with `make -j`, no duplicate compiles of shared sources. |
++| **Controlled verbosity** | Default only lists objects, while `V=1` display full commands. |
++| **`clean` included** | `make clean` deletes all objects, binaries and links. |
++
++---
++
++## Quick Start
++
++### 1 · List your sources
++
++```make
++C_SRCDIRS   := src src/cdeps    # all .c are in these directories
++CXX_SRCDIRS := src src/cxxdeps  # all .cpp are in these directories
++```
++
++### 2 · Add and include
++
++```make
++# root/Makefile
++include multiconf.make
++```
++
++### 3 · Declare targets
++
++```make
++app:
++$(eval $(call c_program,app,app.o cdeps/obj.o))
++
++test:
++$(eval $(call cxx_program,test, test.o cxxdeps/objcxx.o))
++
++lib.a:
++$(eval $(call static_library,lib.a, lib.o cdeps/obj.o))
++
++lib.so:
++$(eval $(call c_dynamic_library,lib.so, lib.o cdeps/obj.o))
++```
++
++### 4 · Build any config you like
++
++```sh
++# Release with GCC
++make CFLAGS="-O3"
++
++# Debug with Clang + AddressSanitizer (new cache dir)
++make CC=clang CFLAGS="-g -O0 -fsanitize=address"
++
++# Switch back to GCC release (objects still valid, relink only)
++make CFLAGS="-O3"
++```
++
++Objects for each command live in different sub-folders; nothing overlaps.
++
++---
++
+diff --git a/build/make/multiconf.make b/build/make/multiconf.make
+new file mode 100644
+index 0000000..3b7419c
+--- /dev/null
++++ b/build/make/multiconf.make
+@@ -0,0 +1,293 @@
++# ##########################################################################
++# multiconf.make
++# Copyright (C) Yann Collet
++#
++# GPL v2 License
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License along
++# with this program; if not, write to the Free Software Foundation, Inc.,
++# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
++#
++# ##########################################################################
++
++
++# Provides c_program(_shared_o) and cxx_program(_shared_o) target generation macros
++# Provides static_library and c_dynamic_library target generation macros
++# Support recompilation of only impacted units when an associated *.h is updated.
++# Provides V=1 / VERBOSE=1 support. V=2 is used for debugging purposes.
++# Complement target clean: delete objects and binaries created by this script
++
++# Requires:
++# - C_SRCDIRS, CXX_SRCDIRS, ASM_SRCDIRS defined
++#   OR
++#   C_SRCS, CXX_SRCS and ASM_SRCS variables defined
++#   *and* vpath set to find all source files
++#   OR
++#   C_OBJS, CXX_OBJS and ASM_OBJS variables defined
++#   *and* vpath set to find all source files
++# - directory `cachedObjs/` available to cache object files.
++#   alternatively: set CACHE_ROOT to some different value.
++# Optional:
++# - HASH can be set to a different custom hash program.
++
++# *_program*: generates a recipe for a target that will be built in a cache directory.
++# The cache directory is automatically derived from CACHE_ROOT and list of flags and compilers.
++# *_shared_o* variants are optional optimization variants, that share the same objects across multiple targets.
++# However, as a consequence, all these objects must have exactly the same list of flags,
++# which in practice means that there must be no target-level modification (like: target: CFLAGS += someFlag).
++# If unsure, only use the standard variants, c_program and cxx_program.
++
++# All *_program* macro functions take up to 4 argument:
++# - The name of the target
++# - The list of object files to build in the cache directory
++# - An optional list of dependencies for linking, that will not be built
++# - An optional complementary recipe code, that will run after compilation and link
++
++
++# Silent mode is default; use V = 1 or VERBOSE = 1 to see compilation lines
++VERBOSE ?= $(V)
++$(VERBOSE).SILENT:
++
++# Directory where object files will be built
++CACHE_ROOT ?= cachedObjs
++
++# --------------------------------------------------------------------------------------------
++
++# Dependency management
++DEPFLAGS = -MT $@ -MMD -MP -MF
++
++# Include dependency files
++include $(wildcard $(CACHE_ROOT)/**/*.d)
++include $(wildcard $(CACHE_ROOT)/generic/*/*.d)
++
++# --------------------------------------------------------------------------------------------
++
++# Automatic determination of build artifacts cache directory, keyed on build
++# flags, so that we can do incremental, parallel builds of different binaries
++# with different build flags without collisions.
++
++UNAME ?= $(shell uname)
++ifeq ($(UNAME), Darwin)
++  HASH ?= md5
++else ifeq ($(UNAME), FreeBSD)
++  HASH ?= gmd5sum
++else ifeq ($(UNAME), OpenBSD)
++  HASH ?= md5
++endif
++HASH ?= md5sum
++
++HAVE_HASH := $(shell echo 1 | $(HASH) > /dev/null && echo 1 || echo 0)
++ifeq ($(HAVE_HASH),0)
++  $(info warning : could not find HASH ($(HASH)), required to differentiate builds using different flags)
++  HASH_FUNC = generic/$(1)
++else
++  HASH_FUNC = $(firstword $(shell echo $(2) | $(HASH) ))
++endif
++
++
++MKDIR ?= mkdir
++LN ?= ln
++
++# --------------------------------------------------------------------------------------------
++# The following macros are used to create object files in the cache directory.
++# The object files are named after the source file, but with a different path.
++
++# Create build directories on-demand.
++#
++# For some reason, make treats the directory as an intermediate file and tries
++# to delete it. So we work around that by marking it "precious". Solution found
++# here:
++# http://ismail.badawi.io/blog/2017/03/28/automatic-directory-creation-in-make/
++.PRECIOUS: $(CACHE_ROOT)/%/.
++$(CACHE_ROOT)/%/. :
++	$(MKDIR) -p $@
++
++
++define addTargetAsmObject  # targetName, addlDeps
++$$(if $$(filter 2,$$(V)),$$(info $$(call $(0),$(1),$(2))))
++
++.PRECIOUS: $$(CACHE_ROOT)/%/$(1)
++$$(CACHE_ROOT)/%/$(1) : $(1:.o=.S) $(2) | $$(CACHE_ROOT)/%/.
++	@echo AS $$@
++	$$(CC) $$(CPPFLAGS) $$(CXXFLAGS) $$(DEPFLAGS) $$(CACHE_ROOT)/$$*/$(1:.o=.d) -c $$< -o $$@
++
++endef # addTargetAsmObject
++
++define addTargetCObject  # targetName, addlDeps
++$$(if $$(filter 2,$$(V)),$$(info $$(call $(0),$(1),$(2)))) #debug print
++
++.PRECIOUS: $$(CACHE_ROOT)/%/$(1)
++$$(CACHE_ROOT)/%/$(1) : $(1:.o=.c) $(2) | $$(CACHE_ROOT)/%/.
++	@echo CC $$@
++	$$(CC) $$(CPPFLAGS) $$(CFLAGS) $$(DEPFLAGS) $$(CACHE_ROOT)/$$*/$(1:.o=.d) -c $$< -o $$@
++
++endef # addTargetCObject
++
++define addTargetCxxObject  # targetName, suffix, addlDeps
++$$(if $$(filter 2,$$(V)),$$(info $$(call $(0),$(1),$(2),$(3))))
++
++.PRECIOUS: $$(CACHE_ROOT)/%/$(1)
++$$(CACHE_ROOT)/%/$(1) : $(1:.o=.$(2)) $(3) | $$(CACHE_ROOT)/%/.
++	@echo CXX $$@
++	$$(CXX) $$(CPPFLAGS) $$(CXXFLAGS) $$(DEPFLAGS) $$(CACHE_ROOT)/$$*/$(1:.o=.d) -c $$< -o $$@
++
++endef # addTargetCxxObject
++
++# Create targets for individual object files
++C_SRCDIRS += .
++vpath %.c $(C_SRCDIRS)
++CXX_SRCDIRS += .
++vpath %.cpp $(CXX_SRCDIRS)
++vpath %.cc $(CXX_SRCDIRS)
++ASM_SRCDIRS += .
++vpath %.S $(ASM_SRCDIRS)
++
++# If C_SRCDIRS, CXX_SRCDIRS and ASM_SRCDIRS are not defined, use C_SRCS, CXX_SRCS and ASM_SRCS
++C_SRCS   ?= $(notdir $(foreach dir,$(C_SRCDIRS),$(wildcard $(dir)/*.c)))
++CPP_SRCS ?= $(notdir $(foreach dir,$(CXX_SRCDIRS),$(wildcard $(dir)/*.cpp)))
++CC_SRCS  ?= $(notdir $(foreach dir,$(CXX_SRCDIRS),$(wildcard $(dir)/*.cc)))
++CXX_SRCS ?= $(CPP_SRCS) $(CC_SRCS)
++ASM_SRCS ?= $(notdir $(foreach dir,$(ASM_SRCDIRS),$(wildcard $(dir)/*.S)))
++
++# If C_SRCS, CXX_SRCS and ASM_SRCS are not defined, use C_OBJS, CXX_OBJS and ASM_OBJS
++C_OBJS   ?= $(patsubst %.c,%.o,$(C_SRCS))
++CPP_OBJS ?= $(patsubst %.cpp,%.o,$(CPP_SRCS))
++CC_OBJS  ?= $(patsubst %.cc,%.o,$(CC_SRCS))
++CXX_OBJS ?= $(CPP_OBJS) $(CC_OBJS) # Note: not used
++ASM_OBJS ?= $(patsubst %.S,%.o,$(ASM_SRCS))
++
++$(foreach OBJ,$(C_OBJS),$(eval $(call addTargetCObject,$(OBJ))))
++$(foreach OBJ,$(CPP_OBJS),$(eval $(call addTargetCxxObject,$(OBJ),cpp)))
++$(foreach OBJ,$(CC_OBJS),$(eval $(call addTargetCxxObject,$(OBJ),cc)))
++$(foreach OBJ,$(ASM_OBJS),$(eval $(call addTargetAsmObject,$(OBJ))))
++
++# --------------------------------------------------------------------------------------------
++# The following macros are used to create targets in the user Makefile.
++# Binaries are built in the cache directory, and then symlinked to the current directory.
++# The cache directory is automatically derived from CACHE_ROOT and list of flags and compilers.
++
++
++# static_library - Create build rules for a static library with caching
++# Parameters:
++#   1. libName       - Library name (becomes output file and phony target)
++#   2. objectDeps    - Object file dependencies (will be built in cache path)
++# The following parameters are all optional:
++#   3. extraDeps     - Additional dependencies (no cache path prefix)
++#   4. postBuildCmds - Extra commands to run after AR
++#   5. extraHash     - Additional key to compute the unique cache path
++# Example:
++#   $(call static_library,libmath.a,vector.o matrix.o,$(CONFIG_H),strip $@,$(VERSION))
++define static_library  # libName, objectDeps, extraDeps, postBuildCmds, extraHash
++
++$$(if $$(filter 2,$$(V)),$$(info $$(call $(0),$(1),$(2),$(3),$(4),$(5))))
++MCM_ALL_BINS += $(1)
++
++$$(CACHE_ROOT)/%/$(1) : $$(addprefix $$(CACHE_ROOT)/%/,$(2)) $(3)
++	@echo AR $$@
++	$$(AR) $$(ARFLAGS) $$@ $$^
++	$(4)
++
++.PHONY: $(1)
++$(1) : ARFLAGS = rcs
++$(1) : $$(CACHE_ROOT)/$$(call HASH_FUNC,$(1),$(2) $$(CPPFLAGS) $$(CC) $$(CFLAGS) $$(CXX) $$(CXXFLAGS) $$(AR) $$(ARFLAGS) $(5))/$(1)
++	$$(LN) -sf $$< $$@
++
++endef # static_library
++
++
++# c_dynamic_library - Create build rules for a C dynamic/shared library with caching
++# Parameters:
++#   1. libName      - Library name (becomes output file and phony target)
++#   2. objectDeps   - Object file dependencies (will be built in cache path)
++# The following parameters are all optional:
++#   3. extraDeps    - Additional dependencies (no cache path prefix)
++#   4. postLinkCmds - Extra commands to run after linking
++#   5. extraHash    - Additional key to compute the unique cache path
++# Example:
++#   $(call c_dynamic_library,libmath.so,vector.o matrix.o,$(CONFIG_H),strip $@,$(VERSION))
++define c_dynamic_library  # libName, objectDeps, extraDeps, postLinkCmds, extraHash
++
++$$(if $$(filter 2,$$(V)),$$(info $$(call $(0),$(1),$(2),$(3),$(4),$(5))))
++MCM_ALL_BINS += $(1)
++
++$$(CACHE_ROOT)/%/$(1) : $$(addprefix $$(CACHE_ROOT)/%/,$(2)) $(3)
++	@echo LD $$@
++	$$(CC) $$(CPPFLAGS) $$(CFLAGS) $$(LDFLAGS) -shared -o $$@ $$^ $$(LDLIBS)
++	$(4)
++
++.PHONY: $(1)
++$(1) : CFLAGS += -fPIC
++$(1) : $$(CACHE_ROOT)/$$(call HASH_FUNC,$(1),$(2) $$(CPPFLAGS) $$(CC) $$(CFLAGS) $$(LDFLAGS) $$(LDLIBS) $(5))/$(1)
++	$$(LN) -sf $$< $$@
++
++endef # c_dynamic_library
++
++
++# program_base - Create build rules for an executable program with caching
++# Parameters:
++#   1. progName      - Executable name (becomes output file and phony target)
++#   2. objectDeps    - Object file dependencies (will be prefixed with cache path)
++# Parameters 3 to 5 are optional:
++#   3. extraDeps     - Additional dependencies (without cache path prefix)
++#   4. postLinkCmds  - Extra commands to run after linking
++#   5. extraHash     - Additional data to include in cache path hash
++# Parameters 6 & 7 are compulsory:
++#   6. compiler      - Variable name of compiler to use (CC or CXX)
++#   7. compilerFlags - Variable name of compiler flags to use (CFLAGS or CXXFLAGS)
++# Example:
++#   $(call program_base,myapp,main.o utils.o,$(CONFIG_H),strip $@,$(VERSION),CC,CFLAGS)
++#   $(call program_base,mycppapp,main.o utils.o,$(CONFIG_H),strip $@,$(VERSION),CXX,CXXFLAGS)
++define program_base  # progName, objectDeps, extraDeps, postLinkCmds, extraHash, compiler, compilerFlags
++
++$$(if $$(filter 2,$$(V)),$$(info $$(call $(0),$(1),$(2),$(3),$(4),$(5),$(6),$(7))))
++MCM_ALL_BINS += $(1)
++
++$$(CACHE_ROOT)/%/$(1) : $$(addprefix $$(CACHE_ROOT)/%/,$(2)) $(3)
++	@echo LD $$@
++	$$($(6)) $$(CPPFLAGS) $$($(7)) $$^ -o $$@ $$(LDFLAGS) $$(LDLIBS)
++	$(4)
++
++.PHONY: $(1)
++$(1) : $$(CACHE_ROOT)/$$(call HASH_FUNC,$(1),$$($(6)) $$(CPPFLAGS) $$($(7)) $$(LDFLAGS) $$(LDLIBS) $(5))/$(1)
++	$$(LN) -sf $$< $$@$(EXT)
++
++endef # program_base
++# Note: $(EXT) must be set to .exe for Windows
++
++define c_program  # progName, objectDeps, extraDeps, postLinkCmds
++$$(eval $$(call program_base,$(1),$(2),$(3),$(4),$(1)$(2),CC,CFLAGS))
++endef # c_program
++
++define c_program_shared_o  # progName, objectDeps, extraDeps, postLinkCmds
++$$(eval $$(call program_base,$(1),$(2),$(3),$(4),,CC,CFLAGS))
++endef # c_program_shared_o
++
++define cxx_program  # progName, objectDeps, extraDeps, postLinkCmds
++$$(eval $$(call program_base,$(1),$(2),$(3),$(4),$(1)$(2),CXX,CXXFLAGS))
++endef # cxx_program
++
++define cxx_program_shared_o  # progName, objectDeps, extraDeps, postLinkCmds
++$$(eval $$(call program_base,$(1),$(2),$(3),$(4),,CXX,CXXFLAGS))
++endef # cxx_program_shared_o
++
++# --------------------------------------------------------------------------------------------
++
++# Cleaning: delete all objects and binaries created by this script
++.PHONY: clean_cache
++clean_cache:
++	$(RM) -rf $(CACHE_ROOT)
++	$(RM) $(MCM_ALL_BINS)
++
++# automatically attach to standard clean target
++.PHONY: clean
++clean: clean_cache
+diff --git a/cli/xsum_arch.c b/cli/xsum_arch.c
+index 3540af4..a6ad0c5 100644
+--- a/cli/xsum_arch.c
++++ b/cli/xsum_arch.c
+@@ -25,7 +25,7 @@
+ 
+ int g_xsumarch_avoid_empty_unit = 0;
+ 
+-#if ((defined(__x86_64__) || defined(_M_AMD64) || defined(_M_X64)) && !defined(_M_ARM64EC)) || defined(__i386__) || defined(_M_IX86) || defined(_M_IX86_FP)
++#if ((defined(__x86_64__) || defined(_M_X64)) && !defined(_M_ARM64EC)) || defined(__i386__) || defined(_M_IX86) || defined(_M_IX86_FP)
+ #if defined(XXHSUM_DISPATCH)
+ 
+ #include "../xxh_x86dispatch.h"
+diff --git a/cli/xsum_arch.h b/cli/xsum_arch.h
+index aae7eaa..a8e2bec 100644
+--- a/cli/xsum_arch.h
++++ b/cli/xsum_arch.h
+@@ -79,7 +79,7 @@
+ #endif
+ 
+ /* makes the next part easier */
+-#if (defined(__x86_64__) || defined(_M_AMD64) || defined(_M_X64)) && !defined(_M_ARM64EC)
++#if (defined(__x86_64__) || defined(_M_X64)) && !defined(_M_ARM64EC)
+ #   define XSUM_ARCH_X64 1
+ #   define XSUM_ARCH_X86 "x86_64"
+ #elif defined(__i386__) || defined(_M_IX86) || defined(_M_IX86_FP)
+@@ -97,7 +97,7 @@
+ #    define XSUM_ARCH XSUM_ARCH_X86 " + AVX2"
+ #  elif defined(__AVX__)
+ #    define XSUM_ARCH XSUM_ARCH_X86 " + AVX"
+-#  elif defined(_M_X64) || defined(_M_AMD64) || defined(__x86_64__) \
++#  elif defined(_M_X64) || defined(__x86_64__) \
+       || defined(__SSE2__) || (defined(_M_IX86_FP) && _M_IX86_FP == 2)
+ #     define XSUM_ARCH XSUM_ARCH_X86 " + SSE2"
+ #  else
+@@ -162,8 +162,16 @@
+ #  else
+ #    define XSUM_ARCH "wasm/asmjs"
+ #  endif
++#elif defined(__riscv)
++#    define XSUM_ARCH "riscv"
+ #elif defined(__loongarch_lp64)
+-#  define XSUM_ARCH "loongarch"
++#  if defined(__loongarch_asx)
++#    define XSUM_ARCH "loongarch64 + lasx"
++#  elif defined(__loongarch_sx)
++#    define XSUM_ARCH "loongarch64 + lsx"
++#  else
++#    define XSUM_ARCH "loongarch64"
++#  endif
+ #else
+ #  define XSUM_ARCH "unknown"
+ #endif
+diff --git a/cli/xsum_config.h b/cli/xsum_config.h
+index eec5528..10ca6a0 100644
+--- a/cli/xsum_config.h
++++ b/cli/xsum_config.h
+@@ -50,6 +50,10 @@
+ #  endif
+ #endif
+ 
++#if defined(_MSC_VER)
++#  pragma warning(disable : 4127) /* disable: C4127: conditional expression is constant */
++#endif
++
+ /* Under Linux at least, pull in the *64 commands */
+ #ifndef _LARGEFILE64_SOURCE
+ #  define _LARGEFILE64_SOURCE
+@@ -170,11 +174,7 @@
+ #endif /* XSUM_WIN32_USE_WCHAR */
+ 
+ #ifndef XSUM_API
+-#  ifdef XXH_INLINE_ALL
+-#    define XSUM_API static
+-#  else
+-#    define XSUM_API
+-#  endif
++#  define XSUM_API
+ #endif
+ 
+ #ifndef XSUM_NO_TESTS
+diff --git a/cli/xsum_sanity_check.c b/cli/xsum_sanity_check.c
+index 98014d5..c83ec1f 100644
+--- a/cli/xsum_sanity_check.c
++++ b/cli/xsum_sanity_check.c
+@@ -342,7 +342,7 @@ static XSUM_U32 XSUM_rand(void)
+  * Technically, XXH3_64bits_update is identical to XXH3_128bits_update as of
+  * v0.8.0, but we treat them as separate.
+  */
+-typedef XXH_errorcode (*XSUM_XXH3_update_t)(XXH3_state_t* state, const void* input, size_t length);
++typedef XXH_errorcode (*XSUM_XXH3_update_t)(XXH_NOESCAPE XXH3_state_t* state, XXH_NOESCAPE const void* input, size_t length);
+ 
+ /*
+  * Runs the passed XXH3_update variant on random lengths. This is to test the
+@@ -412,7 +412,7 @@ static void XSUM_testXXH3(const void* data, const XSUM_testdata64_t* testData)
+ 
+         /* random ingestion */
+         (void)XXH3_64bits_reset_withSeed(state, seed);
+-        XSUM_XXH3_randomUpdate(state, data, len, &XXH3_64bits_update);
++        XSUM_XXH3_randomUpdate(state, data, len, XXH3_64bits_update);
+         XSUM_checkResult64(XXH3_64bits_digest(state), Nresult);
+ 
+         /* byte by byte ingestion */
+@@ -483,7 +483,7 @@ static void XSUM_testXXH3_withSecret(const void* data, const void* secret,
+ 
+         /* random ingestion */
+         (void)XXH3_64bits_reset_withSecret(state, secret, secretSize);
+-        XSUM_XXH3_randomUpdate(state, data, len, &XXH3_64bits_update);
++        XSUM_XXH3_randomUpdate(state, data, len, XXH3_64bits_update);
+         XSUM_checkResult64(XXH3_64bits_digest(state), Nresult);
+ 
+         /* byte by byte ingestion */
+@@ -565,7 +565,7 @@ static void XSUM_testXXH128(const void* data, const XSUM_testdata128_t* testData
+ 
+         /* random ingestion */
+         (void)XXH3_128bits_reset_withSeed(state, seed);
+-        XSUM_XXH3_randomUpdate(state, data, len, &XXH3_128bits_update);
++        XSUM_XXH3_randomUpdate(state, data, len, XXH3_128bits_update);
+         XSUM_checkResult128(XXH3_128bits_digest(state), Nresult);
+ 
+         /* byte by byte ingestion */
+@@ -632,7 +632,7 @@ static void XSUM_testXXH128_withSecret(const void* data, const void* secret, siz
+ 
+         /* random ingestion */
+         (void)XXH3_128bits_reset_withSecret(state, secret, secretSize);
+-        XSUM_XXH3_randomUpdate(state, data, len, &XXH3_128bits_update);
++        XSUM_XXH3_randomUpdate(state, data, len, XXH3_128bits_update);
+         XSUM_checkResult128(XXH3_128bits_digest(state), Nresult);
+ 
+         /* byte by byte ingestion */
+diff --git a/cli/xxhsum.1.md b/cli/xxhsum.1.md
+index 7f5c76d..e4ac9ea 100644
+--- a/cli/xxhsum.1.md
++++ b/cli/xxhsum.1.md
+@@ -64,7 +64,7 @@ OPTIONS
+   `stdin` is also a valid way to provide filenames (when no *FILE* or `-` provided).
+   Valid format is one filename per line, which can include embedded spaces, etc with no need for quotes, escapes, etc.
+   A line commencing with '\\' will enable the convention used in the encoding of filenames against output hashes,
+-  whereby subsequent \\\\, \n and \r seqeuences are converted to the single
++  whereby subsequent \\\\, \n and \r sequences are converted to the single
+   character 0x5C, 0x0A and 0x0D respectively.
+ 
+ ### The following options are useful only for checksum verification:
+diff --git a/cli/xxhsum.c b/cli/xxhsum.c
+index 046070d..116a5c9 100644
+--- a/cli/xxhsum.c
++++ b/cli/xxhsum.c
+@@ -35,12 +35,6 @@
+ #include "xsum_output.h"       /* XSUM_output */
+ #include "xsum_sanity_check.h" /* XSUM_sanityCheck */
+ #include "xsum_bench.h"        /* NBLOOPS_DEFAULT */
+-#ifdef XXH_INLINE_ALL
+-#  include "xsum_os_specific.c"
+-#  include "xsum_output.c"
+-#  include "xsum_sanity_check.c"
+-#  include "xsum_bench.c"
+-#endif
+ 
+ /* ************************************
+  *  Includes
+@@ -426,6 +420,7 @@ static LineStatus XSUM_hashFile(const char* fileName,
+         }
+         inFile = XSUM_fopen( fileName, "rb" );
+         if (inFile==NULL) {
++            XSUM_log("Error: unable to open input\n");
+             return LineStatus_failedToOpen;
+     }   }
+ 
+@@ -1396,22 +1391,23 @@ static int XSUM_usage(const char* exename)
+     XSUM_log( "Usage: %s [options] [files] \n\n", exename);
+     XSUM_log( "When no filename provided or when '-' is provided, uses stdin as input. \n");
+     XSUM_log( "\nOptions: \n");
+-    XSUM_log( "  -H#             select an xxhash algorithm (default: %i) \n", (int)g_defaultAlgo);
+-    XSUM_log( "                  0: XXH32 \n");
+-    XSUM_log( "                  1: XXH64 \n");
+-    XSUM_log( "                  2: XXH128 (also called XXH3_128bits) \n");
+-    XSUM_log( "                  3: XXH3 (also called XXH3_64bits) \n");
+-    XSUM_log( "  -c, --check     read xxHash checksum from [files] and check them \n");
+-    XSUM_log( "      --filelist  generate hashes for files listed in [files] \n");
+-    XSUM_log( "  -h, --help      display a long help page about advanced options \n");
++    XSUM_log( "  -H#                  select an xxhash algorithm (default: %i) \n", (int)g_defaultAlgo);
++    XSUM_log( "                       0: XXH32 \n");
++    XSUM_log( "                       1: XXH64 \n");
++    XSUM_log( "                       2: XXH128 (also called XXH3_128bits) \n");
++    XSUM_log( "                       3: XXH3 (also called XXH3_64bits) \n");
++    XSUM_log( "  -c, --check          read xxHash checksum from [files] and check them \n");
++    XSUM_log( "      --files-from     generate hashes for files listed in [files] \n");
++    XSUM_log( "      --filelist       generate hashes for files listed in [files] \n");
++    XSUM_log( "  -                    forces stdin as input, even if it's the console \n");
++    XSUM_log( "  -h, --help           display a long help page about advanced options \n");
+     return 0;
+ }
+ 
+-
+ static int XSUM_usage_advanced(const char* exename)
+ {
+     XSUM_usage(exename);
+-    XSUM_log( "\nAdvanced :\n");
++    XSUM_log( "\nAdvanced: \n");
+     XSUM_log( "  -V, --version        Display version information \n");
+     XSUM_log( "      --tag            Produce BSD-style checksum lines \n");
+     XSUM_log( "      --little-endian  Checksum values use little endian convention (default: big endian) \n");
+@@ -1658,8 +1654,10 @@ XSUM_API int XSUM_main(int argc, const char* argv[])
+     }
+ 
+     /* Check if input is defined as console; trigger an error in this case */
+-    if ( (filenamesStart==0) && XSUM_isConsole(stdin) && !explicitStdin)
+-        return XSUM_badusage(exename);
++    if ( (filenamesStart==0) && XSUM_isConsole(stdin) && !explicitStdin) {
++        XSUM_log("No input provided \n");
++        return 1;
++    }
+ 
+     if (filenamesStart==0) filenamesStart = argc;
+ 
+diff --git a/cmake_unofficial/README.md b/cmake_unofficial/README.md
+deleted file mode 100644
+index 3733912..0000000
+--- a/cmake_unofficial/README.md
++++ /dev/null
+@@ -1,37 +0,0 @@
+-
+-## Usage
+-
+-### Way 1: import targets
+-Build xxHash targets:
+-
+-    cd </path/to/xxHash/>
+-    mkdir build
+-    cd build
+-    cmake ../cmake_unofficial [options]
+-    cmake --build .
+-    cmake --build . --target install #optional
+-
+-Where possible options are:
+-- `-DXXHASH_BUILD_ENABLE_INLINE_API=<ON|OFF>`: adds xxhash.c for the `-DXXH_INLINE_ALL` api. ON by default.
+-- `-DXXHASH_BUILD_XXHSUM=<ON|OFF>`: build the command line binary. ON by default
+-- `-DBUILD_SHARED_LIBS=<ON|OFF>`: build dynamic library. ON by default.
+-- `-DCMAKE_INSTALL_PREFIX=<path>`: use custom install prefix path.
+-- `-DDISPATCH=<ON|OFF>`: enable dispatch mode. OFF by default.
+-
+-Add lines into downstream CMakeLists.txt:
+-
+-    find_package(xxHash 0.7 CONFIG REQUIRED)
+-    ...
+-    target_link_libraries(MyTarget PRIVATE xxHash::xxhash)
+-
+-### Way 2: Add subdirectory
+-Add lines into downstream CMakeLists.txt:
+-
+-    option(BUILD_SHARED_LIBS "Build shared libs" OFF) #optional
+-    ...
+-    set(XXHASH_BUILD_ENABLE_INLINE_API OFF) #optional
+-    set(XXHASH_BUILD_XXHSUM OFF) #optional
+-    add_subdirectory(</path/to/xxHash/cmake_unofficial/> </path/to/xxHash/build/> EXCLUDE_FROM_ALL)
+-    ...
+-    target_link_libraries(MyTarget PRIVATE xxHash::xxhash)
+-
+diff --git a/fuzz/fuzzer.c b/fuzz/fuzzer.c
+index 731ba4d..906853a 100644
+--- a/fuzz/fuzzer.c
++++ b/fuzz/fuzzer.c
+@@ -4,8 +4,8 @@
+ 
+ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+   volatile XXH64_hash_t hash64 = XXH64(data, size, 0);
+-  (void)hash64;
+   volatile XXH32_hash_t hash32 = XXH32(data, size, 0);
++  (void)hash64;
+   (void)hash32;
+   return 0;
+ }
+diff --git a/libxxhash.pc.in b/libxxhash.pc.in
+index fc59344..4842f6f 100644
+--- a/libxxhash.pc.in
++++ b/libxxhash.pc.in
+@@ -11,5 +11,6 @@ Name: xxhash
+ Description: extremely fast hash algorithm
+ URL: http://www.xxhash.com/
+ Version: @VERSION@
++License: BSD-2-clause
+ Libs: -L${libdir} -lxxhash
+ Cflags: -I${includedir}
+diff --git a/tests/Makefile b/tests/Makefile
+index b9e45b0..f1f60ae 100644
+--- a/tests/Makefile
++++ b/tests/Makefile
+@@ -23,13 +23,12 @@
+ #   - xxHash source repository: https://github.com/Cyan4973/xxHash
+ # ################################################################
+ 
++MAKEFLAGS += --no-print-directory
+ CFLAGS += -Wall -Wextra -Wundef -g
+ 
+ CP = cp
+ NM = nm
+ GREP = grep
+-XXHSUM_DIR = ..
+-XXHSUM = $(XXHSUM_DIR)/xxhsum
+ 
+ # Define *.exe as extension for Windows systems
+ ifneq (,$(filter Windows%,$(OS)))
+@@ -47,42 +46,44 @@ endif
+ .PHONY: default
+ default: all
+ 
++C_SRCDIRS = . .. ../cli
++include ../build/make/multiconf.make
++
+ .PHONY: all
+-all: test
++all: test test_alias
+ 
+ .PHONY: test
+ test: test_multiInclude test_unicode test_sanity
+ 
+ .PHONY: test_multiInclude
+ test_multiInclude:
+-	@$(MAKE) clean
+ 	# compile without xxhash.o, ensure symbols exist within target
+ 	# Note: built using only default rules
+ 	$(MAKE) multiInclude
+-	@$(MAKE) clean
++	$(RM) multiInclude
+ 	# compile with xxhash.o, to detect duplicated symbols
+ 	$(MAKE) multiInclude_withxxhash
+-	@$(MAKE) clean
++	$(RM) multiInclude_withxxhash
+ 	# compile with XXH_NAMESPACE before XXH_INLINE_ALL
+ 	CPPFLAGS=-DXXH_NAMESPACE=TESTN_ $(MAKE) multiInclude
+ 	# no symbol prefixed TESTN_ should exist
+ 	! $(NM) multiInclude | $(GREP) TESTN_
+-	$(MAKE) clean
++	$(RM) multiInclude
+ 	# compile xxhash.o with XXH_NAMESPACE
+ 	CPPFLAGS=-DXXH_NAMESPACE=TESTN_ $(MAKE) multiInclude_withxxhash
+ 	# symbols prefixed TESTN_ should exist in xxhash.o (though not be invoked)
+ 	$(NM) multiInclude_withxxhash | $(GREP) TESTN_
+-	$(MAKE) clean
++	$(RM) multiInclude_withxxhash
+ 
+ .PHONY: test_ppc_redefine
+-test_ppc_redefine: ppc_define.c
+-	@$(MAKE) clean
+-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $^
++test_ppc_redefine: ppc_define.o
++
++XXHSUM_OBJS = xxhash.o $(notdir $(patsubst %.c,%.o,$(wildcard ../cli/*.c)))
++xxhsum:
++$(eval $(call c_program,xxhsum,$(XXHSUM_OBJS)))
+ 
+-.PHONY: $(XXHSUM)
+-$(XXHSUM):
+-	$(MAKE) -C $(XXHSUM_DIR) xxhsum
+-	$(CP) $(XXHSUM) .
++generate_unicode_test:
++$(eval $(call c_program,generate_unicode_test,generate_unicode_test.o))
+ 
+ # Make sure that Unicode filenames work.
+ # https://github.com/Cyan4973/xxHash/issues/293
+@@ -92,24 +93,23 @@ test_unicode:
+ 	@echo "Skipping Unicode test, your terminal doesn't appear to support UTF-8."
+ 	@echo "Try with ENABLE_UNICODE=1"
+ else
+-test_unicode: $(XXHSUM) generate_unicode_test.c
++test_unicode: generate_unicode_test xxhsum
+ 	# Generate a Unicode filename test dynamically
+ 	# to keep UTF-8 out of the source tree.
+-	$(CC) $(CFLAGS) $(LDFLAGS) generate_unicode_test.c -o generate_unicode_test$(EXT)
+ 	./generate_unicode_test$(EXT)
+ 	$(SHELL) ./unicode_test.sh
+ endif
+ 
+ .PHONY: test_filename_escape
+-test_filename_escape: $(XXHSUM)
++test_filename_escape: xxhsum
+ 	./filename-escape.sh
+ 
+ .PHONY: test_cli_comment_line
+-test_cli_comment_line: $(XXHSUM)
++test_cli_comment_line: xxhsum
+ 	$(SHELL) ./cli-comment-line.sh
+ 
+ .PHONY: test_cli_ignore_missing
+-test_cli_ignore_missing: $(XXHSUM)
++test_cli_ignore_missing: xxhsum
+ 	$(SHELL) ./cli-ignore-missing.sh
+ 
+ .PHONY: test_sanity
+@@ -117,19 +117,23 @@ test_sanity: sanity_test.c
+ 	$(CC) $(CFLAGS) $(LDFLAGS) sanity_test.c -o sanity_test$(EXT)
+ 	$(RUN_ENV) ./sanity_test$(EXT)
+ 
++sanity_test_vectors_generator:
++$(eval $(call c_program,sanity_test_vectors_generator,sanity_test_vectors_generator.o))
++
+ .PHONY: sanity_test_vectors.h
+-sanity_test_vectors.h: sanity_test_vectors_generator.c
+-	$(CC) $(CFLAGS) $(LDFLAGS) sanity_test_vectors_generator.c -o sanity_test_vectors_generator$(EXT)
++sanity_test_vectors.h: sanity_test_vectors_generator
+ 	./sanity_test_vectors_generator$(EXT)
+ 
+-xxhash.o: ../xxhash.c ../xxhash.h
+-	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) -c -o $@ $<
++multiInclude_withxxhash:
++$(eval $(call c_program,multiInclude_withxxhash,multiInclude.o xxhash.o))
+ 
+-multiInclude_withxxhash: multiInclude.o xxhash.o
+-	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) -o $@ $^
++test_alias: CPPFLAGS += -I..
++test_alias: CFLAGS += -O3 -Werror
++$(eval $(call c_program,test_alias,test_alias.o))
+ 
++.PHONY: clean
+ clean:
+ 	@$(RM) *.o
+-	@$(RM) multiInclude multiInclude_withxxhash
+-	@$(RM) *.unicode generate_unicode_test$(EXT) unicode_test.* xxhsum*
++	@$(RM) multiInclude
++	@$(RM) *.unicode unicode_test.*
+ 	@$(RM) sanity_test$(EXT) sanity_test_vectors_generator$(EXT)
+diff --git a/tests/bench/Makefile b/tests/bench/Makefile
+index a7edd48..ec5d56f 100644
+--- a/tests/bench/Makefile
++++ b/tests/bench/Makefile
+@@ -52,11 +52,14 @@ benchHash_avx2: CXXFLAGS += -mavx2
+ benchHash_avx512: CFLAGS   += -mavx512f
+ benchHash_avx512: CXXFLAGS += -mavx512f
+ 
++benchHash_rvv: CFLAGS   += -march=rv64gcv -O2
++benchHash_rvv: CXXFLAGS += -march=rv64gcv -O2
++
+ benchHash_hw: CPPFLAGS += -DHARDWARE_SUPPORT
+ benchHash_hw: CFLAGS   += -mavx2 -maes
+ benchHash_hw: CXXFLAGS += -mavx2 -mpclmul -std=c++14
+ 
+-benchHash benchHash32 benchHash_avx2 benchHash_avx512 benchHash_nosimd benchHash_hw: $(OBJ_LIST)
++benchHash benchHash32 benchHash_avx2 benchHash_avx512 benchHash_nosimd benchHash_hw benchHash_rvv: $(OBJ_LIST)
+ 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ $(LDFLAGS) -o $@
+ 
+ 
+@@ -68,4 +71,4 @@ benchHash.o: benchHash.h
+ 
+ 
+ clean:
+-	$(RM) *.o benchHash benchHash32 benchHash_avx2 benchHash_avx512 benchHash_hw
++	$(RM) *.o benchHash benchHash32 benchHash_avx2 benchHash_avx512 benchHash_hw benchHash_rvv
+diff --git a/tests/bench/main.c b/tests/bench/main.c
+index 8a6b816..a0f1c4b 100644
+--- a/tests/bench/main.c
++++ b/tests/bench/main.c
+@@ -110,7 +110,7 @@ static int longCommandWArg(const char** stringPtr, const char* longCommand)
+ #  define SMALL_SIZE_MIN_DEFAULT   1
+ #endif
+ #ifndef SMALL_SIZE_MAX_DEFAULT
+-#  define SMALL_SIZE_MAX_DEFAULT 127
++#  define SMALL_SIZE_MAX_DEFAULT  30
+ #endif
+ #ifndef LARGE_SIZELOG_MIN_DEFAULT
+ #  define LARGE_SIZELOG_MIN_DEFAULT   9
+diff --git a/tests/collisions/Makefile b/tests/collisions/Makefile
+index eee4b59..208090f 100644
+--- a/tests/collisions/Makefile
++++ b/tests/collisions/Makefile
+@@ -23,9 +23,8 @@
+ #  - xxHash source repository: https://github.com/Cyan4973/xxHash
+ #
+ 
+-SRC_DIRS = ./ ../../ allcodecs/
+-VPATH = $(SRC_DIRS)
+-CPPFLAGS += $(addprefix -I ,$(SRC_DIRS))
++HEADER_DIRS = ./ ../../ allcodecs/
++CPPFLAGS += $(addprefix -I ,$(HEADER_DIRS))
+ CFLAGS   += -Wall -Wextra -Wconversion \
+             -std=c11
+ CXXFLAGS += -Wall -Wextra -Wconversion \
+@@ -33,28 +32,27 @@ CXXFLAGS += -Wall -Wextra -Wconversion \
+ LDFLAGS  += -pthread
+ TESTHASHES = 3200000
+ 
+-HASH_SRC := $(sort $(wildcard allcodecs/*.c allcodecs/*.cc))
+-HASH_OBJ := $(patsubst %.c,%.o,$(HASH_SRC))
+-
++HASH_SRC := $(wildcard allcodecs/*.c) $(wildcard allcodecs/*.cc) $(wildcard allcodecs/*.cpp)
++HASH_OBJ := $(addsuffix .o,$(basename $(HASH_SRC)))
+ 
+ .PHONY: default
+-default: release
+-
+-.PHONY: all
+-all: release
++default: collisionsTest
+ 
+-collisionsTest: main.o pool.o threading.o sort.o $(HASH_OBJ)
+-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ $(LDFLAGS) -o $@
++C_SRCDIRS = $(shell find allcodecs -type d)
++CXX_SRCDIRS = $(shell find allcodecs -type d)
++include ../../build/make/multiconf.make
+ 
+-main.o: hashes.h xxhash.h
++.PHONY: all
++all: collisionsTest
+ 
+-release: CXXFLAGS += -O3
+-release: CFLAGS += -O3
+-release: collisionsTest
++collisionsTest: CXXFLAGS := -O3 $(CXXFLAGS)
++collisionsTest: CFLAGS := -O3 $(CFLAGS)
++$(eval $(call cxx_program,collisionsTest,main.o pool.o threading.o sort.o $(HASH_OBJ)))
+ 
+-debug: CXXFLAGS += -g3 -O0 -DDEBUG
+-debug: CFLAGS += -g3 -O0 -DDEBUG
+-debug: collisionsTest
++.PHONY: debug
++debug: CPPFLAGS += -DDEBUG -DXXH_NO_INLINE_HINTS
++debug:
++	CFLAGS='$(CFLAGS) -g3 -Og' CXXFLAGS='$(CXXFLAGS) -g3 -Og' CPPFLAGS='$(CPPFLAGS)' $(MAKE) collisionsTest
+ 
+ .PHONY: check
+ check: test
+@@ -75,4 +73,3 @@ test: debug
+ .PHONY: clean
+ clean:
+ 	$(RM) *.o allcodecs/*.o
+-	$(RM) collisionsTest
+diff --git a/tests/multiInclude.c b/tests/multiInclude.c
+index 8912771..60668ec 100644
+--- a/tests/multiInclude.c
++++ b/tests/multiInclude.c
+@@ -61,15 +61,16 @@
+ 
+ void hash_advanced(void)
+ {
++    const char input[] = "Hello World !";
+     XXH3_state_t state;   /* this type is part of experimental API */
+ 
+     XXH3_64bits_reset(&state);
+-    const char input[] = "Hello World !";
+ 
+     XXH3_64bits_update(&state, input, sizeof(input));
+ 
+-    XXH64_hash_t const h = XXH3_64bits_digest(&state);
+-    printf("hash '%s': %08x%08x \n", input, (unsigned)(h >> 32), (unsigned)h);
++    {   XXH64_hash_t const h = XXH3_64bits_digest(&state);
++        printf("hash '%s': %08x%08x \n", input, (unsigned)(h >> 32), (unsigned)h);
++    }
+ }
+ 
+ int main(void)
+diff --git a/tests/sanity_test.c b/tests/sanity_test.c
+index 3e3d4f1..e933cd4 100644
+--- a/tests/sanity_test.c
++++ b/tests/sanity_test.c
+@@ -90,7 +90,7 @@ static XSUM_U8* createSanityBuffer(size_t bufferLenInBytes)
+ 
+ /* TODO : Share this function with sanity_check.c and xsum_sanity_check.c */
+ /*
+- * Delete (free) the buffer which has been genereated by createSanityBuffer()
++ * Delete (free) the buffer which has been generated by createSanityBuffer()
+  */
+ static void releaseSanityBuffer(XSUM_U8* buffer)
+ {
+@@ -286,7 +286,7 @@ static XSUM_U64 SANITY_TEST_computeRandSeed(size_t step)
+  * Technically, XXH3_64bits_update is identical to XXH3_128bits_update as of
+  * v0.8.0, but we treat them as separate.
+  */
+-typedef XXH_errorcode (*SANITY_TEST_XXH3_update_t)(XXH3_state_t* state, const void* input, size_t length);
++typedef XXH_errorcode (*SANITY_TEST_XXH3_update_t)(XXH_NOESCAPE XXH3_state_t* state, XXH_NOESCAPE const void* input, size_t length);
+ 
+ 
+ /* TODO : Share this function with xsum_sanity_check.c */
+diff --git a/tests/sanity_test_vectors_generator.c b/tests/sanity_test_vectors_generator.c
+index f910462..7c206b7 100644
+--- a/tests/sanity_test_vectors_generator.c
++++ b/tests/sanity_test_vectors_generator.c
+@@ -189,7 +189,7 @@ static XSUM_U8* createSanityBuffer(size_t bufferLenInBytes)
+ 
+ /* TODO : Share this function with sanity_check.c and xsum_sanity_check.c */
+ /*
+- * Delete (free) the buffer which has been genereated by createSanityBuffer()
++ * Delete (free) the buffer which has been generated by createSanityBuffer()
+  */
+ static void releaseSanityBuffer(XSUM_U8* buffer)
+ {
+diff --git a/tests/test_alias.c b/tests/test_alias.c
+new file mode 100644
+index 0000000..af1065f
+--- /dev/null
++++ b/tests/test_alias.c
+@@ -0,0 +1,18 @@
++#define XXH_INLINE_ALL
++
++#include <inttypes.h>
++#include <stdio.h>
++#include "xxhash.h"
++
++int main() {
++	// it seems this has to be exactly 24 bytes.
++	union {
++		char x[24];
++		// force 8-byte alignment without making
++		// aliasable with uint64_t.
++		void *y[3];
++	} data = {.x = "garblegarblegarblegarble"};
++	uint64_t hash = XXH64(&data, sizeof(data), 0);
++	printf("%016"PRIx64"\n", hash);
++	return 0;
++}
+diff --git a/xxh_x86dispatch.c b/xxh_x86dispatch.c
+index 03e7dc4..0c15820 100644
+--- a/xxh_x86dispatch.c
++++ b/xxh_x86dispatch.c
+@@ -632,7 +632,7 @@ typedef XXH128_hash_t (*XXH3_dispatchx86_hashLong128_default)(XXH_NOESCAPE const
+ 
+ typedef XXH128_hash_t (*XXH3_dispatchx86_hashLong128_withSeed)(XXH_NOESCAPE const void* XXH_RESTRICT, size_t, XXH64_hash_t);
+ 
+-typedef XXH128_hash_t (*XXH3_dispatchx86_hashLong128_withSecret)(XXH_NOESCAPE const void* XXH_RESTRICT, size_t, const void* XXH_RESTRICT, size_t);
++typedef XXH128_hash_t (*XXH3_dispatchx86_hashLong128_withSecret)(XXH_NOESCAPE const void* XXH_RESTRICT, size_t, XXH_NOESCAPE const void* XXH_RESTRICT, size_t);
+ 
+ typedef struct {
+     XXH3_dispatchx86_hashLong128_default    hashLong128_default;
+diff --git a/xxhash.h b/xxhash.h
+index 78fc2e8..9c819f9 100644
+--- a/xxhash.h
++++ b/xxhash.h
+@@ -241,7 +241,7 @@
+  * xxHash prototypes and implementation
+  */
+ 
+-#if defined (__cplusplus)
++#if defined(__cplusplus) && !defined(XXH_NO_EXTERNC_GUARD)
+ extern "C" {
+ #endif
+ 
+@@ -791,18 +791,9 @@ XXH_PUBLIC_API XXH_PUREF XXH32_hash_t XXH32_hashFromCanonical(const XXH32_canoni
+ #endif
+ /*! @endcond */
+ 
+-/*! @cond Doxygen ignores this part */
+-/*
+- * C23 __STDC_VERSION__ number hasn't been specified yet. For now
+- * leave as `201711L` (C17 + 1).
+- * TODO: Update to correct value when its been specified.
+- */
+-#define XXH_C23_VN 201711L
+-/*! @endcond */
+-
+ /*! @cond Doxygen ignores this part */
+ /* C-language Attributes are added in C23. */
+-#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= XXH_C23_VN) && defined(__has_c_attribute)
++#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 202311L) && defined(__has_c_attribute)
+ # define XXH_HAS_C_ATTRIBUTE(x) __has_c_attribute(x)
+ #else
+ # define XXH_HAS_C_ATTRIBUTE(x) 0
+@@ -1125,7 +1116,8 @@ XXH_PUBLIC_API XXH_PUREF XXH64_hash_t XXH64_hashFromCanonical(XXH_NOESCAPE const
+ #  define XXH_VSX    5 /*!< VSX and ZVector for POWER8/z13 (64-bit) */
+ #  define XXH_SVE    6 /*!< SVE for some ARMv8-A and ARMv9-A */
+ #  define XXH_LSX    7 /*!< LSX (128-bit SIMD) for LoongArch64 */
+-
++#  define XXH_LASX   8 /*!< LASX (256-bit SIMD) for LoongArch64 */
++#  define XXH_RVV    9 /*!< RVV (RISC-V Vector) for RISC-V */
+ 
+ /*-**********************************************************************
+ *  XXH3 64-bit variant
+@@ -1362,7 +1354,7 @@ XXH_PUBLIC_API XXH_errorcode XXH3_64bits_update (XXH_NOESCAPE XXH3_state_t* stat
+  *
+  * @see @ref streaming_example "Streaming Example"
+  */
+-XXH_PUBLIC_API XXH_PUREF XXH64_hash_t  XXH3_64bits_digest (XXH_NOESCAPE const XXH3_state_t* statePtr);
++XXH_PUBLIC_API XXH_PUREF XXH64_hash_t XXH3_64bits_digest (XXH_NOESCAPE const XXH3_state_t* statePtr);
+ #endif /* !XXH_NO_STREAM */
+ 
+ /* note : canonical representation of XXH3 is the same as XXH64
+@@ -1727,6 +1719,7 @@ struct XXH64_state_s {
+ #endif
+ 
+ /*!
++ * @internal
+  * @brief The size of the internal XXH3 buffer.
+  *
+  * This is the optimal update size for incremental hashing.
+@@ -1736,10 +1729,11 @@ struct XXH64_state_s {
+ #define XXH3_INTERNALBUFFER_SIZE 256
+ 
+ /*!
+- * @internal
+- * @brief Default size of the secret buffer (and @ref XXH3_kSecret).
++ * @def XXH3_SECRET_DEFAULT_SIZE
++ * @brief Default Secret's size
+  *
+- * This is the size used in @ref XXH3_kSecret and the seeded functions.
++ * This is the size of internal XXH3_kSecret
++ * and is needed by XXH3_generateSecret_fromSeed().
+  *
+  * Not to be confused with @ref XXH3_SECRET_SIZE_MIN.
+  */
+@@ -1769,7 +1763,7 @@ struct XXH64_state_s {
+  */
+ struct XXH3_state_s {
+    XXH_ALIGN_MEMBER(64, XXH64_hash_t acc[8]);
+-       /*!< The 8 accumulators. See @ref XXH32_state_s::v and @ref XXH64_state_s::v */
++       /*!< The 8 accumulators. See @ref XXH32_state_s::acc and @ref XXH64_state_s::acc */
+    XXH_ALIGN_MEMBER(64, unsigned char customSecret[XXH3_SECRET_DEFAULT_SIZE]);
+        /*!< Used to store a custom secret generated from a seed. */
+    XXH_ALIGN_MEMBER(64, unsigned char buffer[XXH3_INTERNALBUFFER_SIZE]);
+@@ -1986,7 +1980,7 @@ XXH3_64bits_withSecretandSeed(XXH_NOESCAPE const void* data, size_t len,
+ /*!
+  * @brief Calculates 128-bit seeded variant of XXH3 hash of @p data.
+  *
+- * @param data       The memory segment to be hashed, at least @p len bytes in size.
++ * @param input      The memory segment to be hashed, at least @p len bytes in size.
+  * @param length     The length of @p data, in bytes.
+  * @param secret     The secret used to alter hash result predictably.
+  * @param secretSize The length of @p secret, in bytes (must be >= XXH3_SECRET_SIZE_MIN)
+@@ -2391,16 +2385,35 @@ static void XXH_free(void* p) { free(p); }
+ 
+ #endif  /* XXH_NO_STDLIB */
+ 
+-#include <string.h>
++#ifndef XXH_memcpy
++/*!
++ * @internal
++ * @brief XXH_memcpy() macro can be redirected at compile time
++ */
++#  include <string.h>
++#  define XXH_memcpy memcpy
++#endif
+ 
++#ifndef XXH_memset
+ /*!
+  * @internal
+- * @brief Modify this function to use a different routine than memcpy().
++ * @brief XXH_memset() macro can be redirected at compile time
+  */
+-static void* XXH_memcpy(void* dest, const void* src, size_t size)
+-{
+-    return memcpy(dest,src,size);
+-}
++#  include <string.h>
++#  define XXH_memset memset
++#endif
++
++#ifndef XXH_memcmp
++/*!
++ * @internal
++ * @brief XXH_memcmp() macro can be redirected at compile time
++ * Note: only needed by XXH128.
++ */
++#  include <string.h>
++#  define XXH_memcmp memcmp
++#endif
++
++
+ 
+ #include <limits.h>   /* ULLONG_MAX */
+ 
+@@ -2639,7 +2652,7 @@ typedef union { xxh_u32 u32; } __attribute__((__packed__)) unalign;
+ #endif
+ static xxh_u32 XXH_read32(const void* ptr)
+ {
+-    typedef __attribute__((__aligned__(1))) xxh_u32 xxh_unalign32;
++    typedef __attribute__((__aligned__(1))) __attribute__((__may_alias__)) xxh_u32 xxh_unalign32;
+     return *((const xxh_unalign32*)ptr);
+ }
+ 
+@@ -2731,7 +2744,7 @@ static int XXH_isLittleEndian(void)
+  * additional case:
+  *
+  * ```
+- * #if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= XXH_C23_VN)
++ * #if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 202311L)
+  * #  include <stddef.h>
+  * #  ifdef unreachable
+  * #    define XXH_UNREACHABLE() unreachable()
+@@ -3221,7 +3234,7 @@ XXH_PUBLIC_API void XXH32_copyState(XXH32_state_t* dstState, const XXH32_state_t
+ XXH_PUBLIC_API XXH_errorcode XXH32_reset(XXH32_state_t* statePtr, XXH32_hash_t seed)
+ {
+     XXH_ASSERT(statePtr != NULL);
+-    memset(statePtr, 0, sizeof(*statePtr));
++    XXH_memset(statePtr, 0, sizeof(*statePtr));
+     XXH32_initAccs(statePtr->acc, seed);
+     return XXH_OK;
+ }
+@@ -3352,7 +3365,7 @@ typedef union { xxh_u32 u32; xxh_u64 u64; } __attribute__((__packed__)) unalign6
+ #endif
+ static xxh_u64 XXH_read64(const void* ptr)
+ {
+-    typedef __attribute__((__aligned__(1))) xxh_u64 xxh_unalign64;
++    typedef __attribute__((__aligned__(1))) __attribute__((__may_alias__)) xxh_u64 xxh_unalign64;
+     return *((const xxh_unalign64*)ptr);
+ }
+ 
+@@ -3718,7 +3731,7 @@ XXH_PUBLIC_API void XXH64_copyState(XXH_NOESCAPE XXH64_state_t* dstState, const
+ XXH_PUBLIC_API XXH_errorcode XXH64_reset(XXH_NOESCAPE XXH64_state_t* statePtr, XXH64_hash_t seed)
+ {
+     XXH_ASSERT(statePtr != NULL);
+-    memset(statePtr, 0, sizeof(*statePtr));
++    XXH_memset(statePtr, 0, sizeof(*statePtr));
+     XXH64_initAccs(statePtr->acc, seed);
+     return XXH_OK;
+ }
+@@ -3855,8 +3868,13 @@ XXH_PUBLIC_API XXH64_hash_t XXH64_hashFromCanonical(XXH_NOESCAPE const XXH64_can
+ #    include <immintrin.h>
+ #  elif defined(__SSE2__)
+ #    include <emmintrin.h>
++#  elif defined(__loongarch_asx)
++#    include <lasxintrin.h>
++#    include <lsxintrin.h>
+ #  elif defined(__loongarch_sx)
+ #    include <lsxintrin.h>
++#  elif defined(__riscv_vector)
++#    include <riscv_vector.h>
+ #  endif
+ #endif
+ 
+@@ -3946,8 +3964,8 @@ XXH_PUBLIC_API XXH64_hash_t XXH64_hashFromCanonical(XXH_NOESCAPE const XXH64_can
+  * @ingroup tuning
+  * @brief Overrides the vectorization implementation chosen for XXH3.
+  *
+- * Can be defined to 0 to disable SIMD or any of the values mentioned in
+- * @ref XXH_VECTOR_TYPE.
++ * Can be defined to 0 to disable SIMD,
++ * or any other authorized value of @ref XXH_VECTOR.
+  *
+  * If this is not defined, it uses predefined macros to determine the best
+  * implementation.
+@@ -3970,9 +3988,7 @@ XXH_PUBLIC_API XXH64_hash_t XXH64_hashFromCanonical(XXH_NOESCAPE const XXH64_can
+ #endif
+ 
+ #ifndef XXH_VECTOR    /* can be defined on command line */
+-#  if defined(__ARM_FEATURE_SVE)
+-#    define XXH_VECTOR XXH_SVE
+-#  elif ( \
++#  if ( \
+         defined(__ARM_NEON__) || defined(__ARM_NEON) /* gcc */ \
+      || defined(_M_ARM) || defined(_M_ARM64) || defined(_M_ARM64EC) /* msvc */ \
+      || (defined(__wasm_simd128__) && XXH_HAS_INCLUDE(<arm_neon.h>)) /* wasm simd128 via SIMDe */ \
+@@ -3981,18 +3997,24 @@ XXH_PUBLIC_API XXH64_hash_t XXH64_hashFromCanonical(XXH_NOESCAPE const XXH64_can
+     || (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__) \
+    )
+ #    define XXH_VECTOR XXH_NEON
++#  elif defined(__ARM_FEATURE_SVE)
++#    define XXH_VECTOR XXH_SVE
+ #  elif defined(__AVX512F__)
+ #    define XXH_VECTOR XXH_AVX512
+ #  elif defined(__AVX2__)
+ #    define XXH_VECTOR XXH_AVX2
+-#  elif defined(__SSE2__) || defined(_M_AMD64) || defined(_M_X64) || (defined(_M_IX86_FP) && (_M_IX86_FP == 2))
++#  elif defined(__SSE2__) || defined(_M_X64) || (defined(_M_IX86_FP) && (_M_IX86_FP == 2))
+ #    define XXH_VECTOR XXH_SSE2
+ #  elif (defined(__PPC64__) && defined(__POWER8_VECTOR__)) \
+      || (defined(__s390x__) && defined(__VEC__)) \
+      && defined(__GNUC__) /* TODO: IBM XL */
+ #    define XXH_VECTOR XXH_VSX
++#  elif defined(__loongarch_asx)
++#    define XXH_VECTOR XXH_LASX
+ #  elif defined(__loongarch_sx)
+ #    define XXH_VECTOR XXH_LSX
++#  elif defined(__riscv_vector)
++#    define XXH_VECTOR XXH_RVV
+ #  else
+ #    define XXH_VECTOR XXH_SCALAR
+ #  endif
+@@ -4030,8 +4052,12 @@ XXH_PUBLIC_API XXH64_hash_t XXH64_hashFromCanonical(XXH_NOESCAPE const XXH64_can
+ #     define XXH_ACC_ALIGN 64
+ #  elif XXH_VECTOR == XXH_SVE   /* sve */
+ #     define XXH_ACC_ALIGN 64
++#  elif XXH_VECTOR == XXH_LASX   /* lasx */
++#     define XXH_ACC_ALIGN 64
+ #  elif XXH_VECTOR == XXH_LSX   /* lsx */
+ #     define XXH_ACC_ALIGN 64
++#  elif XXH_VECTOR == XXH_RVV   /* rvv */
++#     define XXH_ACC_ALIGN 64
+ #  endif
+ #endif
+ 
+@@ -4040,6 +4066,8 @@ XXH_PUBLIC_API XXH64_hash_t XXH64_hashFromCanonical(XXH_NOESCAPE const XXH64_can
+ #  define XXH_SEC_ALIGN XXH_ACC_ALIGN
+ #elif XXH_VECTOR == XXH_SVE
+ #  define XXH_SEC_ALIGN XXH_ACC_ALIGN
++#elif XXH_VECTOR == XXH_RVV
++#  define XXH_SEC_ALIGN XXH_ACC_ALIGN
+ #else
+ #  define XXH_SEC_ALIGN 8
+ #endif
+@@ -4361,7 +4389,10 @@ do { \
+ #  error "default keyset is not large enough"
+ #endif
+ 
+-/*! Pseudorandom secret taken directly from FARSH. */
++/*!
++ * @internal
++ * @def XXH3_kSecret
++ * @brief Pseudorandom secret taken directly from FARSH. */
+ XXH_ALIGN(64) static const xxh_u8 XXH3_kSecret[XXH_SECRET_DEFAULT_SIZE] = {
+     0xb8, 0xfe, 0x6c, 0x39, 0x23, 0xa4, 0x4b, 0xbe, 0x7c, 0x01, 0x81, 0x2c, 0xf7, 0x21, 0xad, 0x1c,
+     0xde, 0xd4, 0x6d, 0xe9, 0x83, 0x90, 0x97, 0xdb, 0x72, 0x40, 0xa4, 0xa4, 0xb7, 0xb3, 0x67, 0x1f,
+@@ -5241,10 +5272,18 @@ XXH_FORCE_INLINE XXH_TARGET_SSE2 void XXH3_initCustomSecret_sse2(void* XXH_RESTR
+     (void)(&XXH_writeLE64);
+     {   int const nbRounds = XXH_SECRET_DEFAULT_SIZE / sizeof(__m128i);
+ 
+-#       if defined(_MSC_VER) && defined(_M_IX86) && _MSC_VER < 1900
+-        /* MSVC 32bit mode does not support _mm_set_epi64x before 2015 */
+-        XXH_ALIGN(16) const xxh_i64 seed64x2[2] = { (xxh_i64)seed64, (xxh_i64)(0U - seed64) };
+-        __m128i const seed = _mm_load_si128((__m128i const*)seed64x2);
++#       if defined(_MSC_VER) && defined(_M_IX86) && _MSC_VER <= 1900
++        /* MSVC 32bit mode does not support _mm_set_epi64x before 2015
++         * and some specific variants of 2015 may also lack it */
++        /* Cast to unsigned 64-bit first to avoid signed arithmetic issues */
++        xxh_u64 const seed64_unsigned = (xxh_u64)seed64;
++        xxh_u64 const neg_seed64 = (xxh_u64)(0ULL - seed64_unsigned);
++        __m128i const seed = _mm_set_epi32(
++            (int)(neg_seed64 >> 32),      /* high 32 bits of negated seed */
++            (int)(neg_seed64),            /* low 32 bits of negated seed */
++            (int)(seed64_unsigned >> 32), /* high 32 bits of original seed */
++            (int)(seed64_unsigned)        /* low 32 bits of original seed */
++        );
+ #       else
+         __m128i const seed = _mm_set_epi64x((xxh_i64)(0U - seed64), (xxh_i64)seed64);
+ #       endif
+@@ -5712,7 +5751,7 @@ XXH3_scrambleAcc_lsx(void* XXH_RESTRICT acc, const void* XXH_RESTRICT secret)
+     {
+         __m128i* const xacc = (__m128i*) acc;
+         const __m128i* const xsecret = (const __m128i *) secret;
+-        const __m128i prime32 = __lsx_vreplgr2vr_w((int)XXH_PRIME32_1);
++        const __m128i prime32 = __lsx_vreplgr2vr_d(XXH_PRIME32_1);
+ 
+         for (size_t i = 0; i < XXH_STRIPE_LEN / sizeof(__m128i); i++) {
+             /* xacc[i] ^= (xacc[i] >> 47) */
+@@ -5724,16 +5763,205 @@ XXH3_scrambleAcc_lsx(void* XXH_RESTRICT acc, const void* XXH_RESTRICT secret)
+             __m128i const data_key = __lsx_vxor_v(data_vec, key_vec);
+ 
+             /* xacc[i] *= XXH_PRIME32_1; */
+-            __m128i const data_key_hi = __lsx_vsrli_d(data_key, 32);
+-            __m128i const prod_lo = __lsx_vmulwev_d_wu(data_key, prime32);
+-            __m128i const prod_hi = __lsx_vmulwev_d_wu(data_key_hi, prime32);
+-            xacc[i] = __lsx_vadd_d(prod_lo, __lsx_vslli_d(prod_hi, 32));
++            xacc[i] = __lsx_vmul_d(data_key, prime32);
++        }
++    }
++}
++
++#endif
++
++#if (XXH_VECTOR == XXH_LASX)
++#define _LASX_SHUFFLE(z, y, x, w) (((z) << 6) | ((y) << 4) | ((x) << 2) | (w))
++
++XXH_FORCE_INLINE void
++XXH3_accumulate_512_lasx( void* XXH_RESTRICT acc,
++                    const void* XXH_RESTRICT input,
++                    const void* XXH_RESTRICT secret)
++{
++    XXH_ASSERT((((size_t)acc) & 31) == 0);
++    {
++        __m256i* const xacc    =       (__m256i *) acc;
++        const __m256i* const xinput  = (const __m256i *) input;
++        const __m256i* const xsecret = (const __m256i *) secret;
++
++        for (size_t i = 0; i < XXH_STRIPE_LEN / sizeof(__m256i); i++) {
++            /* data_vec = xinput[i]; */
++            __m256i const data_vec = __lasx_xvld(xinput + i, 0);
++            /* key_vec = xsecret[i]; */
++            __m256i const key_vec = __lasx_xvld(xsecret + i, 0);
++            /* data_key = data_vec ^ key_vec; */
++            __m256i const data_key = __lasx_xvxor_v(data_vec, key_vec);
++            /* data_key_lo = data_key >> 32; */
++            __m256i const data_key_lo = __lasx_xvsrli_d(data_key, 32);
++            // __m256i const data_key_lo = __lasx_xvsrli_d(data_key, 32);
++            /* product = (data_key & 0xffffffff) * (data_key_lo & 0xffffffff); */
++            __m256i const product = __lasx_xvmulwev_d_wu(data_key, data_key_lo);
++            /* xacc[i] += swap(data_vec); */
++            __m256i const data_swap = __lasx_xvshuf4i_w(data_vec, _LASX_SHUFFLE(1, 0, 3, 2));
++            __m256i const sum = __lasx_xvadd_d(xacc[i], data_swap);
++            /* xacc[i] += product; */
++            xacc[i] = __lasx_xvadd_d(product, sum);
++        }
++    }
++}
++XXH_FORCE_INLINE XXH3_ACCUMULATE_TEMPLATE(lasx)
++
++XXH_FORCE_INLINE void
++XXH3_scrambleAcc_lasx(void* XXH_RESTRICT acc, const void* XXH_RESTRICT secret)
++{
++    XXH_ASSERT((((size_t)acc) & 31) == 0);
++    {
++        __m256i* const xacc = (__m256i*) acc;
++        const __m256i* const xsecret = (const __m256i *) secret;
++        const __m256i prime32 = __lasx_xvreplgr2vr_d(XXH_PRIME32_1);
++
++        for (size_t i = 0; i < XXH_STRIPE_LEN / sizeof(__m256i); i++) {
++            /* xacc[i] ^= (xacc[i] >> 47) */
++            __m256i const acc_vec = xacc[i];
++            __m256i const shifted = __lasx_xvsrli_d(acc_vec, 47);
++            __m256i const data_vec = __lasx_xvxor_v(acc_vec, shifted);
++            /* xacc[i] ^= xsecret[i]; */
++            __m256i const key_vec = __lasx_xvld(xsecret + i, 0);
++            __m256i const data_key = __lasx_xvxor_v(data_vec, key_vec);
++
++            /* xacc[i] *= XXH_PRIME32_1; */
++            xacc[i] = __lasx_xvmul_d(data_key, prime32);
++        }
++    }
++}
++
++#endif
++
++#if (XXH_VECTOR == XXH_RVV)
++#if ((defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 13) || \
++        (defined(__clang__) && __clang_major__ < 16))
++    #define RVV_OP(op) op
++#else
++    #define concat2(X, Y) X ## Y
++    #define concat(X, Y) concat2(X, Y)
++    #define RVV_OP(op) concat(__riscv_, op)
++#endif
++XXH_FORCE_INLINE void
++XXH3_accumulate_512_rvv(  void* XXH_RESTRICT acc,
++                    const void* XXH_RESTRICT input,
++                    const void* XXH_RESTRICT secret)
++{
++    XXH_ASSERT((((size_t)acc) & 63) == 0);
++    {
++        // Try to set vector lenght to 512 bits.
++        // If this length is unavailable, then maximum available will be used
++        size_t vl = RVV_OP(vsetvl_e64m2)(8);
++
++        uint64_t* const xacc = (uint64_t*) acc;
++        const uint64_t* const xinput = (const uint64_t*) input;
++        const uint64_t* const xsecret = (const uint64_t*) secret;
++        uint64_t swap_mask[16] = {1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14};
++        vuint64m2_t xswap_mask = RVV_OP(vle64_v_u64m2)(swap_mask, vl);
++
++        // vuint64m1_t is sizeless.
++        // But we can assume that vl can be only 4(vlen=128) or 8(vlen=256,512)
++        for(size_t i = 0; i < XXH_STRIPE_LEN/(8 * vl); i++){
++            /* data_vec    = input[i]; */
++            vuint64m2_t data_vec = RVV_OP(vreinterpret_v_u8m2_u64m2)(RVV_OP(vle8_v_u8m2)((const uint8_t*)(xinput + vl * i), vl * 8));
++            /* key_vec     = secret[i]; */
++            vuint64m2_t key_vec = RVV_OP(vreinterpret_v_u8m2_u64m2)(RVV_OP(vle8_v_u8m2)((const uint8_t*)(xsecret + vl * i), vl * 8));
++            /* data_key    = data_vec ^ key_vec; */
++            vuint64m2_t data_key = RVV_OP(vxor_vv_u64m2)(data_vec, key_vec, vl);
++            /* data_key_lo = data_key >> 32; */
++            vuint64m2_t data_key_lo = RVV_OP(vsrl_vx_u64m2)(data_key, 32, vl);
++            /* product     = (data_key & 0xffffffff) * (data_key_lo & 0xffffffff); */
++            vuint64m2_t product = RVV_OP(vmul_vv_u64m2)(RVV_OP(vand_vx_u64m2)(data_key, 0xffffffff, vl), RVV_OP(vand_vx_u64m2)(data_key_lo, 0xffffffff, vl), vl);
++            /* acc_vec = xacc[i]; */
++            vuint64m2_t acc_vec = RVV_OP(vle64_v_u64m2)(xacc + vl * i, vl);
++            acc_vec = RVV_OP(vadd_vv_u64m2)(acc_vec, product, vl);
++            {
++                /* swap high and low halves */
++                vuint64m2_t data_swap = RVV_OP(vrgather_vv_u64m2)(data_vec, xswap_mask, vl);
++                acc_vec = RVV_OP(vadd_vv_u64m2)(acc_vec, data_swap, vl);
++            }
++            RVV_OP(vse64_v_u64m2)(xacc + vl * i, acc_vec, vl);
++        }
++    }
++}
++
++XXH_FORCE_INLINE XXH3_ACCUMULATE_TEMPLATE(rvv)
++
++XXH_FORCE_INLINE void
++XXH3_scrambleAcc_rvv(void* XXH_RESTRICT acc, const void* XXH_RESTRICT secret)
++{
++    XXH_ASSERT((((size_t)acc) & 63) == 0);
++    {
++        // Try to set vector lenght to 512 bits.
++        // If this length is unavailable, then maximum available will be used
++        size_t vl = RVV_OP(vsetvl_e64m2)(8);
++        uint64_t* const xacc = (uint64_t*) acc;
++        const uint64_t* const xsecret = (const uint64_t*) secret;
++
++        uint64_t prime[16] = {XXH_PRIME32_1, XXH_PRIME32_1, XXH_PRIME32_1, XXH_PRIME32_1, XXH_PRIME32_1, XXH_PRIME32_1, XXH_PRIME32_1, XXH_PRIME32_1,\
++                                XXH_PRIME32_1, XXH_PRIME32_1, XXH_PRIME32_1, XXH_PRIME32_1, XXH_PRIME32_1, XXH_PRIME32_1, XXH_PRIME32_1, XXH_PRIME32_1};
++        vuint64m2_t vprime = RVV_OP(vle64_v_u64m2)(prime, vl);
++
++        // vuint64m2_t is sizeless.
++        // But we can assume that vl can be only 4(vlen=128) or 8(vlen=256,512)
++        for(size_t i = 0; i < XXH_STRIPE_LEN/(8 * vl); i++){
++            /* xacc[i] ^= (xacc[i] >> 47) */
++            vuint64m2_t acc_vec = RVV_OP(vle64_v_u64m2)(xacc + vl * i, vl);
++            vuint64m2_t shifted = RVV_OP(vsrl_vx_u64m2)(acc_vec, 47, vl);
++            vuint64m2_t data_vec = RVV_OP(vxor_vv_u64m2)(acc_vec, shifted, vl);
++            /* xacc[i] ^= xsecret[i]; */
++            vuint64m2_t key_vec = RVV_OP(vreinterpret_v_u8m2_u64m2)(RVV_OP(vle8_v_u8m2)((const uint8_t*)(xsecret + vl * i), vl * 8));
++            vuint64m2_t data_key = RVV_OP(vxor_vv_u64m2)(data_vec, key_vec, vl);
++
++            /* xacc[i] *= XXH_PRIME32_1; */
++            vuint64m2_t prod_even = RVV_OP(vmul_vv_u64m2)(RVV_OP(vand_vx_u64m2)(data_key, 0xffffffff, vl), vprime, vl);
++            vuint64m2_t prod_odd = RVV_OP(vmul_vv_u64m2)(RVV_OP(vsrl_vx_u64m2)(data_key, 32, vl), vprime, vl);
++            vuint64m2_t prod = RVV_OP(vadd_vv_u64m2)(prod_even, RVV_OP(vsll_vx_u64m2)(prod_odd, 32, vl), vl);
++            RVV_OP(vse64_v_u64m2)(xacc + vl * i, prod, vl);
+         }
+     }
+ }
+ 
++XXH_FORCE_INLINE void
++XXH3_initCustomSecret_rvv(void* XXH_RESTRICT customSecret, xxh_u64 seed64)
++{
++    XXH_STATIC_ASSERT((XXH_SECRET_DEFAULT_SIZE & 63) == 0);
++    XXH_STATIC_ASSERT(XXH_SEC_ALIGN == 64);
++    XXH_ASSERT(((size_t)customSecret & 63) == 0);
++    {
++        uint64_t* const xcustomSecret = (uint64_t*)customSecret;
++
++        (void)(&XXH_writeLE64);
++        {
++            // Calculate the number of 64-bit elements in the `XXH3_kSecret` secret
++            size_t XXH3_kSecret_64b_len = XXH_SECRET_DEFAULT_SIZE / 8;
++            // Create an array of repeated seed values, alternating between seed64 and -seed64.
++            uint64_t seed_pos[16] = {seed64, (uint64_t)(-(int64_t)seed64), \
++                                    seed64, (uint64_t)(-(int64_t)seed64), \
++                                    seed64, (uint64_t)(-(int64_t)seed64), \
++                                    seed64, (uint64_t)(-(int64_t)seed64), \
++                                    seed64, (uint64_t)(-(int64_t)seed64), \
++                                    seed64, (uint64_t)(-(int64_t)seed64), \
++                                    seed64, (uint64_t)(-(int64_t)seed64), \
++                                    seed64, (uint64_t)(-(int64_t)seed64)};
++            // Cast the default secret to a signed 64-bit pointer for vectorized access
++            const int64_t* const xXXH3_kSecret = (const int64_t*)((const void*)XXH3_kSecret);
++            size_t vl = 0;
++            for (size_t i=0; i < XXH3_kSecret_64b_len; i += vl) {
++
++                vl = RVV_OP(vsetvl_e64m2)(XXH3_kSecret_64b_len - i);
++                {
++                    vint64m2_t seed = RVV_OP(vle64_v_i64m2)((int64_t*)seed_pos, vl);
++                    vint64m2_t src = RVV_OP(vle64_v_i64m2)((const int64_t*)&xXXH3_kSecret[i], vl);
++                    vint64m2_t res = RVV_OP(vadd_vv_i64m2)(src, seed, vl);
++                    RVV_OP(vse64_v_i64m2)((int64_t*)&xcustomSecret[i], res, vl);
++                }
++            }
++        }
++    }
++}
+ #endif
+ 
++
+ /* scalar variants - universal */
+ 
+ #if defined(__aarch64__) && (defined(__GNUC__) || defined(__clang__))
+@@ -5893,7 +6121,7 @@ XXH3_initCustomSecret_scalar(void* XXH_RESTRICT customSecret, xxh_u64 seed64)
+      *  SUB     STR
+      *          STR
+      *
+-     * See XXH3_NEON_LANES for details on the pipsline.
++     * See XXH3_NEON_LANES for details on the pipeline.
+      *
+      * XXH3_64bits_withSeed, len == 256, Snapdragon 835
+      *   without hack: 2654.4 MB/s
+@@ -5964,12 +6192,24 @@ typedef void (*XXH3_f_initCustomSecret)(void* XXH_RESTRICT, xxh_u64);
+ #define XXH3_scrambleAcc    XXH3_scrambleAcc_scalar
+ #define XXH3_initCustomSecret XXH3_initCustomSecret_scalar
+ 
++#elif (XXH_VECTOR == XXH_LASX)
++#define XXH3_accumulate_512 XXH3_accumulate_512_lasx
++#define XXH3_accumulate     XXH3_accumulate_lasx
++#define XXH3_scrambleAcc    XXH3_scrambleAcc_lasx
++#define XXH3_initCustomSecret XXH3_initCustomSecret_scalar
++
+ #elif (XXH_VECTOR == XXH_LSX)
+ #define XXH3_accumulate_512 XXH3_accumulate_512_lsx
+ #define XXH3_accumulate     XXH3_accumulate_lsx
+ #define XXH3_scrambleAcc    XXH3_scrambleAcc_lsx
+ #define XXH3_initCustomSecret XXH3_initCustomSecret_scalar
+ 
++#elif (XXH_VECTOR == XXH_RVV)
++#define XXH3_accumulate_512 XXH3_accumulate_512_rvv
++#define XXH3_accumulate     XXH3_accumulate_rvv
++#define XXH3_scrambleAcc    XXH3_scrambleAcc_rvv
++#define XXH3_initCustomSecret XXH3_initCustomSecret_rvv
++
+ #else /* scalar */
+ 
+ #define XXH3_accumulate_512 XXH3_accumulate_512_scalar
+@@ -6331,7 +6571,7 @@ XXH3_reset_internal(XXH3_state_t* statePtr,
+     XXH_ASSERT(offsetof(XXH3_state_t, nbStripesPerBlock) > initStart);
+     XXH_ASSERT(statePtr != NULL);
+     /* set members from bufferedSize to nbStripesPerBlock (excluded) to 0 */
+-    memset((char*)statePtr + initStart, 0, initLength);
++    XXH_memset((char*)statePtr + initStart, 0, initLength);
+     statePtr->acc[0] = XXH_PRIME32_3;
+     statePtr->acc[1] = XXH_PRIME64_1;
+     statePtr->acc[2] = XXH_PRIME64_2;
+@@ -6450,8 +6690,9 @@ XXH3_consumeStripes(xxh_u64* XXH_RESTRICT acc,
+ #   define XXH3_STREAM_USE_STACK 1
+ # endif
+ #endif
+-/*
+- * Both XXH3_64bits_update and XXH3_128bits_update use this routine.
++/* This function accepts f_acc and f_scramble as function pointers,
++ * making it possible to implement multiple variants with different acc & scramble stages.
++ * This is notably useful to implement multiple vector variants with different intrinsics.
+  */
+ XXH_FORCE_INLINE XXH_errorcode
+ XXH3_update(XXH3_state_t* XXH_RESTRICT const state,
+@@ -6465,6 +6706,16 @@ XXH3_update(XXH3_state_t* XXH_RESTRICT const state,
+     }
+ 
+     XXH_ASSERT(state != NULL);
++    state->totalLen += len;
++
++    /* small input : just fill in tmp buffer */
++    XXH_ASSERT(state->bufferedSize <= XXH3_INTERNALBUFFER_SIZE);
++    if (len <= XXH3_INTERNALBUFFER_SIZE - state->bufferedSize) {
++        XXH_memcpy(state->buffer + state->bufferedSize, input, len);
++        state->bufferedSize += (XXH32_hash_t)len;
++        return XXH_OK;
++    }
++
+     {   const xxh_u8* const bEnd = input + len;
+         const unsigned char* const secret = (state->extSecret == NULL) ? state->customSecret : state->extSecret;
+ #if defined(XXH3_STREAM_USE_STACK) && XXH3_STREAM_USE_STACK >= 1
+@@ -6477,15 +6728,6 @@ XXH3_update(XXH3_state_t* XXH_RESTRICT const state,
+ #else
+         xxh_u64* XXH_RESTRICT const acc = state->acc;
+ #endif
+-        state->totalLen += len;
+-        XXH_ASSERT(state->bufferedSize <= XXH3_INTERNALBUFFER_SIZE);
+-
+-        /* small input : just fill in tmp buffer */
+-        if (len <= XXH3_INTERNALBUFFER_SIZE - state->bufferedSize) {
+-            XXH_memcpy(state->buffer + state->bufferedSize, input, len);
+-            state->bufferedSize += (XXH32_hash_t)len;
+-            return XXH_OK;
+-        }
+ 
+         /* total input is now > XXH3_INTERNALBUFFER_SIZE */
+         #define XXH3_INTERNALBUFFER_STRIPES (XXH3_INTERNALBUFFER_SIZE / XXH_STRIPE_LEN)
+@@ -6532,12 +6774,21 @@ XXH3_update(XXH3_state_t* XXH_RESTRICT const state,
+     return XXH_OK;
+ }
+ 
++/*
++ * Both XXH3_64bits_update and XXH3_128bits_update use this routine.
++ */
++XXH_NO_INLINE XXH_errorcode
++XXH3_update_regular(XXH_NOESCAPE XXH3_state_t* state, XXH_NOESCAPE const void* input, size_t len)
++{
++    return XXH3_update(state, (const xxh_u8*)input, len,
++                       XXH3_accumulate, XXH3_scrambleAcc);
++}
++
+ /*! @ingroup XXH3_family */
+ XXH_PUBLIC_API XXH_errorcode
+ XXH3_64bits_update(XXH_NOESCAPE XXH3_state_t* state, XXH_NOESCAPE const void* input, size_t len)
+ {
+-    return XXH3_update(state, (const xxh_u8*)input, len,
+-                       XXH3_accumulate, XXH3_scrambleAcc);
++    return XXH3_update_regular(state, input, len);
+ }
+ 
+ 
+@@ -7073,7 +7324,7 @@ XXH3_128bits_reset_withSecretandSeed(XXH_NOESCAPE XXH3_state_t* statePtr, XXH_NO
+ XXH_PUBLIC_API XXH_errorcode
+ XXH3_128bits_update(XXH_NOESCAPE XXH3_state_t* state, XXH_NOESCAPE const void* input, size_t len)
+ {
+-    return XXH3_64bits_update(state, input, len);
++    return XXH3_update_regular(state, input, len);
+ }
+ 
+ /*! @ingroup XXH3_family */
+@@ -7095,14 +7346,12 @@ XXH_PUBLIC_API XXH128_hash_t XXH3_128bits_digest (XXH_NOESCAPE const XXH3_state_
+ #endif /* !XXH_NO_STREAM */
+ /* 128-bit utility functions */
+ 
+-#include <string.h>   /* memcmp, memcpy */
+-
+ /* return : 1 is equal, 0 if different */
+ /*! @ingroup XXH3_family */
+ XXH_PUBLIC_API int XXH128_isEqual(XXH128_hash_t h1, XXH128_hash_t h2)
+ {
+     /* note : XXH128_hash_t is compact, it has no padding byte */
+-    return !(memcmp(&h1, &h2, sizeof(h1)));
++    return !(XXH_memcmp(&h1, &h2, sizeof(h1)));
+ }
+ 
+ /* This prototype is compatible with stdlib's qsort().
+@@ -7186,7 +7435,7 @@ XXH3_generateSecret(XXH_NOESCAPE void* secretBuffer, size_t secretSize, XXH_NOES
+     {   size_t pos = 0;
+         while (pos < secretSize) {
+             size_t const toCopy = XXH_MIN((secretSize - pos), customSeedSize);
+-            memcpy((char*)secretBuffer + pos, customSeed, toCopy);
++            XXH_memcpy((char*)secretBuffer + pos, customSeed, toCopy);
+             pos += toCopy;
+     }   }
+ 
+@@ -7211,7 +7460,7 @@ XXH3_generateSecret_fromSeed(XXH_NOESCAPE void* secretBuffer, XXH64_hash_t seed)
+     XXH_ALIGN(XXH_SEC_ALIGN) xxh_u8 secret[XXH_SECRET_DEFAULT_SIZE];
+     XXH3_initCustomSecret(secret, seed);
+     XXH_ASSERT(secretBuffer != NULL);
+-    memcpy(secretBuffer, secret, XXH_SECRET_DEFAULT_SIZE);
++    XXH_memcpy(secretBuffer, secret, XXH_SECRET_DEFAULT_SIZE);
+ }
+ 
+ 
+@@ -7233,6 +7482,6 @@ XXH3_generateSecret_fromSeed(XXH_NOESCAPE void* secretBuffer, XXH64_hash_t seed)
+ #endif  /* XXH_IMPLEMENTATION */
+ 
+ 
+-#if defined (__cplusplus)
++#if defined (__cplusplus) && !defined(XXH_NO_EXTERNC_GUARD)
+ } /* extern "C" */
+ #endif

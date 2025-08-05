@@ -1,0 +1,24 @@
+# /usr/lib/systemd/system/shadow.service
+#
+#  SPDX-License-Identifier: BSD-3-Clause
+#
+#  shadow.service - Verify integrity of password and group files.
+#
+
+[Unit]
+Description=Verify integrity of password and group files
+
+[Service]
+Type=oneshot
+# Run both checks, and fail the service if either of the commands fails.
+ExecStart=/bin/sh -c '/usr/sbin/pwck -r || r=1; /usr/sbin/grpck -r && exit $r'
+
+# Harden the service for security.
+Nice=19
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=read-only
+NoNewPrivileges=yes

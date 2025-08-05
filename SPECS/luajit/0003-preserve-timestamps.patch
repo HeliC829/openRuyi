@@ -1,0 +1,13 @@
+--- LuaJIT-a4f56a459a588ae768801074b46ba0adcfb49eb1/Makefile.orig	2025-09-16 15:42:57.092915938 +0800
++++ LuaJIT-a4f56a459a588ae768801074b46ba0adcfb49eb1/Makefile	2025-09-16 15:43:04.696845172 +0800
+@@ -79,8 +79,8 @@
+ MKDIR= mkdir -p
+ RMDIR= rmdir 2>/dev/null
+ SYMLINK= ln -sf
+-INSTALL_X= install -m 0755
+-INSTALL_F= install -m 0644
++INSTALL_X= install -p -m 0755
++INSTALL_F= install -p -m 0644
+ UNINSTALL= $(RM)
+ LDCONFIG= ldconfig -n 2>/dev/null
+ SED_PC= sed -e "s|^prefix=.*|prefix=$(PREFIX)|" \

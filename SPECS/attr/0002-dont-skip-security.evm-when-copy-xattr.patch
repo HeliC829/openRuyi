@@ -1,0 +1,27 @@
+From 0aa9a1568fc318345c4123fc19f825933f8dcb66 Mon Sep 17 00:00:00 2001
+From: zhangtianxing3 <zhangtianxing3@huawei.com>
+Date: Mon, 24 Jan 2022 11:39:36 +0800
+Subject: [PATCH] dont skip security.evm when copy xattr
+
+IMA feature need to use security.evm, so we should not skip
+
+Signed-off-by: lixiaokeng <lixiaokeng@huawei.com>
+Signed-off-by: volcanodragon <linfeilong@huawei.com>
+---
+ xattr.conf | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/xattr.conf b/xattr.conf
+index 1affac5..07d3403 100644
+--- a/xattr.conf
++++ b/xattr.conf
+@@ -18,5 +18,5 @@ trusted.SGI_DMI_*		skip		# xfs specific
+ trusted.SGI_MAC_FILE		skip		# xfs specific
+ xfsroot.*			skip		# xfs specific; obsolete
+ user.Beagle.*			skip		# ignore Beagle index data
+-security.evm			skip		# may only be written by kernel
++#security.evm			skip		# may only be written by kernel
+ afs.*				skip		# AFS metadata and ACLs
+-- 
+1.8.3.1
+

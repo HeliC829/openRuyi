@@ -1,0 +1,2 @@
+# Allow users in the "rfkill" group to manage rfkill devices
+KERNEL=="rfkill", GROUP="rfkill", MODE="0664"

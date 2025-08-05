@@ -1,0 +1,12 @@
+diff --git a/Makefile b/Makefile
+index 87966a9..7f70d63 100644
+--- a/Makefile
++++ b/Makefile
+@@ -90,7 +90,6 @@ endif
+ all: $(LIBGIFSO) libgif.a $(LIBUTILSO) libutil.a $(UTILS)
+ ifeq ($(UNAME), Darwin)
+ else
+-	$(MAKE) -C doc
+ endif
+ 
+ $(UTILS):: libgif.a libutil.a

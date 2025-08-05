@@ -1,0 +1,20 @@
+# /usr/lib/systemd/system/shadow.timer
+#
+#  SPDX-License-Identifier: BSD-3-Clause
+#
+#  shadow.timer - Daily verification of password and group files.
+#
+
+[Unit]
+Description=Daily verification of password and group files
+
+[Timer]
+# Run once a day.
+OnCalendar=daily
+# Spread the load; timer can be delayed by up to 12 hours.
+AccuracySec=12h
+# Run the job if the system was powered off during the last scheduled time.
+Persistent=true
+
+[Install]
+WantedBy=timers.target

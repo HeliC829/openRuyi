@@ -1,0 +1,143 @@
+diff --git a/Makefile b/Makefile
+index 5c1012c..3ce30dc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -10,71 +10,89 @@ include Fonts/Makefile
+ . := $(maindir)
+ ~ := main
+ 
+-prefix := /usr/local
+-# etcdir must be either /etc or
+-etcdir := $(prefix)/etc
+-bootprefix := $(patsubst %/usr,%/,$(prefix:%/=%))
+-mandir := $(prefix)/share/man
++# ---- Installation Directories ----
++# Allow these to be overridden from the command line, e.g., make prefix=/usr
++prefix ?= /usr
++exec_prefix ?= $(prefix)
++bindir ?= $(exec_prefix)/bin
++sbindir ?= $(exec_prefix)/sbin
++# Use a standard variable for /etc
++sysconfdir ?= /etc
++datarootdir ?= $(prefix)/share
++datadir ?= $(datarootdir)
++mandir ?= $(datarootdir)/man
++
++# Define specific application directories based on the above
++# Use DESTDIR for staging installations (e.g., RPM builds)
++DESTDIR ?=
++install_root = $(DESTDIR)
++
++# --- Original variables remapped to standard ones ---
++# etcdir is now sysconfdir
++# bootprefix/bin is now bindir or sbindir
+ 
+ acmfiles := $(wildcard $./acm/*.acm)
+-
+ gzipped_acmfiles := $(addsuffix .gz, $(acmfiles))
+ 
+-gzipped-acmfiles : $(gzipped_acmfiles)
++gzipped-acmfiles: $(gzipped_acmfiles)
+ 
+ build-common: gzipped-acmfiles
+ 
+ .PHONY: install-common
+ install-common: build-common
+-	install -d  $(bootprefix)/bin/
+-	install setupcon $(bootprefix)/bin/
+-	install -d $(etcdir)/default
+-	install -m 644 config/keyboard $(etcdir)/default/
+-	install -m 644 config/console-setup $(etcdir)/default/
+-	install -d $(mandir)/man1/
+-	install -m 644 man/setupcon.1 $(mandir)/man1/
+-	install -d $(mandir)/man5/
+-	install -m 644 man/keyboard.5 $(mandir)/man5/
+-	install -m 644 man/console-setup.5 $(mandir)/man5/
++	install -d $(install_root)$(bindir)/
++	install setupcon $(install_root)$(bindir)/
++	install -d $(install_root)$(sysconfdir)/default
++	install -m 644 config/keyboard $(install_root)$(sysconfdir)/default/
++	install -m 644 config/console-setup $(install_root)$(sysconfdir)/default/
++	install -d $(install_root)$(mandir)/man1/
++	install -m 644 man/setupcon.1 $(install_root)$(mandir)/man1/
++	install -d $(install_root)$(mandir)/man5/
++	install -m 644 man/keyboard.5 $(install_root)$(mandir)/man5/
++	install -m 644 man/console-setup.5 $(install_root)$(mandir)/man5/
+ 
+ .PHONY: install-common-linux
+ install-common-linux: build-linux
+-	install -d $(prefix)/share/consolefonts/
+-	install -m 644 Fonts/*.psf.gz $(prefix)/share/consolefonts/
+-	install -d $(prefix)/share/consoletrans
+-	install -m 644 acm/*.acm.gz $(prefix)/share/consoletrans/
+-	install -d $(etcdir)/console-setup
+-	install -m 644 Keyboard/compose.*.inc $(etcdir)/console-setup/
+-	install -m 644 Keyboard/remap.inc $(etcdir)/console-setup/
++	install -d $(install_root)$(datadir)/consolefonts/
++	install -m 644 Fonts/*.psf.gz $(install_root)$(datadir)/consolefonts/
++	install -d $(install_root)$(datadir)/consoletrans
++	install -m 644 acm/*.acm.gz $(install_root)$(datadir)/consoletrans/
++	# As per spec, we do not install /etc/console-setup by default.
++	# The user can run a separate make target if they want it.
++	# install -d $(install_root)$(sysconfdir)/console-setup
++	# install -m 644 Keyboard/compose.*.inc $(install_root)$(sysconfdir)/console-setup/
++	# install -m 644 Keyboard/remap.inc $(install_root)$(sysconfdir)/console-setup/
++
+ 
+ .PHONY: install-ckbcomp
+ install-ckbcomp: 
+-	if [ -z "$(xkbdir)" ]; then \
+-		mkdir -p $(etcdir)/console-setup \
+-		&& cp -r Keyboard/ckb/ $(etcdir)/console-setup/ckb; \
+-	fi
+-	install -d $(prefix)/bin/
+-	install -m 755 Keyboard/ckbcomp $(prefix)/bin/
+-	install -d $(mandir)/man1/
+-	install -m 644 man/ckbcomp.1 $(mandir)/man1/
+-
+-.PHONY : install-ckbcomp-mini
+-install-ckbcomp-mini: build-mini-linux
+-	install -d $(prefix)/share/console-setup/
+-	-install -m 644 Keyboard/*.ekmap.gz $(prefix)/share/console-setup/
+-	install -m 644 Keyboard/charmap_functions.sh $(prefix)/share/console-setup/
+-	install -d $(prefix)/bin/
+-	install -m 755 Keyboard/ckbcomp-mini $(prefix)/bin/
+-	ln -s ckbcomp-mini $(prefix)/bin/ckbcomp
+-	install -d $(mandir)/man1/
+-	install -m 644 man/ckbcomp.1 $(mandir)/man1/
+-	ln -s ckbcomp.1 $(mandir)/man1/ckbcomp-mini.1
+-
++	# As per spec, we do not install /etc/console-setup/ckb by default.
++	# if [ -z "$(xkbdir)" ]; then \
++	#	mkdir -p $(install_root)$(sysconfdir)/console-setup \
++	#	&& cp -r Keyboard/ckb/ $(install_root)$(sysconfdir)/console-setup/ckb; \
++	# fi
++	install -d $(install_root)$(bindir)/
++	install -m 755 Keyboard/ckbcomp $(install_root)$(bindir)/
++	install -d $(install_root)$(mandir)/man1/
++	install -m 644 man/ckbcomp.1 $(install_root)$(mandir)/man1/
++
++# This target installs bdf2psf and its data
++.PHONY: install-bdf2psf
++install-bdf2psf:
++	install -d $(install_root)$(bindir)
++	install -m 755 Fonts/bdf2psf $(install_root)$(bindir)/
++	install -d $(install_root)$(mandir)/man1
++	install -m 644 man/bdf2psf.1 $(install_root)$(mandir)/man1/
++	install -d $(install_root)$(datadir)/bdf2psf
++	cp -a Fonts/fontsets Fonts/*.equivalents Fonts/*.set $(install_root)$(datadir)/bdf2psf/
++
++# The main install target, now supporting DESTDIR
++.PHONY: install
++install: install-common install-common-linux install-ckbcomp install-bdf2psf
++
++# An alias for backward compatibility with the spec file's old target
+ .PHONY: install-linux
+-install-linux: install-common install-common-linux install-ckbcomp
+-
+-.PHONY : install-mini-linux
+-install-mini-linux: install-common install-common-linux install-ckbcomp-mini
++install-linux: install
+ 
+ common-uninstall: | build-linux build-mini-linux
+ 	-for font in Fonts/*.psf.gz; do \

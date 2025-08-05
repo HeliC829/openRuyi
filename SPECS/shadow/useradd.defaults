@@ -1,0 +1,16 @@
+# /etc/default/useradd
+# Default values for useradd(8) command.
+# openRuyi's default configuration.
+
+# Default home directory.
+HOME=/home
+
+# The default shell for new users. Bash is a sane and widely used default.
+SHELL=/bin/bash
+
+# The skeleton directory for new user's home.
+SKEL=/etc/skel
+
+# Do not create a mail spool file for new users by default.
+# This is a legacy feature.
+CREATE_MAIL_SPOOL=no

@@ -1,0 +1,35 @@
+# SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
+# SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+#
+# SPDX-License-Identifier: MulanPSL-2.0
+
+%global srcname mccabe
+
+Name:           python-%{srcname}
+Version:        0.7.0
+Release:        %autorelease
+License:        MIT
+URL:            https://github.com/PyCQA/mccabe
+Summary:        McCabe checker, plugin for flake8
+Provides:       python3-%{srcname}
+%python_provide python3-%{srcname}
+#!RemoteAsset
+Source0:        https://files.pythonhosted.org/packages/source/m/%{srcname}/%{srcname}-%{version}.tar.gz
+BuildArch:      noarch
+
+BuildRequires:  python3-devel
+BuildSystem:    pyproject
+BuildOption(install): -l %{srcname} +auto
+%description
+This package provides a Flake8 plug-in to compute the McCabe cyclomatic
+complexity of Python source code.
+
+%generate_buildrequires
+%pyproject_buildrequires
+
+%files -f %{pyproject_files}
+%doc README.rst
+
+%changelog
+%{?autochangelog}

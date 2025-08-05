@@ -1,0 +1,52 @@
+# SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
+# SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
+#
+# SPDX-License-Identifier: MulanPSL-2.0
+
+Name:           perl-Test-Taint
+Version:        1.08
+Release:        %autorelease
+Summary:        Tools to test taintedness
+License:        GPL-1.0-or-later OR Artistic-1.0-Perl
+URL:            https://metacpan.org/dist/Test-Taint
+#!RemoteAsset
+Source0:        http://www.cpan.org/authors/id/P/PE/PETDANCE/Test-Taint-%{version}.tar.gz
+
+BuildRequires:  make
+BuildRequires:  perl-rpm-packaging
+BuildRequires:  perl-macros
+BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(overload)
+BuildRequires:  perl(Scalar::Util)
+BuildRequires:  perl(Test::Builder)
+BuildRequires:  perl(Test::More)
+BuildRequires:  perl(Tie::Array)
+BuildRequires:  perl(Tie::Hash)
+BuildRequires:  perl(Tie::Scalar)
+
+%description
+Tainted data is data that comes from an unsafe source, such as the command
+line, or, in the case of web apps, any GET or POST transactions. Read the
+perlsec man page for details on why tainted data is bad, and how to
+untaint the data.
+
+%prep
+%setup -q -n Test-Taint-%{version}
+
+%build
+perl Makefile.PL INSTALLDIRS=vendor OPTIMIZE="%{optflags}"
+%{make_build}
+
+%install
+%perl_make_install
+find %{buildroot} -type f -name '*.bs' -size 0 -exec rm -f {} \;
+%perl_process_packlist
+%perl_gen_filelist
+
+%files -f %{name}.files
+%doc Changes
+
+%changelog
+%{?autochangelog}

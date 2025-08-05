@@ -1,0 +1,35 @@
+# SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
+# SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+# SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
+#
+# SPDX-License-Identifier: MulanPSL-2.0
+
+Name:           diffstat
+Version:        1.68
+Release:        %autorelease
+Summary:        A utility for displaying a histogram of diff output
+License:        X11
+URL:            https://invisible-island.net/diffstat
+#!RemoteAsset
+Source:         https://invisible-mirror.net/archives/diffstat/diffstat-%{version}.tgz
+BuildSystem:    autotools
+
+BuildRequires:  gcc libtool autoconf automake make
+
+%description
+diffstat reads the output of the diff command and displays a histogram of the
+insertions, deletions, and modifications in each file. It is commonly used
+to provide a summary of changes in large, complex patch files.
+
+%conf -p
+autoreconf -fiv
+
+%files
+%license COPYING
+%doc CHANGES README
+%{_bindir}/diffstat
+%{_mandir}/man1/diffstat.1*
+
+%changelog
+%{?autochangelog}

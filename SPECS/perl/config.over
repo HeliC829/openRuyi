@@ -1,0 +1,6 @@
+#!/bin/sh
+osvers="6.6.0"
+myuname="openruyi"
+myhostname="openruyi"
+mydomain='.nonet'
+cf_time=$(LC_ALL=C date --utc -d @$SOURCE_DATE_EPOCH)

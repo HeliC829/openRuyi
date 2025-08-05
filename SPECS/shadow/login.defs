@@ -1,0 +1,37 @@
+# /etc/login.defs
+# Configuration defaults for the shadow password suite.
+# openRuyi's default configuration.
+
+# Standard mailbox location.
+MAIL_DIR	/var/spool/mail
+
+# Non-intrusive password aging defaults for a general-purpose distro.
+PASS_MAX_DAYS	99999
+PASS_MIN_DAYS	0
+PASS_WARN_AGE	7
+# Set a modern, secure minimum password length.
+PASS_MIN_LEN	8
+
+# Standard UID/GID boundaries for system vs. user accounts.
+UID_MIN			  1000
+GID_MIN			  1000
+SYS_UID_MIN		  100
+SYS_UID_MAX		  999
+SYS_GID_MIN		  100
+SYS_GID_MAX		  999
+
+# Always create home directories for new users.
+CREATE_HOME		yes
+
+# Enable User Private Groups (UPG) for better security.
+USERGROUPS_ENAB	yes
+
+# A secure default umask for new users. (files=644, dirs=755)
+UMASK			022
+
+# A secure default mode for new home directories (private by default).
+HOME_MODE	0700
+
+# Use 'yescrypt' as the default password hashing algorithm.
+# It is a modern, strong, and memory-hard algorithm.
+ENCRYPT_METHOD yescrypt

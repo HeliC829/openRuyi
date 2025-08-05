@@ -1,0 +1,95 @@
+# SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
+# SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+# SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
+#
+# SPDX-License-Identifier: MulanPSL-2.0
+
+Name:           libpsl
+Version:        0.21.5
+Release:        %autorelease
+Summary:        C library for the Public Suffix List
+License:        MIT
+URL:            https://rockdaboot.github.io/libpsl
+#!RemoteAsset
+Source:         https://github.com/rockdaboot/libpsl/archive/refs/tags/%{version}.tar.gz
+BuildSystem:    meson
+
+BuildOption:    -Ddocs=false
+BuildOption:    -Druntime=libidn2
+BuildOption:    -Dbuiltin=true
+BuildOption:    -Dpsl_distfile=%{_datadir}/publicsuffix/public_suffix_list.dafsa
+BuildOption:    -Dpsl_file=%{_datadir}/publicsuffix/effective_tld_names.dat
+BuildOption:    -Dpsl_testfile=%{_datadir}/publicsuffix/test_psl.txt
+
+BuildRequires:  meson
+BuildRequires:  gcc
+BuildRequires:  gettext-devel
+BuildRequires:  glib-devel
+BuildRequires:  icu4c-devel
+BuildRequires:  libidn2-devel
+BuildRequires:  libunistring-devel
+BuildRequires:  make
+BuildRequires:  publicsuffix-list
+BuildRequires:  python3-devel
+
+Requires:       publicsuffix-list
+
+%description
+libpsl is a C library to handle the Public Suffix List, used by web clients to
+manage cookies, certificates, and domain highlighting.
+
+%package        devel
+Summary:        Development files for %{name}
+Requires:       %{name} = %{version}
+Requires:       publicsuffix-list
+
+%description    devel
+This package contains libraries and header files for
+developing applications that use %{name}.
+
+%package -n     psl
+Summary:        Command-line utility to explore the Public Suffix List
+
+%description -n psl
+This package contains a command-line utility to explore the Public Suffix List.
+
+%package -n     psl-make-dafsa
+Summary:        Compiles the Public Suffix List into DAFSA form
+BuildArch:      noarch
+
+%description -n psl-make-dafsa
+This script compiles a plain text Public Suffix List into a
+Deterministic Acyclic Finite State Automaton (DAFSA).
+
+%prep -a
+rm -frv list
+ln -sv %{_datadir}/publicsuffix list
+%py3_shebang_fix src/psl-make-dafsa
+
+%ldconfig_scriptlets
+
+%files
+%license COPYING
+%{_libdir}/libpsl.so.5
+%{_libdir}/libpsl.so.5.*
+%{_mandir}/man1/psl-make-dafsa.1.gz
+%{_mandir}/man1/psl.1.gz
+
+%files devel
+%doc AUTHORS NEWS
+%{_includedir}/libpsl.h
+%{_libdir}/libpsl.so
+%{_libdir}/pkgconfig/libpsl.pc
+
+%files -n psl
+%doc AUTHORS NEWS
+%license COPYING
+%{_bindir}/psl
+
+%files -n psl-make-dafsa
+%license COPYING
+%{_bindir}/psl-make-dafsa
+
+%changelog
+%{?autochangelog}

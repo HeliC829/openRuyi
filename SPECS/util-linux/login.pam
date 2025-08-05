@@ -1,0 +1,11 @@
+#%PAM-1.0
+# This file is part of openRuyi.
+#
+# By default, openRuyi uses a central PAM configuration stack.
+# This file simply includes the system-wide policy for local logins.
+# To customize, edit the files included by 'system-auth'.
+#
+auth       include      system-auth
+account    include      system-auth
+password   include      system-auth
+session    include      system-auth

@@ -1,0 +1,62 @@
+# SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
+# SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileContributor: Mahno <bestwow2014@gmail.com>
+# SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+#
+# SPDX-License-Identifier: MulanPSL-2.0
+
+Name:           blake3
+Version:        1.8.2
+Release:        %autorelease
+Summary:        Official C implementation of the BLAKE3 cryptographic hash function
+
+License:        Apache-2.0
+URL:            https://github.com/BLAKE3-team/BLAKE3/
+#!RemoteAsset
+Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+BuildRequires:  cmake
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  libasan8 libubsan1
+# tbb is not enabled, will be supported in the future
+BuildSystem:    cmake
+BuildOption(conf): -S c
+
+%description
+BLAKE3 is a cryptographic hash function that is:
+- Much faster than MD5, SHA-1, SHA-2, SHA-3, and BLAKE2.
+- Secure, unlike MD5 and SHA-1. And secure against length extension, unlike
+  SHA-2.
+- Highly parallelizable across any number of threads and SIMD lanes, because
+  it's a Merkle tree on the inside.
+- Capable of verified streaming and incremental updates, again because it's a
+  Merkle tree.
+- A PRF, MAC, KDF, and XOF, as well as a regular hash.
+- One algorithm with no variants, which is fast on x86-64 and also on smaller
+  architectures.
+
+%package devel
+Summary:        %{summary} - development files
+Requires:       %{name}
+
+%description devel
+Development files for the %{name} library.
+
+%build -p
+export ASMFLAGS="%{build_cflags}"
+
+%files
+%license LICENSE_A2
+%{_libdir}/libblake3.so.0
+%{_libdir}/libblake3.so.%{version}
+
+%files devel
+%doc c/example.c
+%doc c/README.md
+%{_includedir}/blake3.h
+%{_libdir}/libblake3.so
+%{_libdir}/cmake/blake3/
+%{_libdir}/pkgconfig/libblake3.pc
+
+%changelog
+%{?autochangelog}

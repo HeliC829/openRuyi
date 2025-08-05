@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
+# SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileContributor: Jingwiw <wangjingwei@iscas.ac.cn>
+# SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+#
+# SPDX-License-Identifier: MulanPSL-2.0
+
+%ifarch riscv64
+%global archdir riscv
+%endif
+
+Name:           linux-headers
+Version:        6.17.5
+Release:        %autorelease
+Summary:        Header files for the Linux kernel for use by userspace
+License:        GPL-2.0-only AND LGPL-2.1-only AND MIT AND BSD-2-Clause AND BSD-3-Clause
+URL:            https://www.kernel.org/
+#!RemoteAsset
+Source0:        https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-%{version}.tar.xz
+
+BuildRequires: rsync
+
+%description
+Linux-headers includes the C header files that specify the stable API
+interface between the Linux kernel and userspace libraries and programs.
+
+%prep
+%autosetup -p1 -n linux-%{version}
+
+%install
+%make_build ARCH=%{archdir} headers_install INSTALL_HDR_PATH=%{buildroot}%{_prefix}
+
+%files
+%license COPYING
+%{_includedir}/*
+
+%changelog
+%{?autochangelog}

@@ -1,0 +1,70 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1076,10 +1076,9 @@
+   include_directories(${BOOST_INCLUDE_DIR})
+   add_definitions(-DUSE_FOLLY -DFOLLY_NO_CONFIG)
+   list(APPEND THIRDPARTY_LIBS glog)
+-endif()
++ endif()
+ 
+-set(ROCKSDB_STATIC_LIB rocksdb${ARTIFACT_SUFFIX})
+-set(ROCKSDB_SHARED_LIB rocksdb-shared${ARTIFACT_SUFFIX})
++ set(ROCKSDB_SHARED_LIB rocksdb-shared${ARTIFACT_SUFFIX})
+ 
+ 
+ if(WIN32)
+@@ -1147,12 +1146,6 @@
+ set(BUILD_VERSION_CC ${CMAKE_BINARY_DIR}/build_version.cc)
+ configure_file(util/build_version.cc.in ${BUILD_VERSION_CC} @ONLY)
+ 
+-add_library(${ROCKSDB_STATIC_LIB} STATIC ${SOURCES} ${BUILD_VERSION_CC})
+-target_include_directories(${ROCKSDB_STATIC_LIB} PUBLIC
+-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
+-target_link_libraries(${ROCKSDB_STATIC_LIB} PRIVATE
+-  ${THIRDPARTY_LIBS} ${SYSTEM_LIBS})
+-
+ if(ROCKSDB_BUILD_SHARED)
+   add_library(${ROCKSDB_SHARED_LIB} SHARED ${SOURCES} ${BUILD_VERSION_CC})
+   target_include_directories(${ROCKSDB_SHARED_LIB} PUBLIC
+@@ -1163,10 +1156,8 @@
+   if(WIN32)
+     set_target_properties(${ROCKSDB_SHARED_LIB} PROPERTIES
+       COMPILE_DEFINITIONS "ROCKSDB_DLL;ROCKSDB_LIBRARY_EXPORTS")
+-    if(MSVC)
+-      set_target_properties(${ROCKSDB_STATIC_LIB} PROPERTIES
+-        COMPILE_FLAGS "/Fd${CMAKE_CFG_INTDIR}/${ROCKSDB_STATIC_LIB}.pdb")
+-      set_target_properties(${ROCKSDB_SHARED_LIB} PROPERTIES
++     if(MSVC)
++       set_target_properties(${ROCKSDB_SHARED_LIB} PROPERTIES
+         COMPILE_FLAGS "/Fd${CMAKE_CFG_INTDIR}/${ROCKSDB_SHARED_LIB}.pdb")
+     endif()
+   else()
+@@ -1180,8 +1171,6 @@
+ 
+ if(ROCKSDB_BUILD_SHARED AND NOT WIN32)
+   set(ROCKSDB_LIB ${ROCKSDB_SHARED_LIB})
+-else()
+-  set(ROCKSDB_LIB ${ROCKSDB_STATIC_LIB})
+ endif()
+ 
+ option(WITH_JNI "build with JNI" OFF)
+@@ -1244,17 +1233,9 @@
+     endforeach()
+   endforeach()
+ 
+-  install(DIRECTORY "${PROJECT_SOURCE_DIR}/cmake/modules" COMPONENT devel DESTINATION ${package_config_destination})
+-
+-  install(
+-    TARGETS ${ROCKSDB_STATIC_LIB}
+-    EXPORT RocksDBTargets
+-    COMPONENT devel
+-    ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+-    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+-  )
++   install(DIRECTORY "${PROJECT_SOURCE_DIR}/cmake/modules" COMPONENT devel DESTINATION ${package_config_destination})
+ 
+-  if(ROCKSDB_BUILD_SHARED)
++   if(ROCKSDB_BUILD_SHARED)
+     install(
+       TARGETS ${ROCKSDB_SHARED_LIB}
+       EXPORT RocksDBTargets

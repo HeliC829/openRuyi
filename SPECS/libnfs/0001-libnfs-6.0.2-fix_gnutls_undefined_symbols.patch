@@ -1,0 +1,25 @@
+diff --git a/lib/Makefile.am b/lib/Makefile.am
+index 82376cb..33be5e4 100644
+--- a/lib/Makefile.am
++++ b/lib/Makefile.am
+@@ -48,5 +48,5 @@ libnfs_la_LIBADD = \
+ 
+ if HAVE_TLS
+ libnfs_la_CPPFLAGS += -I$(abs_top_srcdir)/tls
+-libnfs_la_LIBADD += ../tls/libtls.la
++libnfs_la_LIBADD += ../tls/libtls.la -lgnutls
+ endif
+diff --git a/utils/Makefile.am b/utils/Makefile.am
+index bd584b8..2ae7636 100644
+--- a/utils/Makefile.am
++++ b/utils/Makefile.am
+@@ -16,9 +16,6 @@ AM_CPPFLAGS = \
+ 	"-D_U_=__attribute__((unused))"
+ 
+ COMMON_LIBS = ../lib/libnfs.la $(LIBSOCKET)
+-if HAVE_TLS
+-COMMON_LIBS += -lgnutls
+-endif
+ 
+ nfs_cat_LDADD = $(COMMON_LIBS)
+ nfs_ls_LDADD = $(COMMON_LIBS)

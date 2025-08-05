@@ -1,0 +1,49 @@
+# SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
+# SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+# SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
+#
+# SPDX-License-Identifier: MulanPSL-2.0
+
+%define byaccdate 20241231
+
+Name:           byacc
+Version:        2.0.%{byaccdate}
+Release:        %autorelease
+Summary:        A parser generator
+License:        Public-Domain
+URL:            https://invisible-island.net/byacc/byacc.html
+#!RemoteAsset
+Source:         https://invisible-mirror.net/archives/byacc/byacc-%{byaccdate}.tgz
+BuildSystem:    autotools
+
+BuildRequires:  gcc
+
+%description
+Berkeley Yacc is an LALR(1) parser generator, made as compatible as possible
+with AT&T Yacc. It can accept any input specification that conforms to the
+AT&T Yacc documentation.
+
+%prep -a
+find . -type f -name \*.c -print0 | xargs -0 sed -i 's/YYSTACKSIZE 500/YYSTACKSIZE 10000/g'
+
+# as same as ncurses,configure: error: unrecognized option: --docdir=/usr/share/doc/byacc
+%conf
+./configure \
+    --prefix=%{_prefix} \
+    --libdir=%{_libdir} \
+    --mandir=%{_mandir} \
+    --disable-dependency-tracking
+
+%install -a
+ln -s yacc %{buildroot}%{_bindir}/byacc
+ln -s yacc.1 %{buildroot}%{_mandir}/man1/byacc.1
+
+%files
+%doc ACKNOWLEDGEMENTS NEW_FEATURES NO_WARRANTY README CHANGES NOTES
+%license AUTHORS
+%{_bindir}/*
+%{_mandir}/man1/*
+
+%changelog
+%{?autochangelog}

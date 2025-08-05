@@ -1,0 +1,63 @@
+# SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
+# SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileContributor: Jingwiw <wangjingwei@iscas.ac.cn>
+# SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+# SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
+#
+# SPDX-License-Identifier: MulanPSL-2.0
+
+# default without launcher
+%bcond launcher 0
+
+Name:           dbus-broker
+Version:        37
+Release:        %autorelease
+Summary:        D-Bus message bus implementation
+License:        Apache-2.0
+URL:            https://github.com/bus1/dbus-broker
+#!RemoteAsset
+Source:         https://github.com/bus1/dbus-broker/releases/download/v%{version}/%{name}-%{version}.tar.xz
+
+BuildSystem:    meson
+
+BuildOption:    -Daudit=true
+BuildOption:    -Dselinux=true
+%if %{with launcher}
+BuildOption:    -Dlauncher=true
+%else
+BuildOption:    -Dlauncher=false
+%endif
+BuildOption:    -Dtests=false
+
+BuildRequires:  linux-headers >= 4.17
+BuildRequires:  meson
+BuildRequires:  python3
+BuildRequires:  pkgconfig
+BuildRequires:  pkgconfig(audit) >= 3.0
+BuildRequires:  pkgconfig(expat) >= 2.2.3
+BuildRequires:  pkgconfig(glib-2.0) >= 2.50
+BuildRequires:  pkgconfig(libcap-ng) >= 0.6
+BuildRequires:  pkgconfig(libselinux) >= 3.2
+
+%if %{with launcher}
+BuildRequires:  pkgconfig(libsystemd)
+BuildRequires:  pkgconfig(systemd)
+%endif
+
+%description
+dbus-broker is an implementation of a message bus as defined by the D-Bus
+specification. It offers improved performance and reliability compared
+to the reference implementation.
+
+%files
+%license LICENSE
+%{_bindir}/dbus-broker
+%if %{with launcher}
+%{_bindir}/dbus-broker-launch
+%{_journalcatalogdir}/*
+%{_unitdir}/dbus-broker.service
+%{_userunitdir}/dbus-broker.service
+%endif
+
+%changelog
+%{?autochangelog}

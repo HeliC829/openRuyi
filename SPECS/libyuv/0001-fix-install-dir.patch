@@ -1,0 +1,26 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c6cce8a..158d361 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -188,9 +188,6 @@ endif()
+ add_executable      ( cpuid ${ly_base_dir}/util/cpuid.c )
+ target_link_libraries  ( cpuid ${ly_lib_static} )
+ 
+-# this creates the conversion tool
+-add_executable			( yuvconvert ${ly_base_dir}/util/yuvconvert.cc )
+-target_link_libraries	( yuvconvert ${ly_lib_static} )
+ 
+ # this creates the yuvconstants tool
+ add_executable      ( yuvconstants ${ly_base_dir}/util/yuvconstants.c )
+@@ -246,9 +243,9 @@ endif()
+ 
+ 
++include(GNUInstallDirs)
+ # install the conversion tool, .so, .a, and all the header files
+-install ( TARGETS yuvconvert DESTINATION bin )
+ install ( TARGETS ${ly_lib_static}						DESTINATION lib )
+-install ( TARGETS ${ly_lib_shared} LIBRARY DESTINATION lib RUNTIME DESTINATION bin ARCHIVE DESTINATION lib )
++install ( TARGETS ${ly_lib_shared} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} RUNTIME DESTINATION bin ARCHIVE DESTINATION lib )
+ install ( DIRECTORY ${PROJECT_SOURCE_DIR}/include/		DESTINATION include )
+ 
+ # create the .deb and .rpm packages using cpack

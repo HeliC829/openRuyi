@@ -1,0 +1,25 @@
+From ade9632aecbe1ed2d9a9220edcd42f56b9ad0eea Mon Sep 17 00:00:00 2001
+From: luochenglcs <luochunsheng@huawei.com>
+Date: Tue, 30 Aug 2022 15:47:39 +0800
+Subject: [PATCH] avoid array index out-of-bounds
+
+---
+ numad.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/numad.c b/numad.c
+index 0721af4..58a198c 100644
+--- a/numad.c
++++ b/numad.c
+@@ -1983,6 +1983,8 @@ id_list_p pick_numa_nodes(int pid, int cpus, int mbs, int assume_enough_cpus) {
+         // Next line optional, since we will not look at that node again
+         tmp_node[index[best_node_ix]].magnitude = combined_value_of_weighted_resources(0, mbs, cpus, tmp_node[index[best_node_ix]].MBs_free, tmp_node[index[best_node_ix]].CPUs_free);
+         best_node_ix += 1;
++        if (best_node_ix >= num_nodes)
++            break;
+     }
+     // For existing processes, calculate the non-local memory percent to see if
+     // process is already in the right place.
+-- 
+1.8.3.1
+

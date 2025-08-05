@@ -1,0 +1,51 @@
+# SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
+# SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileContributor: Jingwiw <wangjingwei@iscas.ac.cn>
+# SPDX-FileContributor: Suyun114 <ziyu.oerv@isrc.iscas.ac.cn>
+# SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+#
+# SPDX-License-Identifier: MulanPSL-2.0
+
+Name:           libbpf
+Version:        1.6.2
+Release:        %autorelease
+Summary:        C library for managing eBPF programs and maps
+License:        LGPL-2.1-only OR BSD-2-Clause
+URL:            https://github.com/libbpf/libbpf
+#!RemoteAsset
+Source:         https://github.com/libbpf/libbpf/archive/v%{version}.tar.gz
+BuildSystem:    autotools
+
+BuildOption(build): STATIC_LIBS= LIBDIR=%{_libdir}
+BuildOption(build): -C src
+BuildOption(install): STATIC_LIBS= LIBDIR=%{_libdir}
+BuildOption(install): -C src
+
+BuildRequires:  libelf-devel
+BuildRequires:  zlib-devel
+
+%description
+libbpf is a C library which provides API for managing eBPF programs and maps.
+
+%package        devel
+Summary:        Development files for libbpf
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+
+%description    devel
+libbpf is a C library which provides API for managing eBPF programs and maps.
+
+%conf
+
+%check
+# Upstream does not provide a 'make check' target.
+
+%files
+%{_libdir}/libbpf.so.*
+
+%files devel
+%{_libdir}/libbpf.so
+%{_includedir}/bpf/
+%{_libdir}/pkgconfig/libbpf.pc
+
+%changelog
+%{?autochangelog}

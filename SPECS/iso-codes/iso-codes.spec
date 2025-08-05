@@ -1,0 +1,56 @@
+# Copyright (C) 2025 openruyi
+# SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
+# SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+# SPDX-FileContributor: ayostl <yao_xp@yeah.net>
+#
+# SPDX-License-Identifier: MulanPSL-2.0
+
+Name:           iso-codes
+Version:        4.18.0
+Release:        %autorelease
+Summary:        ISO Code Lists and Translations
+License:        LGPL-2.1-or-later
+URL:            https://salsa.debian.org/iso-codes-team/iso-codes
+#!RemoteAsset
+Source0:        https://salsa.debian.org/iso-codes-team/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz
+BuildSystem:    autotools
+
+BuildOption(install):  INSTALL="%{__install} -p"
+
+BuildRequires:  pkgconfig
+BuildRequires:  python3-devel
+BuildRequires:  python3-lxml
+
+BuildArch:      noarch
+Provides:       iso-codes-lang = %{version}
+Obsoletes:      iso-codes-lang <= %{version}
+
+%description
+This package provides the ISO-639 language code list, the ISO-3166
+territory code list, ISO-3166-2 subterritory lists, and all their
+translations in gettext .po form.
+
+%package        devel
+Summary:        ISO code lists and translations
+Requires:       %{name} = %{version}
+
+%description    devel
+This package provides the ISO-639 Language code list, the ISO-3166
+Territory code list, and ISO-3166-2 sub-territory lists, and all their
+
+%install -a
+%find_lang %{name} --all-name
+
+%files -f %{name}.lang
+%doc CHANGELOG.md README.md
+%license COPYING
+%dir %{_datadir}/xml/iso-codes
+%{_datadir}/xml/iso-codes/*.xml
+%{_datadir}/iso-codes
+
+%files devel
+%{_datadir}/pkgconfig/iso-codes.pc
+
+%changelog
+%{?autochangelog}

@@ -1,0 +1,39 @@
+# SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
+# SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+#
+# SPDX-License-Identifier: MulanPSL-2.0
+
+%global srcname pytest-mock
+
+Name:           python-%{srcname}
+Version:        3.14.0
+Release:        %autorelease
+License:        MIT
+URL:            https://github.com/pytest-dev/pytest-mock/
+Summary:        Thin-wrapper around the mock package for easier use with py.test
+Provides:       python3-%{srcname}
+%python_provide python3-%{srcname}
+#!RemoteAsset
+Source0:        https://files.pythonhosted.org/packages/source/p/%{srcname}/%{srcname}-%{version}.tar.gz
+BuildArch:      noarch
+
+BuildRequires:  python3-devel
+BuildSystem:    pyproject
+BuildOption(install): pytest_mock +auto
+%description
+This plugin installs a @code{mocker} fixture which is a thin-wrapper
+around the patching API provided by the @code{mock} package, but with the
+benefit of not having to worry about undoing patches at the end of a test.
+The mocker fixture has the same API as @code{mock.patch}, supporting the
+same arguments.
+
+%generate_buildrequires
+%pyproject_buildrequires
+
+%files -f %{pyproject_files}
+%license LICENSE
+%doc README*
+
+%changelog
+%{?autochangelog}

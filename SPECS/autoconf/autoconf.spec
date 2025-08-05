@@ -1,0 +1,47 @@
+# SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
+# SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+#
+# SPDX-License-Identifier: MulanPSL-2.0
+
+Name:           autoconf
+Version:        2.72
+Release:        %autorelease
+Summary:        A GNU Tool for Automatically Configuring Source Code
+License:        GPL-3.0-or-later
+URL:            https://www.gnu.org/software/autoconf
+#!RemoteAsset
+Source0:        https://ftpmirror.gnu.org/gnu/autoconf/autoconf-%{version}.tar.xz
+#!RemoteAsset
+Source1:        https://ftpmirror.gnu.org/gnu/autoconf/autoconf-%{version}.tar.xz.sig
+Patch0:         autoreconf-ltdl.diff
+BuildRequires:  help2man
+BuildRequires:  m4 >= 1.4.16
+BuildArch:      noarch
+Requires:       m4 >= 1.4.16
+Requires:       perl >= 5.10
+BuildRequires:  perl >= 5.10
+BuildSystem:    autotools
+%description
+GNU Autoconf is a tool for configuring source code and makefiles. Using
+autoconf, programmers can create portable and configurable packages,
+because the person building the package is allowed to specify various
+configuration options.
+
+You should install autoconf if you are developing software and would
+like to create shell scripts to configure your source code packages.
+
+Note that the autoconf package is not required for the end user who may
+be configuring software with an autoconf-generated script; autoconf is
+only required for the generation of the scripts, not their use.
+
+%files
+%doc AUTHORS NEWS README TODO
+%license COPYING
+%{_bindir}/*
+%{_datadir}/autoconf
+%{_infodir}/*.gz
+%{_mandir}/man1/*.gz
+
+%changelog
+%{?autochangelog}

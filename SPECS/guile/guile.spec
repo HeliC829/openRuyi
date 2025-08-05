@@ -1,0 +1,80 @@
+# SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
+# SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileContributor: Suyun114 <ziyu.oerv@isrc.iscas.ac.cn>
+# SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+# SPDX-FileContributor: laokz <zhangkai@iscas.ac.cn>
+#
+# SPDX-License-Identifier: MulanPSL-2.0
+
+Name:           guile
+Version:        3.0.10
+Release:        %autorelease
+Summary:        GNU's Ubiquitous Intelligent Language for Extension
+License:        GFDL-1.3-only AND GPL-3.0-or-later AND LGPL-3.0-or-later
+URL:            https://www.gnu.org/software/guile/
+#!RemoteAsset
+Source0:        https://ftpmirror.gnu.org/gnu/guile/%{name}-%{version}.tar.xz
+#!RemoteAsset
+Source1:        https://ftpmirror.gnu.org/gnu/guile/%{name}-%{version}.tar.xz.sig
+
+BuildSystem:    autotools
+BuildOption(conf):  --disable-static
+
+BuildRequires:  gc-devel
+BuildRequires:  gmp-devel
+BuildRequires:  ncurses-devel
+BuildRequires:  readline-devel
+BuildRequires:  libffi-devel
+BuildRequires:  libunistring-devel
+BuildRequires:  libxcrypt-devel
+
+%description
+This is Guile, a portable, embeddable Scheme implementation written in
+C. Guile provides a machine independent execution platform that can be
+linked in as a library when building extensible programs.
+
+%package devel
+
+Summary:        GNU's Ubiquitous Intelligent Language for Extension
+License:        LGPL-2.1-or-later
+
+Requires:       %{name} = %{version}
+Requires:       gc-devel
+Requires:       gmp-devel
+Requires:       ncurses-devel
+Requires:       readline-devel
+Requires:       libffi-devel
+Requires:       libunistring-devel
+Requires:       libxcrypt-devel
+
+%description    devel
+This is Guile, a portable, embeddable Scheme implementation written in
+C. Guile provides a machine independent execution platform that can be
+linked in as a library when building extensible programs.
+
+%conf -p
+export CFLAGS="$CFLAGS -std=gnu17"
+
+%files
+%license LICENSE COPYING*
+%doc ABOUT-NLS AUTHORS ChangeLog GUILE-VERSION HACKING
+%doc NEWS README THANKS
+%{_bindir}/guile-tools
+%{_bindir}/guild
+%{_bindir}/guile
+%{_libdir}/*.so.*
+%{_libdir}/guile
+%{_datadir}/guile
+%{_mandir}/man1/guile.1*
+
+%files devel
+%{_bindir}/guile-snarf
+%{_bindir}/guile-config
+%{_includedir}/guile/*
+%{_datadir}/aclocal/guile.m4
+%{_infodir}/*.info*
+%{_libdir}/libguile-*.so
+%{_libdir}/pkgconfig/guile-*.pc
+
+%changelog
+%{?autochangelog}
