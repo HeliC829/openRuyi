@@ -1,0 +1,238 @@
+From f7175c71a90aa31a60dd2dd01e869d82bdd61bec Mon Sep 17 00:00:00 2001
+From: Z572 <z572@z572.online>
+Date: Tue, 4 Nov 2025 16:56:15 +0800
+Subject: [PATCH] Add openruyi support.
+
+---
+ mkosi/distribution/__init__.py                |   2 +
+ mkosi/distribution/openruyi.py                | 104 ++++++++++++++++++
+ .../mkosi-initrd/mkosi.conf.d/oepnruyi.conf   |  15 +++
+ .../mkosi-tools/mkosi.conf.d/openruyi.conf    |  24 ++++
+ .../mkosi-vm/mkosi.conf.d/openruyi.conf       |  29 +++++
+ 5 files changed, 174 insertions(+)
+ create mode 100644 mkosi/distribution/openruyi.py
+ create mode 100644 mkosi/resources/mkosi-initrd/mkosi.conf.d/oepnruyi.conf
+ create mode 100644 mkosi/resources/mkosi-tools/mkosi.conf.d/openruyi.conf
+ create mode 100644 mkosi/resources/mkosi-vm/mkosi.conf.d/openruyi.conf
+
+diff --git a/mkosi/distribution/__init__.py b/mkosi/distribution/__init__.py
+index 2b8b632b..6c08a0bc 100644
+--- a/mkosi/distribution/__init__.py
++++ b/mkosi/distribution/__init__.py
+@@ -42,6 +42,7 @@ class Distribution(StrEnum):
+     rocky = enum.auto()
+     alma = enum.auto()
+     azure = enum.auto()
++    openruyi = enum.auto()
+     custom = enum.auto()
+ 
+     def is_centos_variant(self) -> bool:
+@@ -66,6 +67,7 @@ class Distribution(StrEnum):
+             Distribution.rhel,
+             Distribution.rhel_ubi,
+             Distribution.openmandriva,
++            Distribution.openruyi,
+             Distribution.rocky,
+             Distribution.alma,
+         )
+diff --git a/mkosi/distribution/openruyi.py b/mkosi/distribution/openruyi.py
+new file mode 100644
+index 00000000..ac3acaba
+--- /dev/null
++++ b/mkosi/distribution/openruyi.py
+@@ -0,0 +1,104 @@
++# SPDX-License-Identifier: LGPL-2.1-or-later
++import re
++import tempfile
++from collections.abc import Iterable, Sequence
++from pathlib import Path
++
++from mkosi.config import Architecture, Config
++from mkosi.context import Context
++from mkosi.curl import curl
++from mkosi.distribution import (
++    DistributionInstaller,
++    PackageType,
++    join_mirror,
++    Distribution
++)
++from mkosi.installer import PackageManager
++from mkosi.installer.dnf import Dnf
++from mkosi.installer.rpm import RpmRepository, find_rpm_gpgkey, setup_rpm
++from mkosi.log import die
++from mkosi.util import startswith, tuplify
++
++
++@tuplify
++def find_openruyi_rpm_gpgkeys(context: Context) -> Iterable[str]:
++    yield find_rpm_gpgkey(
++                context,
++                "RPM-GPG-KEY-openruyi",
++                "https://vine.oerv.ac.cn/OpenRuyi:/Factory:/Bootstrap/x86_64/repodata/repomd.xml.key",
++            )
++
++class Installer(DistributionInstaller, distribution=Distribution.openruyi):
++    @classmethod
++    def pretty_name(cls) -> str:
++        return "openRuyi Linux"
++
++    @classmethod
++    def filesystem(cls) -> str:
++        return "btrfs"
++
++    @classmethod
++    def package_type(cls) -> PackageType:
++        return PackageType.rpm
++
++    @classmethod
++    def default_release(cls) -> str:
++        return "0.1"
++
++    @classmethod
++    def grub_prefix(cls) -> str:
++        return "grub"
++
++    @classmethod
++    def package_manager(cls, config: Config) -> type[PackageManager]:
++        return Dnf
++
++    @classmethod
++    def setup(cls, context: Context) -> None:
++        setup_rpm(context)
++        Dnf.setup(
++            context,
++            list(cls.repositories(context)),
++            filelists=False,
++            metadata_expire=None,
++        )
++
++    @classmethod
++    def install(cls, context: Context) -> None:
++        cls.install_packages(context, ["filesystem",
++                                       "systemd-udev",
++                                       "glibc",
++                                       "glibc-locale-base",
++                                       "bash",
++                                       "systemd",
++                                       "util-linux",
++                                       "openRuyi-release"],
++                             apivfs=False)
++
++    @classmethod
++    def install_packages(cls, context: Context, packages: Sequence[str], apivfs: bool = True) -> None:
++        Dnf.invoke(context, "install", packages, apivfs=apivfs)
++
++    @classmethod
++    def remove_packages(cls, context: Context, packages: Sequence[str]) -> None:
++        Dnf.invoke(context, "remove", packages, apivfs=True)
++
++    @classmethod
++    def repositories(cls, context: Context) -> Iterable[RpmRepository]:
++        if context.config.local_mirror:
++            yield RpmRepository("local-mirror", f"baseurl={context.config.local_mirror}", gpgurls=())
++            return
++        else:
++            # gpgurls = find_openruyi_rpm_gpgkeys(context)
++            yield RpmRepository("Base", f"baseurl=https://diamond.oerv.ac.cn/openruyi/$basearch/", gpgurls=())
++    @classmethod
++    def architecture(cls, arch: Architecture) -> str:
++        a = {
++            Architecture.riscv64:   "riscv64",
++            Architecture.x86_64:    "x86_64",
++        }.get(arch)  # fmt: skip
++
++        if not a:
++            die(f"Architecture {a} is not supported by openRuyi")
++
++        return a
+diff --git a/mkosi/resources/mkosi-initrd/mkosi.conf.d/oepnruyi.conf b/mkosi/resources/mkosi-initrd/mkosi.conf.d/oepnruyi.conf
+new file mode 100644
+index 00000000..55444305
+--- /dev/null
++++ b/mkosi/resources/mkosi-initrd/mkosi.conf.d/oepnruyi.conf
+@@ -0,0 +1,15 @@
++# SPDX-License-Identifier: LGPL-2.1-or-later
++
++[Match]
++Distribution=openruyi
++
++[Content]
++Packages=
++        btrfs-progs
++        kmod
++        util-linux
++        systemd-dissect
++        systemd-sysusers
++
++RemoveFiles=
++        /usr/share/locale/*
+\ No newline at end of file
+diff --git a/mkosi/resources/mkosi-tools/mkosi.conf.d/openruyi.conf b/mkosi/resources/mkosi-tools/mkosi.conf.d/openruyi.conf
+new file mode 100644
+index 00000000..5b46de3b
+--- /dev/null
++++ b/mkosi/resources/mkosi-tools/mkosi.conf.d/openruyi.conf
+@@ -0,0 +1,24 @@
++# SPDX-License-Identifier: LGPL-2.1-or-later
++
++[Match]
++Distribution=openruyi
++
++[Content]
++Packages=
++        btrfs-progs
++        ca-certificates-mozilla
++        createrepo_c
++        dnf5
++        dnf5-plugins
++        glibc-gconv-modules-extra
++        grep
++        libseccomp
++        openssh-clients
++        policycoreutils
++        python3-cryptography
++        python3-pefile
++        shadow
++        squashfs
++        systemd-boot
++        systemd-sysusers
++        xz
+diff --git a/mkosi/resources/mkosi-vm/mkosi.conf.d/openruyi.conf b/mkosi/resources/mkosi-vm/mkosi.conf.d/openruyi.conf
+new file mode 100644
+index 00000000..5c95369a
+--- /dev/null
++++ b/mkosi/resources/mkosi-vm/mkosi.conf.d/openruyi.conf
+@@ -0,0 +1,29 @@
++# SPDX-License-Identifier: LGPL-2.1-or-later
++
++[Match]
++Distribution=openruyi
++
++[Content]
++Packages=
++        dbus-broker
++        iproute
++        iputils
++        linux
++        polkit
++        tpm2-tss
++        systemd-boot
++        systemd-udev
++        systemd-sysusers
++        systemd-networkd
++        xz
++        filesystem
++        dnf5
++        dnf5-plugins
++        systemd-resolved
++        bash-completion
++        authselect
++        libpwquality
++        ca-certificates
++        ca-certificates-mozilla
++        openRuyi-repos
++        openRuyi-release
+\ No newline at end of file
+-- 
+2.52.0
+
