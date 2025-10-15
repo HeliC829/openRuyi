@@ -6,6 +6,8 @@
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
+%global _test_target regress
+
 Name:           mandoc
 Version:        1.14.6
 Release:        %autorelease
@@ -17,7 +19,7 @@ Source:         https://mandoc.bsd.lv/snapshots/%{name}-%{version}.tar.gz
 BuildSystem:    autotools
 
 BuildRequires:  zlib-devel
-
+BuildOption(check): -C %{name}-%{version}
 %description
 The mandoc manpage compiler toolset (formerly called "mdocml")
 is a suite of tools compiling mdoc(7), the roff(7) macro language
