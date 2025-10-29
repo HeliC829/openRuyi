@@ -1,0 +1,65 @@
+# SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
+# SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
+#
+# SPDX-License-Identifier: MulanPSL-2.0
+
+%global srcname cryptography
+
+Name:           python-%{srcname}
+Version:        46.0.3
+Release:        %autorelease
+Summary:        PyCA's cryptography library
+License:        Apache-2.0 OR BSD-3-Clause
+URL:            https://cryptography.io/en/latest/
+VCS:            git:https://github.com/pyca/cryptography
+#!RemoteAsset
+Source0:        https://files.pythonhosted.org/packages/source/c/%{srcname}/%{srcname}-%{version}.tar.gz
+#!RemoteAsset
+Source1:        https://github.com/TakoPack/%{name}-vendor/releases/download/vendor-%{version}/%{srcname}-%{version}-vendor.tar.bz2
+BuildSystem:    pyproject
+
+BuildOption(prep):  -a1
+BuildOption(install): %{srcname}
+
+BuildRequires:  rust
+BuildRequires:  pkgconfig(openssl)
+BuildRequires:  pyproject-rpm-macros
+BuildRequires:  python3-cffi
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-pip
+BuildRequires:  python3-maturin
+
+Provides:       python3-%{srcname}
+%python_provide python3-%{srcname}
+
+Requires:       openssl
+
+%description
+cryptography is a package designed to expose cryptographic primitives and
+recipes to Python developers.
+
+%prep -a
+mkdir -p .cargo
+cat > .cargo/config.toml <<'EOF'
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "vendor"
+EOF
+
+%generate_buildrequires
+%pyproject_buildrequires
+
+%install -p
+# https://github.com/pyca/cryptography/issues/1463
+find . -name .keep -print -delete
+
+%files -f %{pyproject_files}
+%doc README.rst docs
+%license LICENSE LICENSE.APACHE LICENSE.BSD
+
+%changelog
+%{?autochangelog}
