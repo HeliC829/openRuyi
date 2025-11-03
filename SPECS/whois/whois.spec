@@ -12,9 +12,7 @@ Summary:        Improved WHOIS client
 License:        GPL-2.0-or-later
 URL:            https://github.com/rfc1036/whois
 #!RemoteAsset
-Source0:        https://ftp.debian.org/debian/pool/main/w/%{name}/%{name}_%{version}.tar.xz
-#!RemoteAsset
-Source1:        https://ftp.debian.org/debian/pool/main/w/%{name}/%{name}_%{version}.dsc
+Source0:        https://github.com/rfc1036/whois/archive/refs/tags/v%{version}.tar.gz
 BuildSystem:    autotools
 
 BuildOption(conf):  CONFIG_FILE="%{_sysconfdir}/%{name}.conf"
@@ -39,9 +37,6 @@ This version of the WHOIS client tries to guess the right server to ask for
 the specified object. If no guess can be made it will connect to
 whois.networksolutions.com for NIC handles or whois.arin.net for IPv4
 addresses and network names.
-
-%prep
-%autosetup -p1 -n work
 
 %conf
 # No conf
