@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Jingwiw <wangjingwei@iscas.ac.cn>
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+# SPDX-FileContributor: Jingkun Zheng <zhengjingkun@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -72,7 +73,7 @@ rm -rf %{buildroot}%{_mandir}/{fr,de,pt_BR}/man3
 
 %files
 %license COPYING COPYING.LIB
-%doc doc/bugs.md doc/FAQ NEWS README.md
+%doc doc/bugs.md doc/FAQ NEWS README.md doc/libproc.supp
 %{_libdir}/%{libname}.so.%{sonum}*
 %{_bindir}/free
 %{_bindir}/hugetop
