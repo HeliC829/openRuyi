@@ -11,7 +11,7 @@
 %global signmodules 1
 %global kver %{version}-%{release}
 %global kernel_make_flags LD=ld.bfd KBUILD_BUILD_VERSION=%{release}
-
+%global debug_package %{nil}
 Name:             linux
 Version:          6.17.5
 Release:          %autorelease
