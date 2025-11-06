@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
 # SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
+# SPDX-FileContributor: Jingkun Zheng <zhengjingkun@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -22,12 +23,15 @@ BuildOption(build): USE_THREAD=1
 BuildOption(build): USE_OPENMP=0
 BuildOption(build): NO_STATIC=1
 BuildOption(build): DYNAMIC_ARCH=1
-BuildOption(build): TARGET=RISCV64_GENERIC
 BuildOption(build): NO_TEST=1
 BuildOption(install): PREFIX=%{_prefix}
 BuildOption(install): OPENBLAS_LIBRARY_DIR=%{_libdir}
 BuildOption(install): NO_STATIC=1
 BuildRequires:  gcc perl-devel gcc-c++
+
+%ifarch riscv64
+BuildOption(build): TARGET=RISCV64_GENERIC
+%endif
 
 %description
 OpenBLAS is an optimized BLAS library based on GotoBLAS2, providing a high-performance
