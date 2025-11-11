@@ -12,13 +12,16 @@ Release:        %autorelease
 Summary:        A Trivial Database library
 License:        LGPL-3.0-or-later
 URL:            https://tdb.samba.org/
+# No VCS link available
 #!RemoteAsset
 Source:         https://samba.org/ftp/tdb/tdb-%{version}.tar.gz
 
 BuildSystem:    autotools
 
-BuildOption(conf):    --disable-rpath --bundled-libraries=NONE --builtin-libraries=replace
-BuildOption(conf):    --without-gettext
+BuildOption(conf):  --disable-rpath
+BuildOption(conf):  --bundled-libraries=NONE
+BuildOption(conf):  --builtin-libraries=replace
+BuildOption(conf):  --without-gettext
 
 BuildRequires:  python3-devel
 
@@ -26,20 +29,20 @@ BuildRequires:  python3-devel
 The Tdb library implements a trivial database that is used by Samba and
 other projects. It is extremely fast and designed for concurrent access.
 
-%package tools
+%package        tools
 Summary:        Command-line tools for managing Tdb databases
 Requires:       %{name} = %{version}
 
-%description tools
+%description    tools
 This package contains tools to create, view, and manage Tdb database files,
 such as tdbdump and tdbtool.
 
-%package devel
+%package        devel
 Summary:        Development files for the Tdb library
 Requires:       %{name} = %{version}
 Requires:       tdb-tools = %{version}
 
-%description devel
+%description    devel
 This package contains the header files, pkg-config file, and development
 documentation needed to build applications that use the Tdb library.
 
