@@ -4,6 +4,7 @@
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
+%global modpath %{_prefix}/lib/modules/%{kver}
 
 %ifarch riscv64
 #!BuildConstraint: hardware:jobs 32
@@ -88,8 +89,6 @@ echo "-%{release}" > localversion
 %make_build %{kernel_make_flags}
 
 %install
-%define modpath %{_prefix}/lib/modules/%{kver}
-%define kpath %{buildroot}%{_prefix}/lib/kernel
 %define ksrcpath %{buildroot}%{_usrsrc}/kernels/%{kver}
 install -d %{buildroot}%{modpath} %{ksrcpath}
 
@@ -97,8 +96,10 @@ install -d %{buildroot}%{modpath} %{ksrcpath}
 
 %make_build run-command %{kernel_make_flags} KBUILD_RUN_COMMAND="$(pwd)/scripts/package/install-extmod-build %{ksrcpath}"
 
-ln -sf ../../../../src/kernels/%{kver} %{buildroot}%{modpath}/build
-ln -sf ../../../../src/kernels/%{kver} %{buildroot}%{modpath}/source
+pushd %{buildroot}%{modpath}
+ln -sf %{_usrsrc}/kernels/%{kver} build
+ln -sf %{_usrsrc}/kernels/%{kver} source
+popd
 
 install -Dm644 $(make %{kernel_make_flags} -s image_name) %{buildroot}%{modpath}/vmlinuz
 
@@ -122,6 +123,8 @@ fi
 %files modules
 %{modpath}/*
 %exclude %{modpath}/vmlinuz
+%exclude %{modpath}/build
+%exclude %{modpath}/source
 
 %files devel
 %{_usrsrc}/kernels/%{kver}/
