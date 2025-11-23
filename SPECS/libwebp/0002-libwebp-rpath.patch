@@ -1,0 +1,21 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 268ac6e..3add56e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -120,11 +120,11 @@ endif()
+ include(cmake/deps.cmake)
+ include(GNUInstallDirs)
+ 
+-if(BUILD_SHARED_LIBS AND NOT DEFINED CMAKE_INSTALL_RPATH)
+-  # Set the rpath to match autoconf/libtool behavior. Note this must be set
+-  # before target creation.
+-  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+-endif()
++# if(BUILD_SHARED_LIBS AND NOT DEFINED CMAKE_INSTALL_RPATH)
++#   # Set the rpath to match autoconf/libtool behavior. Note this must be set
++#   # before target creation.
++#   set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
++# endif()
+ 
+ # ##############################################################################
+ # Options.

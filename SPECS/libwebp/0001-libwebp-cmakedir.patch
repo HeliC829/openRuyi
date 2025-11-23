@@ -1,0 +1,13 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 39d3d8f..268ac6e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -795,7 +795,7 @@ install(
+   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+-set(ConfigPackageLocation ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/cmake/)
++set(ConfigPackageLocation ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/)
+ install(EXPORT ${PROJECT_NAME}Targets NAMESPACE ${PROJECT_NAME}::
+         DESTINATION ${ConfigPackageLocation})
+ 
