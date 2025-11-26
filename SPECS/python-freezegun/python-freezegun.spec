@@ -8,7 +8,7 @@
 
 Name:           python-%{srcname}
 Version:        1.5.5
-Release:        1
+Release:        %autorelease
 License:        Apache-2.0
 URL:            https://github.com/spulec/freezegun
 Summary:        Test utility for mocking the datetime module

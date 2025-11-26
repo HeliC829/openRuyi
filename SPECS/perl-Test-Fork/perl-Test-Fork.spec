@@ -6,7 +6,7 @@
 
 Name:           perl-Test-Fork
 Version:        0.02
-Release:        1%{?dist}
+Release:        %autorelease
 Summary:        Test code which forks
 License:        GPL-1.0-or-later OR Artistic-1.0-Perl
 URL:            https://metacpan.org/dist/Test-Fork

@@ -23,7 +23,7 @@ Name:           glib-bootstrap
 Name:           glib
 %endif
 Version:        2.86.0
-release:        1
+Release:        %autorelease
 Summary:        A core application building block and utility library
 License:        LGPL-2.1-or-later
 URL:            https://www.gtk.org

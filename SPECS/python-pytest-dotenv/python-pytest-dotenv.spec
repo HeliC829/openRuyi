@@ -8,7 +8,7 @@
 
 Name:           python-%{srcname}
 Version:        0.5.2
-Release:        1
+Release:        %autorelease
 License:        MIT
 URL:            https://github.com/quiqua/pytest-dotenv
 Summary:        Automatically detect and load a .env file before running tests

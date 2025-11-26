@@ -8,7 +8,7 @@
 
 Name:           python-pytest-asyncio
 Version:        0.24.0
-Release:        1
+Release:        %autorelease
 License:        Apache-2.0
 URL:            https://github.com/pytest-dev/pytest-asyncio
 Summary:        Pytest support for asyncio

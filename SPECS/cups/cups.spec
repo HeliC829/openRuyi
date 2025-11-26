@@ -9,7 +9,7 @@
 
 Name:           cups
 Version:        2.4.14
-Release:        1
+Release:        %autorelease
 Summary:        Standards-based, open source printing system for Linux
 License:        Apache-2.0
 URL:            https://openprinting.github.io/cups/
@@ -189,3 +189,4 @@ rm -f %{buildroot}%{_datadir}/cups/data/testprint
 %{_rpmconfigdir}/macros.d/macros.cups
 
 %changelog
+%{?autochangelog}

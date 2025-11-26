@@ -42,4 +42,4 @@ rm -f $RPM_BUILD_ROOT/%{_infodir}/dir
 %{_infodir}/mtools.info*
 
 %changelog
-%autochangelog
+%{?autochangelog}

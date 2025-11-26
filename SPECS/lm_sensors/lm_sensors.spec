@@ -9,7 +9,7 @@
 
 Name:           lm_sensors
 Version:        %{_version}
-Release:        1
+Release:        %autorelease
 Summary:        Hardware monitoring tools
 # Some man pages are licensed Linux-man-pages-copyleft-var and
 # Linux-man-pages-copyleft (lib/sensors.conf.5, prog/sensors/sensors.1).

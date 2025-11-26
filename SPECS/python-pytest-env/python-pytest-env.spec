@@ -8,7 +8,7 @@
 
 Name:           python-pytest-env
 Version:        0.5.2
-Release:        1
+Release:        %autorelease
 License:        MIT
 URL:            https://github.com/MobileDynasty/pytest-env
 Summary:        Pytest plugin that allows you to add environment variables

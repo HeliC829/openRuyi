@@ -39,3 +39,6 @@ autoreconf -fiv
 %license COPYING
 %{_bindir}/bdftopcf
 %{_mandir}/man1/bdftopcf.1*
+
+%changelog
+%{?autochangelog}

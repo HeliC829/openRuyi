@@ -12,6 +12,18 @@ repos:
        language: pygrep
        entry: '^Group:'
        files: \.spec$
+    -  id: autorelease
+       name: "check autorelease macro"
+       language: pygrep
+       entry: '^Release:.*(%autorelease|%{autorelease}).*$'
+       args: ["--negate"]
+       files: \.spec$
+    -  id: autochangelog
+       name: "check autochangelog macro"
+       language: pygrep
+       entry: '%changelog\s+%\{\?autochangelog\}'
+       args: ["--negate", "--multiline"]
+       files: \.spec$
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
