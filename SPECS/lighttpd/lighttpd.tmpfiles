@@ -1,0 +1,1 @@
+D /run/lighttpd 0750 lighttpd lighttpd -
