@@ -1,0 +1,37 @@
+diff --git a/scripts/Makefile.in b/scripts/Makefile.in
+index 7939a4e..6091440 100644
+--- a/scripts/Makefile.in
++++ b/scripts/Makefile.in
+@@ -31,9 +31,9 @@ MANPAGES=	$(SCRIPTS:%=man/%.1)
+ WEBPAGES=	$(SCRIPTS:%=html/%.html)
+ XMLFILES=	$(SCRIPTS:%=desc/%.xml)
+ 
+-all:		html man scripts
++all:		scripts
+ 
+-html:		html/index.html $(WEBPAGES)
++html:
+ 
+ scripts:	README $(SCRIPTS)
+ 
+@@ -101,16 +101,13 @@ xdg-file-dialog: xdg-file-dialog.in xdg-utils-common.in
+ xdg-terminal: xdg-terminal.in xdg-utils-common.in
+ 
+ man/%.1: desc/%.xml
+-	(cd man;$(XMLTO) man ../$<)
++	echo "Manpage generation disabled"
+ 
+ html/index.html: $(XMLFILES)
+-	(cat html/index.html.pre; \
+-         xsltproc xsl/refentry2htmlindex.xsl $(XMLFILES); \
+-         cat html/index.html.post ) > html/index.html
++	echo "HTML index generation disabled" > $@
+ 
+ html/%.html: desc/%.xml
+-	(cd html;$(XMLTO) html-nochunks ../$<)
++	echo "HTML generation disabled"
+ 
+ %.txt: desc/%.xml
+-	$(XMLTO) txt $<
+-
++	echo "Help content unavailable" > $@
