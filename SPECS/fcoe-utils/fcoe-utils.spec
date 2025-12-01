@@ -29,7 +29,7 @@ BuildRequires:      pkgconfig(lldpad)
 BuildRequires:      systemd-rpm-macros
 BuildRequires:      make gcc
 Requires:           lldpad
-Requires:           iproute
+Requires:           iproute2
 Requires:           device-mapper-multipath
 Requires(post):     systemd
 Requires(preun):    systemd
