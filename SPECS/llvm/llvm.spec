@@ -1026,9 +1026,6 @@ popd
 %if %{without compat_build}
 	%global cmake_config_args %{cmake_config_args} -DLLVM_VERSION_SUFFIX=''
 %endif
-%ifarch x86_64
-	%global cmake_config_args %{cmake_config_args} -DCMAKE_SHARED_LINKER_FLAGS="$LDFLAGS -Wl,-z,cet-report=error"
-%endif
 %global cmake_config_args %{cmake_config_args} -DLLVM_RAM_PER_COMPILE_JOB=2048
 #endregion misc options
 extra_cmake_args=''
