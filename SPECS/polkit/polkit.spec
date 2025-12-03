@@ -13,8 +13,7 @@ License:        LGPL-2.1-or-later
 URL:            https://gitlab.freedesktop.org/polkit/polkit/
 #!RemoteAsset
 Source0:        https://github.com/polkit-org/polkit/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Source1:        system-user-polkitd.conf
-Source2:        50-default.rules
+Source1:        50-default.rules
 BuildSystem:    meson
 
 BuildOption(conf):    -D session_tracking=logind
@@ -53,8 +52,7 @@ Development files for the PolicyKit Authorization Framework.
 
 %install -a
 install -d %{buildroot}%{_localstatedir}/lib/polkit
-install -m0644 %{SOURCE2} %{buildroot}%{_datadir}/polkit-1/rules.d/
-install -m0644 %{SOURCE1} %{buildroot}%{_sysusersdir}/
+install -m0644 %{SOURCE1} %{buildroot}%{_datadir}/polkit-1/rules.d/
 mkdir -p %{buildroot}%{_sysconfdir}/polkit-1/actions
 rm -rf %{buildroot}%{_datadir}/locale
 
@@ -98,7 +96,6 @@ rm -rf %{buildroot}%{_datadir}/locale
 %attr(0750,root,polkitd) %dir %{_sysconfdir}/polkit-1/rules.d
 %dir %{_sysconfdir}/polkit-1/actions
 %dir %{_localstatedir}/lib/polkit
-%{_sysusersdir}/system-user-polkitd.conf
 %{_unitdir}/polkit.service
 %{_sysusersdir}/polkit.conf
 %{_tmpfilesdir}/polkit-tmpfiles.conf
