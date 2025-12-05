@@ -9,19 +9,22 @@
 Name:           python-%{srcname}
 Version:        3.16.1
 Release:        %autorelease
+Summary:        Platform independent file lock
 License:        Unlicense
 URL:            https://github.com/tox-dev/py-filelock
-Summary:        Platform independent file lock
-Provides:       python3-%{srcname}
-%python_provide python3-%{srcname}
 #!RemoteAsset
 Source0:        https://files.pythonhosted.org/packages/source/f/%{srcname}/%{srcname}-%{version}.tar.gz
 BuildArch:      noarch
+BuildSystem:    pyproject
+
+BuildOption(install): -l %{srcname} +auto
 
 BuildRequires:  python3-devel
 BuildRequires:  pyproject-rpm-macros
-BuildSystem:    pyproject
-BuildOption(install): -l %{srcname} +auto
+
+Provides:       python3-%{srcname}
+%python_provide python3-%{srcname}
+
 %description
 @code{filelock} contains a single module implementing
 a platform independent file lock in Python, which provides a simple way of
