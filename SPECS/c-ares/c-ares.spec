@@ -6,7 +6,7 @@
 # SPDX-License-Identifier: MulanPSL-2.0
 
 Name:           c-ares
-Version:        1.34.5
+Version:        1.34.6
 Release:        %autorelease
 Summary:        Library for asynchronous name resolves
 License:        MIT
