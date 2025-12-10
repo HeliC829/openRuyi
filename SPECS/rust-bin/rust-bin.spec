@@ -14,7 +14,7 @@
 %endif
 
 Name:           rust-bin
-Version:        1.90.0
+Version:        1.91.1
 Release:        %autorelease
 Summary:        A systems programming language
 License:        Apache-2.0 OR MIT
@@ -64,5 +64,6 @@ rm %{buildroot}%{_prefix}/lib/rustlib/manifest-*
 %ifarch x86_64
 %{_prefix}/lib/libLLVM.so.*-rust-%{version}-stable
 %endif
+%exclude %{_sysconfdir}/target-spec-json-schema.json
 %changelog
 %{?autochangelog}
