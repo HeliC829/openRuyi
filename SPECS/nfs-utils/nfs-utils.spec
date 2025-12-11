@@ -64,7 +64,6 @@ the NFS kernel server utilities.
 %package     -n nfs-client
 Summary:        Support Utilities for NFS Client
 Requires:       keyutils
-Requires:       netcfg
 Requires:       rpcbind
 Requires(pre):  systemd-sysusers
 
@@ -73,7 +72,6 @@ This package contains common NFS utilities which are needed for an NFS client.
 
 %package     -n nfs-kernel-server
 Summary:        Support Utilities for Kernel NFS Server
-Requires:       netcfg
 Requires:       nfs-client = %{version}
 Requires:       rpcbind
 Requires:       (kmod(nfsd.ko) if kernel)
@@ -100,7 +98,7 @@ autoreconf -fiv
 
 %install -a
 install -d %{buildroot}%{_sysusersdir}
-install -m 644 %{SOURCE3} %{buildroot}%{_sysusersdir}/
+install -m 644 %{SOURCE3} %{buildroot}%{_sysusersdir}/statd-user.conf
 
 install -D -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/nfs.conf
 mkdir -p -m 755 %{buildroot}%{_sysconfdir}/nfs.conf.d
@@ -239,7 +237,7 @@ fi
 %{_mandir}/man8/statd.8*
 %{_mandir}/man8/svcgssd.8*
 %{_mandir}/man8/umount.nfs.8*
-%{_sysusersdir}/statd-user.sysusers
+%{_sysusersdir}/statd-user.conf
 %dir %{_localstatedir}/lib/nfs
 %dir %{_localstatedir}/lib/nfs/rpc_pipefs
 %dir %{_localstatedir}/lib/nfs/v4recovery
