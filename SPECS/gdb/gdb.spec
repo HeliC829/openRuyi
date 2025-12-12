@@ -72,8 +72,8 @@ machine than the one which is running the program being debugged.
 Summary:        Documentation for GDB (the GNU source-level debugger)
 License:        GFDL
 BuildArch:      noarch
-Requires(post): /sbin/install-info
-Requires(preun): /sbin/install-info
+Requires(post): /usr/sbin/install-info
+Requires(preun): /usr/sbin/install-info
 
 %description    doc
 GDB, the GNU debugger, allows you to debug programs written in C, C++,
@@ -178,8 +178,8 @@ done
 # For --excludedocs:
 if [ -e %{_infodir}/gdb.info.gz ]
 then
-  /sbin/install-info --info-dir=%{_infodir} %{_infodir}/annotate.info.gz || :
-  /sbin/install-info --info-dir=%{_infodir} %{_infodir}/gdb.info.gz || :
+  /usr/sbin/install-info --info-dir=%{_infodir} %{_infodir}/annotate.info.gz || :
+  /usr/sbin/install-info --info-dir=%{_infodir} %{_infodir}/gdb.info.gz || :
 fi
 
 %preun doc
@@ -188,8 +188,8 @@ then
   # For --excludedocs:
   if [ -e %{_infodir}/gdb.info.gz ]
   then
-    /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/annotate.info.gz || :
-    /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/gdb.info.gz || :
+    /usr/sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/annotate.info.gz || :
+    /usr/sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/gdb.info.gz || :
   fi
 fi
 
