@@ -1,0 +1,15 @@
+diff --git a/Makefile b/Makefile
+index 6e85b6c..b529c04 100644
+--- a/Makefile
++++ b/Makefile
+@@ -63,8 +63,8 @@ strip:	iptstate
+ 
+ 
+ install:
+-	$(INSTALL) -D --mode=755 iptstate $(SBIN)/iptstate
+-	$(INSTALL) -D --mode=444 iptstate.8 $(MAN)/man8/iptstate.8
++	$(INSTALL) -D --mode=755 iptstate $(DESTDIR)$(SBIN)/iptstate
++	$(INSTALL) -D --mode=444 iptstate.8 $(DESTDIR)$(MAN)/man8/iptstate.8
+ 
+ 
+ clean:
