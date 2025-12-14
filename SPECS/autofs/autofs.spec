@@ -29,7 +29,7 @@ BuildRequires: cyrus-sasl-devel
 BuildRequires: openssl-devel
 BuildRequires: util-linux
 BuildRequires: krb5-devel
-Requires: /bin/bash sed grep /bin/ps
+Requires: /usr/bin/bash sed grep /usr/bin/ps
 
 BuildSystem: autotools
 BuildOption(conf): --with-systemd
