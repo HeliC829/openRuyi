@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
-# SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
+# SPDX-FileContributor: yyjeqhc <jialin.oerv@isrc.iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -27,11 +27,11 @@ The "Embedded Linux Library" (ELL) provides a comprehensive set of APIs for
 asynchronous programming, event loops, and various utility functions. This package
 contains the runtime shared library.
 
-%package devel
+%package        devel
 Summary:        Development files for the Embedded Linux Library (ELL)
 Requires:       %{name} = %version
 
-%description devel
+%description    devel
 This package contains the header files, pkg-config files, and other development
 files for the Embedded Linux Library (ELL).
 
