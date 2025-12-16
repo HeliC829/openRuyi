@@ -5,6 +5,8 @@
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
+%global _test_target test
+
 Name:           libcap
 Version:        2.76
 Release:        %autorelease
