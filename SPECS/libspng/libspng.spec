@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
-# SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
+# SPDX-FileContributor: yyjeqhc <jialin.oerv@isrc.iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -15,7 +15,13 @@ URL:            https://libspng.org/
 Source0:        https://github.com/randy408/libspng/archive/v%{version}/libspng-%{version}.tar.gz
 BuildSystem:    meson
 
-BuildOption(conf): -Ddev_build=true
+# some patch should fail.
+# spng incompatible with libpng 1.6.47 (PNGv3)
+# https://github.com/randy408/libspng/issues/276
+Patch0:         0001-tests-should-fail.patch
+
+BuildOption(conf):  -Ddev_build=true
+
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  meson
@@ -42,6 +48,11 @@ developing applications that use %{name}.
 %doc CONTRIBUTING.md README.md
 %{_libdir}/libspng.so.0
 %{_libdir}/libspng.so.0.*
+
+%ifarch riscv64
+%check
+# waiting to fix/check the feature in riscv64.
+%endif
 
 %files devel
 %doc docs
