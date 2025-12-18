@@ -11,6 +11,7 @@ Release:        %autorelease
 Summary:        GNU file archiving program
 License:        GPL-3.0-or-later
 URL:            https://www.gnu.org/software/tar/tar.html
+VCS:            git:https://https.git.savannah.gnu.org/git/tar.git
 #!RemoteAsset
 Source0:        https://ftpmirror.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
 #!RemoteAsset
@@ -28,7 +29,6 @@ BuildRequires:  automake
 BuildRequires:  autoconf
 BuildRequires:  make
 BuildRequires:  texinfo
-
 
 %install -a
 %find_lang %{name} --generate-subpackages
