@@ -1,0 +1,40 @@
+From bf8ed0d04406706078b0605d297cb36b962e583e Mon Sep 17 00:00:00 2001
+From: misaka00251 <liuxin@iscas.ac.cn>
+Date: Fri, 19 Dec 2025 15:27:57 +0800
+Subject: [PATCH] Skip testsock test
+
+---
+ test/Makefile.in  | 2 +-
+ test/abts_tests.h | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/test/Makefile.in b/test/Makefile.in
+index e3b71e0..dc33f48 100644
+--- a/test/Makefile.in
++++ b/test/Makefile.in
+@@ -28,7 +28,7 @@ TESTS = testtime.lo teststr.lo testvsn.lo testipsub.lo testshm.lo \
+ 	testpoll.lo testlock.lo testsockopt.lo testpipe.lo testthread.lo \
+ 	testhash.lo testargs.lo testnames.lo testuser.lo testpath.lo \
+ 	testenv.lo testprocmutex.lo testfnmatch.lo testatomic.lo testflock.lo \
+-	testsock.lo testglobalmutex.lo teststrnatcmp.lo testfilecopy.lo \
++	testglobalmutex.lo teststrnatcmp.lo testfilecopy.lo \
+ 	testtemp.lo testlfs.lo testcond.lo testescape.lo testskiplist.lo \
+ 	testencode.lo
+ 
+diff --git a/test/abts_tests.h b/test/abts_tests.h
+index 07e2205..0e59b88 100644
+--- a/test/abts_tests.h
++++ b/test/abts_tests.h
+@@ -57,7 +57,9 @@ const struct testlist {
+     {testrand},
+     {testsleep},
+     {testshm},
++#if 0 /* not do-able in qemu userspace */
+     {testsock},
++#endif
+     {testsockets},
+     {testsockopt},
+     {teststr},
+-- 
+2.52.0
+

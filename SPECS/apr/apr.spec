@@ -14,6 +14,9 @@ URL:            https://apr.apache.org/
 Source:         https://www.apache.org/dist/apr/%{name}-%{version}.tar.bz2
 BuildSystem:    autotools
 
+# Can't run testsock in qemu user space emulation
+Patch2000:      2000-Skip-testsock-test.patch
+
 BuildOption(conf): --includedir=%{_includedir}/apr-1
 BuildOption(conf): --with-installbuilddir=%{_libdir}/apr-1/build
 BuildOption(conf): --with-devrandom=/dev/urandom
@@ -66,6 +69,10 @@ done
 
 rm -f %{buildroot}%{_libdir}/apr.exp
 rm -f %{buildroot}%{_libdir}/libapr-1.a
+
+%check -p
+# Build tests serially to avoid race conditions
+%define _smp_build_ncpus 1
 
 %files
 %doc CHANGES LICENSE NOTICE README*
