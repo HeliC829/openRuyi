@@ -191,7 +191,7 @@ This subpackage provides module for Apache Kafka output.
 %package        mongodb
 Summary:        MongoDB support for rsyslog
 BuildRequires:  pkgconfig(libmongoc-1.0)
-BuildRequires:  pkgconfig(snappy)
+BuildRequires:  snappy-devel
 BuildRequires:  pkgconfig(libsasl2)
 Requires:       %{name} = %{version}-%{release}
 
