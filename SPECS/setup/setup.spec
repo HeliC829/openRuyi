@@ -33,7 +33,7 @@ Source22:       lang.sh
 
 Source31:       COPYING
 Source32:       uidgid
-Source33:       setup.sysusers.conf
+Source33:       setup.sysusers
 Source34:       uidgidlint
 Source35:       serviceslint
 

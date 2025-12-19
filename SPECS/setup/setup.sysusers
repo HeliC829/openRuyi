@@ -19,5 +19,4 @@ g floppy         19
 g games          20
 g ftp            50
 g lock           54
-g clock          103
 g nobody         65534
