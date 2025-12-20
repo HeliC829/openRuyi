@@ -50,6 +50,9 @@ rm -f %{buildroot}%{_initrddir}/%{name}
 install -p -D -m 0644 %{SOURCE1} %{buildroot}%{_unitdir}/%{name}.service
 install -p -D -m 0600 %{SOURCE2} %{buildroot}%{_sysconfdir}/sysconfig/%{name}-config
 
+%check
+# No tests here.
+
 %post
 %systemd_post %{name}.service
 
