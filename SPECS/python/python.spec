@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
 # SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
+# SPDX-FileContributor: yyjeqhc <jialin.oerv@isrc.iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -483,8 +484,11 @@ for file in %{buildroot}%{pylibdir}/pydoc_data/topics.py $(grep --include='*.py'
     rm ${directory}/{__pycache__/${module}.cpython-%{pyshortver}.opt-?.pyc,${module}.py}
 done
 
-%if "%{flavor}" == "bootstrap"
 %check
+%if "%{flavor}" == "bootstrap"
+%else
+EXCLUDES="-x test_ensurepip -x test_ctypes -x test_tools"
+%make_build test TESTOPTS="$EXCLUDES"
 %endif
 
 %files -n %{pkgname}
@@ -649,11 +653,6 @@ done
 %{_includedir}/python%{pybasever}/internal/
 %{_includedir}/python%{pybasever}/cpython/
 
-%{_bindir}/python3-config
-%{_bindir}/python-config
-%{_libdir}/pkgconfig/python3.pc
-%{_libdir}/pkgconfig/python.pc
-%{_libdir}/pkgconfig/python3-embed.pc
 %{_bindir}/pygettext3.py
 %{_bindir}/pygettext.py
 %{_bindir}/msgfmt3.py
@@ -662,13 +661,8 @@ done
 %{_bindir}/pygettext%{pybasever}.py
 %{_bindir}/msgfmt%{pybasever}.py
 
-%{_bindir}/python%{pybasever}-config
 %{_bindir}/python*-config
-%{_bindir}/python*-*-config
-%{_libdir}/pkgconfig/python-*.pc
-%{_libdir}/pkgconfig/python-*-embed.pc
-%{_libdir}/pkgconfig/python-%{pybasever}.pc
-%{_libdir}/pkgconfig/python-%{pybasever}-embed.pc
+%{_libdir}/pkgconfig/python*.pc
 
 %files -n %{pkgname}-idle
 %{_bindir}/idle*
