@@ -18,6 +18,9 @@ Source1:        https://sourceware.org/ftp/%{name}/%{version}/%{name}-%{version}
 Source2:        %{name}.keyring
 
 BuildSystem:    autotools
+
+BuildOption(conf):  CC="gcc -gz=none" CXX="g++ -gz=none"
+
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  help2man
@@ -25,6 +28,10 @@ BuildRequires:  pkgconfig(libdw)
 BuildRequires:  pkgconfig(libelf)
 BuildRequires:  pkgconfig(libxxhash)
 BuildRequires:  pkgconfig(libzstd)
+# Tests
+BuildRequires:  gdb
+BuildRequires:  dwz
+
 Requires:       binutils
 Requires:       coreutils
 Requires:       dwz
