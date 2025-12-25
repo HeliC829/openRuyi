@@ -71,6 +71,9 @@ touch %{name}-%{version}-%{release}.soc
 ln -s %{name}-%{version}-%{release}.soc %{name}.soc
 popd
 
+# No check
+%check
+
 %post
 %{_bindir}/install-catalog --add %{_sysconfdir}/sgml/%{name}-%{version}-%{release}.soc \
     %{_datadir}/sgml/%{name}-%{version}/catalog >/dev/null 2>/dev/null || :
