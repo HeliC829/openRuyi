@@ -45,6 +45,9 @@ BuildRequires:  pkgconfig(xrandr)
 BuildRequires:  pkgconfig(xcb)
 %endif
 
+# Vulkan-Tools dlopen's libvulkan.so.1 from this package
+Requires:       vulkan-loader
+
 Provides:       vulkan-demos = %{version}-%{release}
 
 %description
