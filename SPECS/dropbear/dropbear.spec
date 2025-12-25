@@ -49,6 +49,10 @@ install -d %{buildroot}%{_unitdir}
 install -pm644 %{SOURCE1} %{buildroot}%{_unitdir}/%{name}.service
 install -pm644 %{SOURCE2} %{buildroot}%{_unitdir}/dropbear-keygen.service
 
+# Tests require local network and the running user to be able to login,
+# not feasible with mock restrictions
+%check
+
 %post
 %systemd_post %{name}.service
 
