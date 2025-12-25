@@ -11,15 +11,21 @@ Release:        %autorelease
 Summary:        Source Code Highlighter with Support for Many Languages
 License:        GPL-3.0-or-later
 URL:            http://www.gnu.org/software/src-highlite
+VCS:            git:https://https.git.savannah.gnu.org/git/src-highlite.git
 #!RemoteAsset
 Source:         https://ftpmirror.gnu.org/gnu/src-highlite/source-highlight-%{version}.tar.gz
 BuildSystem:    autotools
 
-BuildOption(conf): --with-boost-regex=boost_regex
-BuildOption(conf): --disable-rpath --disable-static
-BuildOption(build): CXXFLAGS="%{optflags} -std=c++14"
+BuildOption(conf):  --with-boost-regex=boost_regex
+BuildOption(conf):  --disable-rpath --disable-static
+BuildOption(build):  CXXFLAGS="%{optflags} -std=c++14"
 
-BuildRequires:  bison boost-devel chrpath flex gcc gcc-c++ help2man
+BuildRequires:  bison
+BuildRequires:  boost-devel
+BuildRequires:  chrpath
+BuildRequires:  flex
+BuildRequires:  gcc
+BuildRequires:  help2man
 BuildRequires:  bash-completion
 
 %description
@@ -29,12 +35,11 @@ easily extended for handling new languages and output formats.
 
 %package        devel
 Summary:        Header files and development libraries for source-highlight
-Requires:       %{name} = %{version}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    devel
 This package contains the header files, pkg-config files, and development libraries
 for the source-highlight library.
-
 
 %install -a
 echo -e "\ncxx = cpp.lang" >> %{buildroot}%{_datadir}/source-highlight/lang.map
