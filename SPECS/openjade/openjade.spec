@@ -95,6 +95,8 @@ touch %{_sysconfdir}/sgml/%{name}-%{version}-%{release}.soc
 %{_bindir}/*
 %{_libdir}/*.so.*
 %{_datadir}/sgml/%{name}-%{version}
+# Maybe spilt this into a -devel package later
+%{_libdir}/lib*.so
 
 %changelog
 %{?autochangelog}
