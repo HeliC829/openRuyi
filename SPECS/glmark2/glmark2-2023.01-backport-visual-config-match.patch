@@ -1,0 +1,339 @@
+From 49104870ae8cbdc9bc179a055744fc04663f3c94 Mon Sep 17 00:00:00 2001
+From: Alexandros Frantzis <alexandros.frantzis@collabora.com>
+Date: Wed, 1 Nov 2023 12:35:41 +0200
+Subject: [PATCH 1/4] libmatrix: Add Log::warning() function
+
+---
+ src/libmatrix/log.cc | 21 +++++++++++++++++++++
+ src/libmatrix/log.h  |  2 ++
+ 2 files changed, 23 insertions(+)
+
+diff --git a/src/libmatrix/log.cc b/src/libmatrix/log.cc
+index d203c6d..cbbb532 100644
+--- a/src/libmatrix/log.cc
++++ b/src/libmatrix/log.cc
+@@ -39,6 +39,7 @@ static const string terminal_color_normal("\033[0m");
+ static const string terminal_color_red("\033[1;31m");
+ static const string terminal_color_cyan("\033[36m");
+ static const string terminal_color_yellow("\033[33m");
++static const string terminal_color_magenta("\033[35m");
+ static const string empty;
+ 
+ static void
+@@ -167,6 +168,26 @@ Log::error(const char *fmt, ...)
+     va_end(ap);
+ }
+ 
++void
++Log::warning(const char *fmt, ...)
++{
++    static const string warnprefix("Warning");
++    va_list ap;
++    va_start(ap, fmt);
++
++#ifndef ANDROID
++    static const string& warncolor(isatty(fileno(stderr)) ? terminal_color_magenta : empty);
++    print_prefixed_message(std::cerr, warncolor, warnprefix, fmt, ap);
++#else
++    __android_log_vprint(ANDROID_LOG_WARN, appname_.c_str(), fmt, ap);
++#endif
++
++    if (extra_out_)
++        print_prefixed_message(*extra_out_, empty, warnprefix, fmt, ap);
++
++    va_end(ap);
++}
++
+ void
+ Log::flush()
+ {
+diff --git a/src/libmatrix/log.h b/src/libmatrix/log.h
+index 9054323..573de78 100644
+--- a/src/libmatrix/log.h
++++ b/src/libmatrix/log.h
+@@ -32,6 +32,8 @@ public:
+     static void debug(const char *fmt, ...);
+     // Emit an error message
+     static void error(const char *fmt, ...);
++    // Emit a warning message
++    static void warning(const char *fmt, ...);
+     // Explicit flush of the log buffer
+     static void flush();
+     // A prefix constant that informs the logging infrastructure that the log
+-- 
+2.52.0
+
+From 0c5e965b3fe7c443910b726fdb7127e5b4e1be9e Mon Sep 17 00:00:00 2001
+From: David Brownlee <abs@absd.org>
+Date: Wed, 26 Jul 2023 14:52:44 +0100
+Subject: [PATCH 2/4] GLStateEGL,GLStateGLX: Change failure to get a "good"
+ visual config to warning
+
+With ea488e9 glmark2 was adjusted to abort if it could not find a
+"good" EGL or GLX config.
+
+This commit changes that to instead warn and continue in that case.
+
+Fixes glmark2 running on at least NetBSD-10/amd64 on a ThinkPad
+T530, and should also address issue#202 for Ubuntu 22.04 on arm64
+
+Fixes #202
+
+Co-authored-by: Alexandros Frantzis <alexandros.frantzis@collabora.com>
+---
+ src/gl-state-egl.cpp | 8 +++++++-
+ src/gl-state-glx.cpp | 8 +++++++-
+ 2 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/src/gl-state-egl.cpp b/src/gl-state-egl.cpp
+index 0d73859..f423981 100644
+--- a/src/gl-state-egl.cpp
++++ b/src/gl-state-egl.cpp
+@@ -635,7 +635,13 @@ GLStateEGL::select_best_config(std::vector<EGLConfig>& configs)
+         }
+     }
+ 
+-    return best_score > 0 ? best_config : 0;
++    if (best_score <= 0) {
++        Log::warning("Unable to find a good EGL config, will continue with the best match,\n"
++                     "but you should verify that the config values are acceptable.\n"
++                     "Tip: Use --visual-config to request a different config\n");
++    }
++
++    return best_config;
+ }
+ 
+ bool
+diff --git a/src/gl-state-glx.cpp b/src/gl-state-glx.cpp
+index 9f41a32..de1c9f4 100644
+--- a/src/gl-state-glx.cpp
++++ b/src/gl-state-glx.cpp
+@@ -342,7 +342,13 @@ GLStateGLX::select_best_config(std::vector<GLXFBConfig> configs)
+         }
+     }
+ 
+-    return best_score > 0 ? best_config : 0;
++    if (best_score <= 0) {
++        Log::warning("Unable to find a good GLX FB config, will continue with the best match,\n"
++                     "but you should verify that the config values are acceptable.\n"
++                     "Tip: Use --visual-config to request a different config\n");
++    }
++
++    return best_config;
+ }
+ 
+ GLADapiproc
+-- 
+2.52.0
+
+From 7bde100b0ef2bba3a23943e6f696cf808c0f1a7f Mon Sep 17 00:00:00 2001
+From: Alexandros Frantzis <alexandros.frantzis@collabora.com>
+Date: Wed, 1 Nov 2023 13:17:28 +0200
+Subject: [PATCH 3/4] Options,GLStateEGL,GLStateGLX: Add option to require a
+ good visual config
+
+When this option is set, failure to find a good visual config will
+lead to an error rather than a warning.
+---
+ doc/glmark2.1.in     | 4 ++++
+ src/gl-state-egl.cpp | 2 ++
+ src/gl-state-glx.cpp | 2 ++
+ src/options.cpp      | 6 ++++++
+ src/options.h        | 1 +
+ 5 files changed, 15 insertions(+)
+
+diff --git a/doc/glmark2.1.in b/doc/glmark2.1.in
+index 015ba20..10f010f 100644
+--- a/doc/glmark2.1.in
++++ b/doc/glmark2.1.in
+@@ -41,6 +41,10 @@ The parameters may be defined in any order, and any omitted parameters assume a
+ default value of '0' (id, stencil, samples) or '1' (red, green, blue, alpha, buffer).
+ If 'id' is set to a non-zero value, all other parameters are ignored
+ .TP
++\fB--good-config\fR
++Require a config that meets all the requested component requirements
++(see --visual-config)
++.TP
+ \fB\-\-reuse\-context\fR
+ Use a single context for all scenes
+ (by default, each scene gets its own context)
+diff --git a/src/gl-state-egl.cpp b/src/gl-state-egl.cpp
+index f423981..60c967b 100644
+--- a/src/gl-state-egl.cpp
++++ b/src/gl-state-egl.cpp
+@@ -636,6 +636,8 @@ GLStateEGL::select_best_config(std::vector<EGLConfig>& configs)
+     }
+ 
+     if (best_score <= 0) {
++        if (Options::good_config)
++            return NULL;
+         Log::warning("Unable to find a good EGL config, will continue with the best match,\n"
+                      "but you should verify that the config values are acceptable.\n"
+                      "Tip: Use --visual-config to request a different config\n");
+diff --git a/src/gl-state-glx.cpp b/src/gl-state-glx.cpp
+index de1c9f4..97dddd7 100644
+--- a/src/gl-state-glx.cpp
++++ b/src/gl-state-glx.cpp
+@@ -343,6 +343,8 @@ GLStateGLX::select_best_config(std::vector<GLXFBConfig> configs)
+     }
+ 
+     if (best_score <= 0) {
++        if (Options::good_config)
++            return NULL;
+         Log::warning("Unable to find a good GLX FB config, will continue with the best match,\n"
+                      "but you should verify that the config values are acceptable.\n"
+                      "Tip: Use --visual-config to request a different config\n");
+diff --git a/src/options.cpp b/src/options.cpp
+index 8d1ec16..5159b39 100644
+--- a/src/options.cpp
++++ b/src/options.cpp
+@@ -45,6 +45,7 @@ bool Options::run_forever = false;
+ bool Options::annotate = false;
+ bool Options::offscreen = false;
+ GLVisualConfig Options::visual_config;
++bool Options::good_config = false;
+ Options::Results Options::results = Options::ResultsFps;
+ std::string Options::results_file;
+ std::vector<Options::WindowSystemOption> Options::winsys_options;
+@@ -60,6 +61,7 @@ static struct option long_options[] = {
+     {"swap-mode", 1, 0, 0},
+     {"off-screen", 0, 0, 0},
+     {"visual-config", 1, 0, 0},
++    {"good-config", 0, 0, 0},
+     {"reuse-context", 0, 0, 0},
+     {"run-forever", 0, 0, 0},
+     {"size", 1, 0, 0},
+@@ -216,6 +218,8 @@ Options::print_help()
+            "                         default value of '0' (id, stencil, samples) or '1' (red,\n"
+            "                         green, blue, alpha, buffer). If 'id' is set to a non-zero\n"
+            "                         value, all other parameters are ignored\n"
++           "      --good-config      Require a config that meets all the requested component\n"
++           "                         requirements (see --visual-config)\n"
+            "      --reuse-context    Use a single context for all scenes\n"
+            "                         (by default, each scene gets its own context)\n"
+            "  -s, --size WxH         Size of the output window (default: 800x600)\n"
+@@ -281,6 +285,8 @@ Options::parse_args(int argc, char **argv)
+             Options::offscreen = true;
+         else if (!strcmp(optname, "visual-config"))
+             Options::visual_config = GLVisualConfig(optarg);
++        else if (!strcmp(optname, "good-config"))
++            Options::good_config = true;
+         else if (!strcmp(optname, "reuse-context"))
+             Options::reuse_context = true;
+         else if (c == 's' || !strcmp(optname, "size"))
+diff --git a/src/options.h b/src/options.h
+index b5cfbfe..a89df70 100644
+--- a/src/options.h
++++ b/src/options.h
+@@ -75,6 +75,7 @@ struct Options {
+     static bool annotate;
+     static bool offscreen;
+     static GLVisualConfig visual_config;
++    static bool good_config;
+     static Results results;
+     static std::string results_file;
+     static std::vector<WindowSystemOption> winsys_options;
+-- 
+2.52.0
+
+From 2c60e7f4b69b154b349cbd31db6494de9c89be9f Mon Sep 17 00:00:00 2001
+From: Alexandros Frantzis <alexandros.frantzis@collabora.com>
+Date: Wed, 1 Nov 2023 13:43:00 +0200
+Subject: [PATCH 4/4] GLVisualConfig: By default don't care about the stencil
+ config component
+
+Our benchmarks don't use a stencil buffer, but its presence doesn't hurt
+either, so don't mark configs that have one as unacceptable. Our scoring
+still favors configs without one, unless the user explicitly specifies
+otherwise with --visual-config.
+---
+ doc/glmark2.1.in         | 2 +-
+ src/gl-visual-config.cpp | 9 ++++++---
+ src/gl-visual-config.h   | 2 +-
+ src/options.cpp          | 6 +++---
+ 4 files changed, 11 insertions(+), 8 deletions(-)
+
+diff --git a/doc/glmark2.1.in b/doc/glmark2.1.in
+index 10f010f..5b3fde5 100644
+--- a/doc/glmark2.1.in
++++ b/doc/glmark2.1.in
+@@ -38,7 +38,7 @@ Render to an off-screen surface
+ The visual configuration to use for the rendering target:
+ \'id=ID:red=R:green=G:blue=B:alpha=A:buffer=BUF:stencil=STENCIL:samples=SAMPLES'.
+ The parameters may be defined in any order, and any omitted parameters assume a
+-default value of '0' (id, stencil, samples) or '1' (red, green, blue, alpha, buffer).
++default value of '0' (id, samples), -1 (stencil) or '1' (red, green, blue, alpha, buffer).
+ If 'id' is set to a non-zero value, all other parameters are ignored
+ .TP
+ \fB--good-config\fR
+diff --git a/src/gl-visual-config.cpp b/src/gl-visual-config.cpp
+index de92f93..665f53a 100644
+--- a/src/gl-visual-config.cpp
++++ b/src/gl-visual-config.cpp
+@@ -26,7 +26,7 @@
+ #include <vector>
+ 
+ GLVisualConfig::GLVisualConfig(const std::string &s) :
+-    id(0), red(1), green(1), blue(1), alpha(1), depth(1), stencil(0), buffer(1), samples(0)
++    GLVisualConfig()
+ {
+     std::vector<std::string> elems;
+ 
+@@ -85,7 +85,7 @@ GLVisualConfig::match_score(const GLVisualConfig &target) const
+     score += score_component(blue, target.blue, 4);
+     score += score_component(alpha, target.alpha, 4);
+     score += score_component(depth, target.depth, 1);
+-    score += score_component(stencil, target.stencil, 0);
++    score += score_component(stencil, target.stencil, 1);
+     score += score_component(buffer, target.buffer, 1);
+     score += score_component(samples, target.samples, -1);
+ 
+@@ -135,11 +135,14 @@ GLVisualConfig::score_component(int component, int target, int scale) const
+          * score for all components ranges from [0,MAXIMUM_COMPONENT_SCORE).
+          * If scale > 0, we reward the largest positive difference from target,
+          * otherwise the smallest positive difference from target.
++         * We also reward the smallest positive difference from the target,
++         * if the target < 0, i.e., we don't care about this value.
+          */
+         int diff = std::abs(scale) * (component - target);
+         if (diff > 0)
+         {
+-            score = scale < 0 ? MAXIMUM_COMPONENT_SCORE - diff : diff;
++            score = (scale < 0 || target < 0) ?
++                    MAXIMUM_COMPONENT_SCORE - diff : diff;
+             score = std::min(MAXIMUM_COMPONENT_SCORE, score);
+             score = std::max(0, score);
+         }
+diff --git a/src/gl-visual-config.h b/src/gl-visual-config.h
+index b28473f..013ce14 100644
+--- a/src/gl-visual-config.h
++++ b/src/gl-visual-config.h
+@@ -31,7 +31,7 @@ class GLVisualConfig
+ {
+ public:
+     GLVisualConfig():
+-        id(0), red(1), green(1), blue(1), alpha(1), depth(1), stencil(0), buffer(1), samples(0) {}
++        id(0), red(1), green(1), blue(1), alpha(1), depth(1), stencil(-1), buffer(1), samples(0) {}
+     GLVisualConfig(const std::string &s);
+ 
+     /**
+diff --git a/src/options.cpp b/src/options.cpp
+index 5159b39..17ab267 100644
+--- a/src/options.cpp
++++ b/src/options.cpp
+@@ -215,9 +215,9 @@ Options::print_help()
+            "                         target: 'id=ID:red=R:green=G:blue=B:alpha=A:buffer=BUF:\n"
+            "                         stencil=STENCIL:samples=SAMPLES'. The parameters may be\n"
+            "                         defined in any order, and any omitted parameters assume a\n"
+-           "                         default value of '0' (id, stencil, samples) or '1' (red,\n"
+-           "                         green, blue, alpha, buffer). If 'id' is set to a non-zero\n"
+-           "                         value, all other parameters are ignored\n"
++           "                         default value of '0' (id, samples), '-1' (stencil) or\n"
++           "                         '1' (red, green, blue, alpha, buffer). If 'id' is set to\n"
++           "                         a non-zero value, all other parameters are ignored\n"
+            "      --good-config      Require a config that meets all the requested component\n"
+            "                         requirements (see --visual-config)\n"
+            "      --reuse-context    Use a single context for all scenes\n"
+-- 
+2.52.0
+
