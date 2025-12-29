@@ -9,12 +9,10 @@ OptFlags: riscv64 -O2 -g -march=rva23u64
 OptFlags: x86_64 -O2 -g
 
 Release: <CI_CNT>.<B_CNT>%%{?dist}
-Substitute: distribution-release system-release
-
-Required: rpm-build gcc15
+PublishFilter: .*-bootstrap.*
 
 # use zlib, not zlib-ng
-Prefer: zlib-devel
+Prefer: zlib-devel libz1 pytest
 # use ninja, not samurai-ninja
 Prefer: ninja
 Prefer: shadow
@@ -26,11 +24,9 @@ Prefer: glib-devel glib
 
 Prefer: python3-libs python3-devel
 Prefer: python3  python3-packaging  python3-pip python3-wheel
-#Prefer: python3-Cython
-
-#Prefer: p11-kit libnetfilter_conntrack glib libbpf nspr-devel util-macros cyrus-sasl 
-#Prefer: libsodium glib-devel kmod-devel dbus-broker-allow-restart libpwquality
-Preinstall: systemd-sysusers systemd-shared setup
+Keep: setup systemd
+Preinstall: systemd-sysusers
+Preinstall: setup
 Preinstall: gcc gcc-c++ expat ncurses filesystem popt
 Preinstall: acl pam librpmbuild10 libdw1 libxml2 gawk  libattr1 
 Preinstall: linux-headers
@@ -46,7 +42,7 @@ Preinstall: lz4
 
 Support: glibc-gconv-modules-extra
 Support: systemd-rpm-macros
-Support: mold
+Support: mold filesystem
 Support: perl file 
 Support: gcc cpp  gcc15-c++ libstdc++6-devel-gcc15
 Support: libasan8 libitm1 libtsan2 libubsan1
@@ -148,11 +144,9 @@ Macros:
 %bcond_override_default_acl_tests 1
 %__systemd_sysusers /usr/bin/systemd-sysusers
 %autorelease 1%{?dist}
-%_vendor_bug_url https://git.oerv.ac.cn/openRuyi/openruyi-repo/issues
 %autochangelog %{nil}
-%_vendor openruyi
-%_vendor_name openRuyi
-%_vendor_url https://git.oerv.ac.cn/openRuyi/openruyi-repo
+%_sbindir %_bindir
+%_vendor_repo_url https://diamond.oerv.ac.cn/openruyi/\\$basearch/
 :Macros
 
 
