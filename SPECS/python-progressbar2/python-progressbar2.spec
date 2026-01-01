@@ -1,5 +1,5 @@
-# SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
-# SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileCopyrightText: (C) 2025, 2026 Institute of Software, Chinese Academy of Sciences (ISCAS)
+# SPDX-FileCopyrightText: (C) 2025, 2026 openRuyi Project Contributors
 # SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
@@ -18,9 +18,12 @@ BuildArch:      noarch
 BuildSystem:    pyproject
 
 BuildOption(install): -l progressbar
+BuildOption(check): -e progressbar.terminal.os_specific.windows
 
 BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python3-devel
+BuildRequires:  python3-pytest
+BuildRequires:  python3-freezegun
 
 Provides:       python3-%{srcname}
 %python_provide python3-%{srcname}
