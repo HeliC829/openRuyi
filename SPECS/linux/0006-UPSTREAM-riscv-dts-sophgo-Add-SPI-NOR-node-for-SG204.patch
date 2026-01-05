@@ -1,7 +1,7 @@
-From 5449329cd95a15cf438d28fcb50fa4f46551d0eb Mon Sep 17 00:00:00 2001
+From 7b3180deb7ecf3cbb17725873541cbb602d3b088 Mon Sep 17 00:00:00 2001
 From: Zixian Zeng <sycamoremoon376@gmail.com>
 Date: Tue, 16 Sep 2025 21:22:50 +0800
-Subject: [PATCH 006/102] UPSTREAM: riscv: dts: sophgo: Add SPI NOR node for
+Subject: [PATCH 06/99] UPSTREAM: riscv: dts: sophgo: Add SPI NOR node for
  SG2042
 
 Add SPI NOR controller node for SG2042

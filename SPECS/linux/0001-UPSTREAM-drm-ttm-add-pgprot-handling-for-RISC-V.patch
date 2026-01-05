@@ -1,7 +1,7 @@
-From b5180ce2ddc589f0269aca02b5cc8496f5c700bb Mon Sep 17 00:00:00 2001
+From 9c61dfe1d9315de0b8ac3e885c30c236198e0183 Mon Sep 17 00:00:00 2001
 From: Han Gao <gaohan@iscas.ac.cn>
 Date: Fri, 5 Dec 2025 10:42:07 +0800
-Subject: [PATCH 001/102] UPSTREAM: drm/ttm: add pgprot handling for RISC-V
+Subject: [PATCH 01/99] UPSTREAM: drm/ttm: add pgprot handling for RISC-V
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit

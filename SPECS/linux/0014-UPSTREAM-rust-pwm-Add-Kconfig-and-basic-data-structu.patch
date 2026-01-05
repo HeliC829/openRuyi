@@ -1,7 +1,7 @@
-From 934586da46f82e16d3105544d745d7cda4399f1f Mon Sep 17 00:00:00 2001
+From f393e985d477663bb619cf2d02154c1f0b223122 Mon Sep 17 00:00:00 2001
 From: Michal Wilczynski <m.wilczynski@samsung.com>
 Date: Thu, 16 Oct 2025 15:38:02 +0200
-Subject: [PATCH 014/102] UPSTREAM: rust: pwm: Add Kconfig and basic data
+Subject: [PATCH 14/99] UPSTREAM: rust: pwm: Add Kconfig and basic data
  structures
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
