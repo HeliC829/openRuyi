@@ -63,7 +63,7 @@ crun is a fast and low-memory OCI Container Runtime written in C.
 ./autogen.sh
 
 %install -a
-rm -rf %{buildroot}%{_prefix}/*.a
+rm -rf %{buildroot}%{_libdir}/*.a
 
 %check
 # just skip tests as the env is not support.
