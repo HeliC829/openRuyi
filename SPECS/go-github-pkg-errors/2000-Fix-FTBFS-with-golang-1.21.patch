@@ -1,0 +1,22 @@
+
+From: Shengjing Zhu <zhsj@debian.org>
+Date: Thu, 27 Jul 2023 19:59:16 +0800
+Subject: Fix FTBFS with golang-1.21
+
+---
+ stack_test.go | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/stack_test.go b/stack_test.go
+index aa10a72..5651a7f 100644
+--- a/stack_test.go
++++ b/stack_test.go
+@@ -145,7 +145,7 @@ func TestStackTrace(t *testing.T) {
+ 				return Errorf("hello %s", fmt.Sprintf("world: %s", "ooh"))
+ 			}()
+ 		}()), []string{
+-			`github.com/pkg/errors.TestStackTrace.func2.1` +
++			`github.com/pkg/errors.TestStackTrace.+func2.+` +
+ 				"\n\t.+/github.com/pkg/errors/stack_test.go:145", // this is the stack of Errorf
+ 			`github.com/pkg/errors.TestStackTrace.func2` +
+ 				"\n\t.+/github.com/pkg/errors/stack_test.go:146", // this is the stack of Errorf's caller
