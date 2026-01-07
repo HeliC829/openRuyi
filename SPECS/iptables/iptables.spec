@@ -1,5 +1,5 @@
-# SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
-# SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileCopyrightText: (C) 2025, 2026 Institute of Software, Chinese Academy of Sciences (ISCAS)
+# SPDX-FileCopyrightText: (C) 2025, 2026 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
 # SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
@@ -79,9 +79,9 @@ a safer way to update iptables remotely.
 %package        nft
 Summary:        nftables compatibility for iptables, arptables and ebtables
 Requires:       %{name}-libs = %{version}-%{release}
-Requires(post): /usr/sbin/update-alternatives
+Requires(post): update-alternatives
 Requires(post): /usr/bin/readlink
-Requires(postun): /usr/sbin/update-alternatives
+Requires(postun): update-alternatives
 Provides:       arptables-helper
 Provides:       iptables
 Provides:       arptables
@@ -109,8 +109,8 @@ out of the base package since they are not active by default anymore.
 Summary:        Legacy tools for managing Linux kernel packet filtering capabilities
 Requires:       %{name}-legacy-libs%{?_isa} = %{version}-%{release}
 Requires:       %{name}-libs%{?_isa} = %{version}-%{release}
-Requires(post): /usr/sbin/update-alternatives
-Requires(postun): /usr/sbin/update-alternatives
+Requires(post): update-alternatives
+Requires(postun): update-alternatives
 Provides:       %{name}-compat = %{version}-%{release}
 
 %description    legacy
