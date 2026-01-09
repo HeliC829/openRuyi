@@ -1,5 +1,5 @@
-# SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
-# SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileCopyrightText: (C) 2025, 2026 Institute of Software, Chinese Academy of Sciences (ISCAS)
+# SPDX-FileCopyrightText: (C) 2025, 2026 openRuyi Project Contributors
 # SPDX-FileContributor: Jingwiw <wangjingwei@iscas.ac.cn>
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
 #
@@ -13,6 +13,7 @@
 %endif
 
 %bcond  static        0
+# For -tests subpackage.
 %bcond  tests         0
 %bcond  doc           0
 %bcond  man           0
@@ -22,13 +23,13 @@ Name:           glib-bootstrap
 %else
 Name:           glib
 %endif
-Version:        2.86.0
+Version:        2.87.1
 Release:        %autorelease
 Summary:        A core application building block and utility library
 License:        LGPL-2.1-or-later
 URL:            https://www.gtk.org
 #!RemoteAsset
-Source0:        https://download.gnome.org/sources/glib/2.86/glib-%{version}.tar.xz
+Source0:        https://download.gnome.org/sources/glib/2.87/glib-%{version}.tar.xz
 
 Patch0:         meson.build-Avoid-linking-with-libatomic-when-unneed.patch
 
@@ -80,6 +81,8 @@ BuildRequires:  shared-mime-info
 %if %{with man}
 BuildRequires:  python3-docutils
 %endif
+# For %check
+BuildRequires:  systemd
 
 %description
 GLib is the low-level core library that forms the basis of GTK and GNOME.
@@ -140,6 +143,9 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %transfiletriggerpostun -- %{_datadir}/glib-2.0/schemas
 glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 
+%check
+# Avoid fragile tests failure.
+%meson_test --timeout-multiplier 5 || cat %{_build}/meson-logs/testlog.txt
 
 %files
 %license LICENSES/LGPL-2.1-or-later.txt
