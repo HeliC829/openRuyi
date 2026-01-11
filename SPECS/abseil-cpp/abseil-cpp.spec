@@ -1,12 +1,12 @@
-# SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
-# SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileCopyrightText: (C) 2025, 2026 Institute of Software, Chinese Academy of Sciences (ISCAS)
+# SPDX-FileCopyrightText: (C) 2025, 2026 openRuyi Project Contributors
 # SPDX-FileContributor: Xuhai Chang <xuhai.oerv@isrc.iscas.ac.cn>
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
 Name:           abseil-cpp
-Version:        20250814.0
+Version:        20260107.0
 Release:        %autorelease
 Summary:        C++ Common Libraries
 License:        Apache-2.0 AND LicenseRef-openRuyi-Public-Domain
@@ -29,6 +29,8 @@ BuildOption(conf):  -DABSL_BUILD_TESTING:BOOL=ON
 BuildOption(conf):  -DABSL_BUILD_TEST_HELPERS:BOOL=ON
 BuildOption(conf):  -DCMAKE_BUILD_TYPE:STRING=None
 BuildOption(conf):  -DCMAKE_CXX_STANDARD:STRING=17
+# TODO: Exclude flaky test. https://github.com/abseil/abseil-cpp/issues/1804
+BuildOption(check): --exclude-regex absl_failure_signal_handler_test
 
 # The contents of absl/time/internal/cctz are derived from
 # https://github.com/google/cctz (https://src.fedoraproject.org/rpms/cctz), but
@@ -79,7 +81,7 @@ Provides:       bundled(cctz)
 Development headers for %{name}
 
 %files
-%global lib_version 2508.0.0
+%global lib_version 2601.0.0
 %license LICENSE
 %doc FAQ.md README.md UPGRADES.md
 # All shared libraries except installed TESTONLY libraries; see the %%files
@@ -165,7 +167,8 @@ Development headers for %{name}
 %{_libdir}/libabsl_strerror.so.%{lib_version}
 %{_libdir}/libabsl_strings.so.%{lib_version}
 %{_libdir}/libabsl_strings_internal.so.%{lib_version}
-%{_libdir}/libabsl_string_view.so.%{lib_version}
+%{_libdir}/libabsl_borrowed_fixup_buffer.so.%{lib_version}
+%{_libdir}/libabsl_generic_printer_internal.so.%{lib_version}
 %{_libdir}/libabsl_symbolize.so.%{lib_version}
 %{_libdir}/libabsl_synchronization.so.%{lib_version}
 %{_libdir}/libabsl_throw_delegate.so.%{lib_version}
