@@ -1,8 +1,11 @@
-# SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
-# SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileCopyrightText: (C) 2025, 2026 Institute of Software, Chinese Academy of Sciences (ISCAS)
+# SPDX-FileCopyrightText: (C) 2025, 2026 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+# SPDX-FileContributor: yyjeqhc <jialin.oerv@isrc.iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
+
+%global _lto_cflags %{nil}
 
 Name:           cmocka
 Version:        1.1.7
@@ -10,7 +13,6 @@ Release:        %autorelease
 Summary:        Lightweight library to simplify and generalize unit tests for C
 License:        Apache-2.0
 URL:            https://cmocka.org
-
 #!RemoteAsset
 Source0:        https://cmocka.org/files/1.1/%{name}-%{version}.tar.xz
 #!RemoteAsset
