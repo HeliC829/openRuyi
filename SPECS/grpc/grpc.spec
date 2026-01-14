@@ -1,5 +1,5 @@
-# SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
-# SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileCopyrightText: (C) 2025, 2026 Institute of Software, Chinese Academy of Sciences (ISCAS)
+# SPDX-FileCopyrightText: (C) 2025, 2026 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
 # SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
 #
@@ -15,6 +15,9 @@ URL:            https://grpc.io/
 Source:         https://github.com/grpc/grpc/archive/refs/tags/v%{version}.tar.gz
 # From openSUSE:Factory:RISCV/grpc to fix unresolved deps: pkgconfig(opentelemetry_api)
 Patch0:         telemetry.patch
+# From https://github.com/grpc/grpc/pull/41351
+Patch1:         add-missing-includes.patch
+
 BuildSystem:    cmake
 
 BuildOption(conf): -DgRPC_INSTALL:BOOL=ON
