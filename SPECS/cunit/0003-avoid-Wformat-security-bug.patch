@@ -1,0 +1,41 @@
+diff --git a/CUnit/Sources/Curses/Curses.c b/CUnit/Sources/Curses/Curses.c
+index b65beab..91d5298 100644
+--- a/CUnit/Sources/Curses/Curses.c
++++ b/CUnit/Sources/Curses/Curses.c
+@@ -952,10 +952,12 @@ static void show_suite_level_help(CU_pSuite pSuite)
+ 
+   snprintf(szTemp, STRING_LENGTH,   _("Commands:  R - run all tests in suite %s"),
+                                     pSuite->pName);
++  assert(NULL == strchr(szTemp, '%'));
+   mvwprintw(details_pad.pPad, 0, 0, szTemp);
+   mvwprintw(details_pad.pPad, 1, 0, _("           S - Select and run a test"));
+   snprintf(szTemp, STRING_LENGTH,   _("           L - List all tests registered in suite %s"),
+                                     pSuite->pName);
++  assert(NULL == strchr(szTemp, '%'));
+   mvwprintw(details_pad.pPad, 2, 0, szTemp);
+   mvwprintw(details_pad.pPad, 3, 0, _("           A - Activate or deactivate a test (toggle)"));
+   mvwprintw(details_pad.pPad, 4, 0, _("           F - Show failures from last test run"));
+@@ -1068,6 +1070,7 @@ static void list_tests(CU_pSuite pSuite)
+   }
+ 
+   snprintf(szTemp, STRING_LENGTH, "%s: %s", _("Suite"), pSuite->pName);
++  assert(NULL == strchr(szTemp, '%'));
+   mvwprintw(details_pad.pPad, 0, 0, szTemp);
+ 
+   snprintf(szTemp, STRING_LENGTH,
+@@ -1075,6 +1078,7 @@ static void list_tests(CU_pSuite pSuite)
+            width[0], _("#"),
+            width[1], _("Test Name"),
+            width[2], _("Active?"));
++  assert(NULL == strchr(szTemp, '%'));
+   mvwprintw(details_pad.pPad, 1, 0, szTemp);
+ 
+   for (i = 0, pCurTest = pSuite->pTest ;
+@@ -1158,6 +1162,7 @@ static STATUS curses_set_options_run(void)
+ 
+     snprintf(szTemp, STRING_LENGTH,   _("   1 - Inactive suites/tests treated as runtime failures     %s"),
+                                       (CU_FALSE != CU_get_fail_on_inactive()) ? _("Yes") : _("No "));
++  assert(NULL == strchr(szTemp, '%'));
+     mvwprintw(details_pad.pPad, 2, 0, szTemp);
+     refresh_details_window();
+     read_input_string(_("Enter number of option to change : "), szTemp, STRING_LENGTH);
