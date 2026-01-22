@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: (C) 2025, 2026 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
 # SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -16,6 +17,7 @@ Release:        %autorelease
 Summary:        A Tool for Transferring Data from URLs
 License:        curl
 URL:            https://curl.se
+VCS:            git:https://github.com/curl/curl
 #!RemoteAsset
 Source0:        https://curl.se/download/curl-%{version}.tar.xz
 #!RemoteAsset
@@ -25,9 +27,35 @@ Source2:        https://daniel.haxx.se/mykey.asc#/curl.keyring
 BuildSystem:    autotools
 
 %if %{with openssl}
-BuildOption(conf): --enable-hsts --enable-ipv6 --with-openssl --with-ca-fallback --without-ca-path --without-ca-bundle --with-libidn2 --with-nghttp2 --enable-docs --with-gssapi=$(krb5-config --prefix) --with-brotli --with-libssh --enable-symbol-hiding --disable-static --enable-threaded-resolver
+BuildOption(conf):  --enable-hsts
+BuildOption(conf):  --enable-ipv6
+BuildOption(conf):  --with-openssl
+BuildOption(conf):  --with-ca-fallback
+BuildOption(conf):  --without-ca-path
+BuildOption(conf):  --without-ca-bundle
+BuildOption(conf):  --with-libidn2
+BuildOption(conf):  --with-nghttp2
+BuildOption(conf):  --enable-docs
+BuildOption(conf):  --with-gssapi=$(krb5-config --prefix)
+BuildOption(conf):  --with-brotli
+BuildOption(conf):  --with-libssh
+BuildOption(conf):  --enable-symbol-hiding
+BuildOption(conf):  --disable-static
+BuildOption(conf):  --enable-threaded-resolver
 %else
-BuildOption(conf): --enable-hsts --enable-ipv6 --with-gnutls --with-libidn2 --with-nghttp2 --enable-docs --without-libssh --without-brotli --without-gssapi --enable-symbol-hiding --disable-static --enable-threaded-resolver --with-ca-bundle=%{_sysconfdir}/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
+BuildOption(conf):  --enable-hsts
+BuildOption(conf):  --enable-ipv6
+BuildOption(conf):  --with-gnutls
+BuildOption(conf):  --with-libidn2
+BuildOption(conf):  --with-nghttp2
+BuildOption(conf):  --enable-docs
+BuildOption(conf):  --without-libssh
+BuildOption(conf):  --without-brotli
+BuildOption(conf):  --without-gssapi
+BuildOption(conf):  --enable-symbol-hiding
+BuildOption(conf):  --disable-static
+BuildOption(conf):  --enable-threaded-resolver
+BuildOption(conf):  --with-ca-bundle=%{_sysconfdir}/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
 %endif
 
 BuildRequires:  groff
@@ -56,19 +84,16 @@ server using any of the supported protocols (HTTP, HTTPS, FTP, FTPS,
 TFTP, DICT, TELNET, LDAP, or FILE). The command is designed to work
 without user interaction or any kind of interactivity.
 
-%package -n     libcurl-devel
+%package        devel
 Summary:        Development files for the curl library
 Requires:       glibc-devel
-Requires:       %{name} = %{version}
-Provides:       curl-devel = %{version}
-Obsoletes:      curl-devel < %{version}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
-%description -n libcurl-devel
+%description    devel
 Curl is a client to get documents and files from or send documents to a
 server using any of the supported protocols (HTTP, HTTPS, FTP, GOPHER,
 DICT, TELNET, LDAP, or FILE). The command is designed to work without
 user interaction or any kind of interactivity.
-
 
 %build -p
 CPPFLAGS="-D_FORTIFY_SOURCE=2"
@@ -95,7 +120,7 @@ popd
 %{_mandir}/man1/wcurl.*
 %{_libdir}/libcurl.so.4*
 
-%files -n libcurl-devel
+%files devel
 %license COPYING
 %{_bindir}/curl-config
 %{_includedir}/curl

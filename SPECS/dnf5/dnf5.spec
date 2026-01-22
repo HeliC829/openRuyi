@@ -53,7 +53,7 @@ BuildRequires:  pkgconfig(systemd)
 BuildRequires:  toml11
 BuildRequires:  zlib-devel
 BuildRequires:  pkgconfig(smartcols)
-BuildRequires:  libcurl-devel
+BuildRequires:  pkgconfig(libcurl)
 BuildRequires:  swig
 BuildRequires:  python3-devel
 
