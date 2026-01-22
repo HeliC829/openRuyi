@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Yafen Fang <yafen@iscas.ac.cn>
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -13,19 +14,21 @@ Release:        %autorelease
 Summary:        Settings tool for Ethernet NICs
 License:        GPL-2.0-only AND GPL-2.0-or-later
 URL:            https://www.kernel.org/pub/software/network/ethtool
+VCS:            git:https://git.kernel.org/pub/scm/network/ethtool/ethtool.git
 #!RemoteAsset
 Source0:        https://www.kernel.org/pub/software/network/%{name}/%{name}-%{version}.tar.xz
 #!RemoteAsset
 Source1:        https://www.kernel.org/pub/software/network/%{name}/%{name}-%{version}.tar.sign
+BuildSystem:    autotools
+
 Patch1:         0001-netlink-fix-missing-headers-in-text-output.patch
 Patch2:         0002-netlink-fix-print_string-when-the-value-is-NULL.patch
 
-BuildSystem:    autotools
-BuildOption(conf): --disable-static
+BuildOption(conf):  --disable-static
 
 BuildRequires:  xz
 BuildRequires:  gcc
-BuildRequires:  libmnl-devel
+BuildRequires:  pkgconfig(libmnl)
 
 %description
 Ethtool is the standard Linux utility for controlling network drivers and
