@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: yyjeqhc <jialin.oerv@isrc.iscas.ac.cn>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -20,7 +21,7 @@ BuildOption(conf):  -DENABLE_OPT=ON
 
 BuildRequires:  cmake
 BuildRequires:  gcc-c++
-BuildRequires:  spirv-tools-devel
+BuildRequires:  pkgconfig(SPIRV-Tools)
 BuildRequires:  python3
 
 %description
@@ -30,7 +31,7 @@ interpretation of the specifications for these languages.
 
 %package        devel
 Summary:        Development files for %{name}
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    devel
 Development headers and libraries for glslang.
