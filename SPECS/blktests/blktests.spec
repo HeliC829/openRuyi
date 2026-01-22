@@ -1,15 +1,14 @@
-# SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
-# SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileCopyrightText: (C) 2025, 2026 Institute of Software, Chinese Academy of Sciences (ISCAS)
+# SPDX-FileCopyrightText: (C) 2025, 2026 openRuyi Project Contributors
 # SPDX-FileContributor: Yafen Fang <yafen@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
-%global commit_date  20251031
-%global commit       4badb276ca98398513a77d5e9bdc9892f7544762
+%global commit       7c3ad92d3d8f64e09e9b1ad130b07cd36bf11e7b
 %global shortcommit  %(c=%{commit}; echo ${c:0:7})
 
 Name:           blktests
-Version:        %{commit_date}+git%{shortcommit}
+Version:        0+git20260122.%{shortcommit}
 Release:        %autorelease
 Summary:        Linux kernel block layer testing framework
 License:        GPL-2.0-or-later
