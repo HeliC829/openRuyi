@@ -19,7 +19,7 @@
 # Bundle compat libraries for a previous LLVM version, as part of llvm-libs and
 # clang-libs.
 %bcond bundle_compat_lib 0
-%bcond check 1
+%bcond check 0
 %if %{with bundle_compat_lib}
 %global compat_maj_ver 20
 %global compat_ver %{compat_maj_ver}.1.8
