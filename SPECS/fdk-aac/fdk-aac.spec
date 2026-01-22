@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -14,8 +15,8 @@ URL:            https://github.com/mstorsjo/fdk-aac
 Source:         https://github.com/mstorsjo/fdk-aac/archive/refs/tags/v%{version}.tar.gz
 BuildSystem:    autotools
 
-BuildOption(conf): --disable-silent-rules
-BuildOption(conf): --disable-static
+BuildOption(conf):  --disable-silent-rules
+BuildOption(conf):  --disable-static
 
 BuildRequires:  automake
 BuildRequires:  gcc
@@ -30,7 +31,7 @@ This version has been stripped of patented code to be redistributable.
 
 %package        devel
 Summary:        Development files for %{name}
-Requires:       %{name}%{?_isa} = %{version}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    devel
 The %{name}-devel package contains libraries and header files for
