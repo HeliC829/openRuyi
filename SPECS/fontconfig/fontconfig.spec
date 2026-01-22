@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Dingli Zhang <dingli@iscas.ac.cn>
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -11,6 +12,7 @@ Release:        %autorelease
 Summary:        Font configuration and customization library
 License:        HPND AND LicenseRef-openRuyi-Public-Domain AND Unicode-DFS-2016
 URL:            https://www.freedesktop.org/wiki/Software/fontconfig/
+VCS:            git:https://gitlab.freedesktop.org/fontconfig/fontconfig
 #!RemoteAsset
 Source:         https://gitlab.freedesktop.org/fontconfig/fontconfig/-/archive/%{version}/fontconfig-%{version}.tar.gz
 
@@ -27,7 +29,8 @@ BuildOption(conf):  -Dcache-dir=/usr/lib/fontconfig/cache
 
 BuildRequires:  gcc
 BuildRequires:  gperf
-BuildRequires:  make, meson
+BuildRequires:  make
+BuildRequires:  meson
 BuildRequires:  pkgconfig
 BuildRequires:  python3
 BuildRequires:  docbook-utils
@@ -42,21 +45,21 @@ Fontconfig is a library designed to locate fonts within the system and select
 them according to requirements specified by applications. This package contains
 the runtime library and essential command-line tools.
 
-%package devel
+%package        devel
 Summary:        Development files for fontconfig
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       pkgconfig(freetype2)
 
-%description devel
+%description    devel
 This package includes the header files, pkgconfig files, and developer docs
 for the fontconfig library. Install it if you want to develop programs that
 use fontconfig.
 
-%package doc
+%package        doc
 Summary:        Documentation for fontconfig
 BuildArch:      noarch
 
-%description doc
+%description    doc
 Contains detailed user and developer documentation for fontconfig.
 
 %install -a
