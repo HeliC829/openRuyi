@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -10,10 +11,12 @@ Release:        %autorelease
 Summary:        A line-oriented text editor
 License:        GPL-3.0-or-later AND LGPL-2.1-or-later
 URL:            https://www.gnu.org/software/ed/
+# VCS: TODO: How to write https://savannah.gnu.org/cvs/?group=ed
 #!RemoteAsset
 Source:         https://ftpmirror.gnu.org/ed/ed-%{version}.tar.lz
-BuildRequires:  lzip
 Buildsystem:    autotools
+
+BuildRequires:  lzip
 
 %description
 GNU ed is a line-oriented text editor. It is used to create, display,
