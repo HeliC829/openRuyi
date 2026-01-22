@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
 # SPDX-FileContributor: ayostl <yao_xp@yeah.net>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -11,6 +12,7 @@ Release:        %autorelease
 Summary:        A Backup and Archiving Utility
 License:        GPL-3.0-only
 URL:            https://www.gnu.org/software/cpio/cpio.html
+VCS:            git:https://git.savannah.gnu.org/git/cpio.git
 #!RemoteAsset
 Source0:        https://ftpmirror.gnu.org/gnu/%{name}/%{name}-%{version}.tar.bz2
 #!RemoteAsset
@@ -20,15 +22,15 @@ BuildSystem:    autotools
 # GCC15: give xstat a real prototype
 Patch0:         0001-fix-xstat-prototype.patch
 
-BuildOption(conf): --with-rmt="%{_bindir}/rmt"
-BuildOption(conf): --enable-mt
-BuildOption(conf): --program-transform-name='s/^mt$/gnumt/'
+BuildOption(conf):  --with-rmt="%{_bindir}/rmt"
+BuildOption(conf):  --enable-mt
+BuildOption(conf):  --program-transform-name='s/^mt$/gnumt/'
 
 BuildRequires:  autoconf
 BuildRequires:  automake
 
 Suggests:       rmt
-Suggests:       %{name}-mt = %{version}
+Suggests:       %{name}-mt = %{version}-%{release}
 
 %description
 GNU cpio is a program to manage archives of files. Cpio copies files
@@ -37,9 +39,9 @@ other files plus information about them, such as their pathname, owner,
 time stamps, and access permissions. The archive can be another file on
 the disk, a magnetic tape, or a pipe.
 
-%package mt
+%package        mt
 Summary:        Tape drive control utility
-Requires:       %{name} = %{version}
+Requires:       %{name} = %{version}-%{release}
 Requires(post): update-alternatives
 Provides:       mt
 Conflicts:      mt
