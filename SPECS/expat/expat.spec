@@ -13,6 +13,7 @@ Release:        %autorelease
 Summary:        XML Parser Toolkit
 License:        MIT
 URL:            https://libexpat.github.io
+VCS:            git:https://github.com/libexpat/libexpat
 #!RemoteAsset
 Source0:        https://github.com/libexpat/libexpat/releases/download/R_%{unversion}/expat-%{version}.tar.xz
 #!RemoteAsset
@@ -40,7 +41,7 @@ parser might find in the XML document (like start tags).
 
 %package        devel
 Summary:        Development files for expat, an XML parser toolkit
-Requires:       expat%{?_isa} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    devel
 Expat is an XML parser library written in C. It is a stream-oriented
