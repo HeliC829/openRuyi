@@ -2,37 +2,42 @@
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
 # SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
 # default without systemd
 %bcond systemd 0
 
-Name:      iprutils
-Version:   2.4.19
-Release:   %autorelease
-Summary:   Utilities for the ipr
-License:   CPL-1.0
-URL:       https://github.com/bjking1/iprutils
+Name:           iprutils
+Version:        2.4.19
+Release:        %autorelease
+Summary:        Utilities for the ipr
+License:        CPL-1.0
+URL:            https://github.com/bjking1/iprutils
 #!RemoteAsset
-Source0:   https://github.com/bjking1/iprutils/archive/rel-2-4-19/%{name}-%{version}.tar.gz
+Source0:        https://github.com/bjking1/iprutils/archive/rel-2-4-19/%{name}-%{version}.tar.gz
 BuildSystem:    autotools
 
 %if %{with systemd}
-BuildOption(conf): --with-systemd
-BuildOption(conf): --without-initscripts
+BuildOption(conf):  --with-systemd
+BuildOption(conf):  --without-initscripts
 %else
-BuildOption(conf): --without-systemd
-BuildOption(conf): --with-initscripts
+BuildOption(conf):  --without-systemd
+BuildOption(conf):  --with-initscripts
 %endif
+BuildOption(conf):  --disable-static
+BuildOption(conf):  --disable-sosreport
 
-BuildOption(conf): --disable-static
-BuildOption(conf): --disable-sosreport
-
-BuildRequires: libtool libcap-devel linux-headers zlib-devel autoconf automake
-BuildRequires: ncurses-devel
+BuildRequires:  libtool
+BuildRequires:  pkgconfig(libcap)
+BuildRequires:  linux-headers
+BuildRequires:  pkgconfig(zlib)
+BuildRequires:  autoconf
+BuildRequires:  automake
+BuildRequires:  pkgconfig(ncurses)
 %if %{with systemd}
-BuildRequires: systemd-rpm-macros
+BuildRequires:  systemd-rpm-macros
 %endif
 
 %description
@@ -41,8 +46,6 @@ Provides a suite of utilities to manage and configure SCSI devices.
 %conf -p
 export LDFLAGS="$LDFLAGS -lncursesw -ltinfo"
 autoreconf -ivf
-
-%install -a
 
 %if %{with systemd}
 %post
