@@ -2,31 +2,37 @@
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Bo YU <yubo@iscas.ac.cn>
 # SPDX-FileContributor: Xuhai Chang <xuhai.oerv@isrc.iscas.ac.cn>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
-Name:           hwloc
-Summary:        Portable Hardware Locality - portable abstraction of hierarchical architectures
 %global major_version 2
 %global minor_version 12
 %global patch_version 2
+
+Name:           hwloc
+Summary:        Portable Hardware Locality - portable abstraction of hierarchical architectures
 Version:        %{major_version}.%{minor_version}.%{patch_version}
 Release:        %autorelease
 License:        BSD-2-Clause
 URL:            http://www.open-mpi.org/projects/hwloc/
+VCS:            git:https://github.com/open-mpi/ompi
 #!RemoteAsset
 Source0:        https://download.open-mpi.org/release/hwloc/v%{major_version}.%{minor_version}/hwloc-%{version}.tar.gz
 BuildSystem:    autotools
-BuildOption(conf): --disable-plugins
-BuildOption(conf): --disable-silent-rules
-BuildOption(conf): --runstatedir=/run
+
+BuildOption(conf):  --disable-plugins
+BuildOption(conf):  --disable-silent-rules
+BuildOption(conf):  --runstatedir=/run
+
 # disabled features: plugins for GL,pci,libxml, X11 graphical interface, opencl support, rdma-core support, html doc
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
-BuildRequires:  ncurses-devel
+BuildRequires:  pkgconfig(ncurses)
 BuildRequires:  pkgconfig(numa)
 BuildRequires:  make
 BuildRequires:  pkgconfig(libxml-2.0)
+
 %description
 The Portable Hardware Locality (hwloc) software package provides
 a portable abstraction (across OS, versions, architectures, ...)
@@ -41,11 +47,11 @@ hwloc may display the topology in multiple convenient formats.
 It also offers a powerful programming interface (C API) to gather information
 about the hardware, bind processes, and much more.
 
-%package devel
-Summary:   Headers and shared development libraries for hwloc
-Requires:   %{name}%{?_isa} = %{version}-%{release}
+%package        devel
+Summary:        Headers and shared development libraries for hwloc
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
-%description devel
+%description    devel
 Headers and shared object symbolic links for the hwloc.
 
 %conf -a
