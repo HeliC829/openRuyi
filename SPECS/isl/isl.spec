@@ -1,44 +1,37 @@
 # SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
-%define islsover 23
 Name:           isl
 Version:        0.27
 Release:        %autorelease
 Summary:        Integer Set Library
 License:        MIT
 URL:            https://libisl.sourceforge.io/
+VCS:            git:https://repo.or.cz/isl.git
 #!RemoteAsset
 Source:         https://libisl.sourceforge.io/isl-%{version}.tar.xz
-BuildRequires:  gmp-devel
-BuildRequires:  pkgconfig
-
 BuildSystem:    autotools
-BuildOption(conf): --disable-static
+
+BuildOption(conf):  --disable-static
+
+BuildRequires:  pkgconfig(gmp)
+BuildRequires:  pkgconfig
 
 %description
 ISL is a library for manipulating sets and relations of integer points
 bounded by linear constraints.
 It is used by Cloog and the GCC Graphite optimization framework.
 
-%package devel
+%package        devel
 Summary:        Development tools for ISL
-Requires:       libisl%{islsover} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
-%description devel
+%description    devel
 Development tools and headers for the ISL.
-
-%package -n libisl%{islsover}
-Summary:        The ISL shared library
-
-%description -n libisl%{islsover}
-The shared library for the ISL.
-
-ISL is a library for manipulating sets and relations of integer points
-bounded by linear constraints.
 
 %check
 %make_build check
@@ -46,8 +39,8 @@ bounded by linear constraints.
 %install -a
 rm -f  %{buildroot}%{_libdir}/libisl.so.*-gdb.py
 
-%files -n libisl%{islsover}
-%{_libdir}/libisl.so.%{islsover}*
+%files
+%{_libdir}/libisl.so.*
 
 %files devel
 %{_includedir}/isl
