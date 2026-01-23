@@ -1,39 +1,41 @@
 # SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
-Name:		    json-glib
-Version:	    1.10.8
-Release:	    %autorelease
-Summary:	    Library for JavaScript Object Notation (JSON) format
-License:	    LGPL-2.1-or-later
-URL:		    https://wiki.gnome.org/Projects/JsonGlib
+Name:           json-glib
+Version:        1.10.8
+Release:        %autorelease
+Summary:        Library for JavaScript Object Notation (JSON) format
+License:        LGPL-2.1-or-later
+URL:            https://wiki.gnome.org/Projects/JsonGlib
+VCS:            git:https://gitlab.gnome.org/GNOME/json-glib
 #!RemoteAsset
-Source: 	    https://download.gnome.org/sources/json-glib/1.10/json-glib-%{version}.tar.xz
+Source:         https://download.gnome.org/sources/json-glib/1.10/json-glib-%{version}.tar.xz
 BuildSystem:    meson
 
-BuildOption(conf): -Ddocumentation=disabled
-BuildOption(conf): -Dman=true
-BuildOption(conf): -Dtests=false
+BuildOption(conf):  -Ddocumentation=disabled
+BuildOption(conf):  -Dman=true
+BuildOption(conf):  -Dtests=false
 
-BuildRequires:	meson
-BuildRequires:	gettext-devel
-BuildRequires:	gi-docgen
-BuildRequires:	pkgconfig(gio-2.0) >= 2.72.0
-BuildRequires:	gobject-introspection-devel
-BuildRequires:	python3-docutils
+BuildRequires:  meson
+BuildRequires:  gettext-devel
+BuildRequires:  gi-docgen
+BuildRequires:  pkgconfig(gio-2.0)
+BuildRequires:  pkgconfig(gobject-introspection)
+BuildRequires:  python3-docutils
 
 %description
 json-glib is a library providing serialization and deserialization support
 for the JavaScript Object Notation (JSON) format.
 
-%package     devel
-Summary:	 Development files and tools for json-glib
-Requires:	 %{name} = %{version}
+%package        devel
+Summary:        Development files and tools for json-glib
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
-%description devel
+%description    devel
 This package contains the header files, libraries, documentation, and tools
 needed to develop applications that use the json-glib library.
 
