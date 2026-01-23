@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: (C) 2026 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2026 openRuyi Project Contributors
 # SPDX-FileContributor: Xuhai Chang <xuhai.oerv@isrc.iscas.ac.cn>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -54,14 +55,14 @@ This package contains documentation for %{name}.
 %{_libdir}/libkeybinder-3.0.so.*
 %{_libdir}/girepository-1.0/Keybinder-3.0.typelib
 
-%files          devel
+%files devel
 %dir %{_includedir}/keybinder-3.0/
 %{_includedir}/keybinder-3.0/keybinder.h
 %{_libdir}/pkgconfig/keybinder-3.0.pc
 %{_libdir}/libkeybinder-3.0.so
 %{_datadir}/gir-1.0/Keybinder-3.0.gir
 
-%files          doc
+%files doc
 %dir %{_datadir}/gtk-doc/html/keybinder-3.0/
 %{_datadir}/gtk-doc/html/keybinder-3.0/*
 
