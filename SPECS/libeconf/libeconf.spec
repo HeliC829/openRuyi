@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
 # SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -13,7 +14,6 @@ License:        MIT
 URL:            https://github.com/openSUSE/libeconf
 #!RemoteAsset
 Source:         https://github.com/openSUSE/libeconf/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
-Provides:       libeconf0
 BuildSystem:    meson
 
 BuildRequires:  meson
@@ -23,10 +23,9 @@ BuildRequires:  pkgconfig
 Enhanced config file parser, which merges config files placed
 in several locations into one. This package contains the runtime library.
 
-
 %package        devel
 Summary:        Development files for libeconf
-Requires:       %{name} = %{version}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    devel
 This package contains all necessary include files and libraries needed
@@ -34,15 +33,15 @@ to develop applications that use libeconf.
 
 %package        static
 Summary:        Static library for libeconf
-Requires:       %{name}-devel = %{version}
-Provides:       %{name}-devel-static = %{version}
+Requires:       %{name}-devel = %{version}-%{release}
+Provides:       %{name}-devel-static = %{version}-%{release}
 
 %description    static
 This package contains the libeconf.a static library.
 
 %package        utils
 Summary:        Command line interface for libeconf
-Requires:       %{name} = %{version}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    utils
 This package contains tools for handling configuration files.
