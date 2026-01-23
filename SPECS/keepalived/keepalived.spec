@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
 # SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -19,52 +20,52 @@ Release:        %autorelease
 Summary:        High Availability monitor for LVS and VRRP
 License:        GPL-2.0-or-later
 URL:            http://www.keepalived.org/
+VCS:            git:https://github.com/acassen/keepalived
 #!RemoteAsset
 Source0:        http://www.keepalived.org/software/keepalived-%{version}.tar.gz
 Source1:        keepalived.service
 BuildSystem:    autotools
 
 %if %{with debug}
-BuildOption(conf): --enable-debug
+BuildOption(conf):  --enable-debug
 %endif
 %if %{with profile}
-BuildOption(conf): --enable-profile
+BuildOption(conf):  --enable-profile
 %endif
 %if %{without vrrp}
-BuildOption(conf): --disable-vrrp
+BuildOption(conf):  --disable-vrrp
 %endif
 %if %{with snmp}
-BuildOption(conf): --enable-snmp --enable-snmp-rfc
+BuildOption(conf):  --enable-snmp --enable-snmp-rfc
 %endif
 %if %{with nftables}
-BuildOption(conf): --enable-nftables --disable-iptables
+BuildOption(conf):  --enable-nftables --disable-iptables
 %endif
 %if %{with json}
-BuildOption(conf): --enable-json
+BuildOption(conf):  --enable-json
 %endif
 %if %{with sha1}
-BuildOption(conf): --enable-sha1
+BuildOption(conf):  --enable-sha1
 %endif
-BuildOption(conf): --with-init=systemd
-
-BuildOption(build): STRIP=/bin/true
+BuildOption(conf):  --with-init=systemd
+BuildOption(build):  STRIP=/bin/true
 
 %if %{with snmp}
-BuildRequires:  net-snmp-devel
+BuildRequires:  pkgconfig(netsnmp)
 %endif
 %if %{with nftables}
-BuildRequires:  libmnl-devel
-BuildRequires:  libnftnl-devel
+BuildRequires:  pkgconfig(libmnl)
+BuildRequires:  pkgconfig(libnftnl)
 %else
-BuildRequires:  ipset-devel
-BuildRequires:  iptables-devel
+BuildRequires:  pkgconfig(libmnl)
+BuildRequires:  pkgconfig(xtables)
 %endif
 BuildRequires:  gcc
-BuildRequires:  systemd-devel
-BuildRequires:  openssl-devel
-BuildRequires:  libnl-devel
-BuildRequires:  libnfnetlink-devel
-BuildRequires:  file-devel
+BuildRequires:  pkgconfig(systemd)
+BuildRequires:  pkgconfig(openssl)
+BuildRequires:  pkgconfig(libnl-3.0)
+BuildRequires:  pkgconfig(libnfnetlink)
+BuildRequires:  pkgconfig(libmagic)
 BuildRequires:  make
 
 Requires(post):   systemd
