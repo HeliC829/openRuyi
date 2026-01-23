@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: (C) 2025, 2026 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
 # SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -14,22 +15,37 @@ Release:        %autorelease
 Summary:        The Kerberos 5 network authentication system
 License:        MIT
 URL:            https://web.mit.edu/kerberos/
+VCS:            git:https://github.com/krb5/krb5
 #!RemoteAsset
 Source:         https://kerberos.org/dist/krb5/1.22/%{name}-%{version}.tar.gz
 BuildSystem:    autotools
 
-BuildOption(conf): --without-ldap
-BuildOption(conf): --disable-static --enable-dns-for-realm --disable-rpath
-BuildOption(conf): --with-pam --enable-pkinit --with-crypto-impl=openssl --with-selinux
-BuildOption(conf): --with-system-et --with-system-ss --with-system-verto --with-lmdb
-BuildOption(conf): --localstatedir=%{_localstatedir}
+BuildOption(conf):  --without-ldap
+BuildOption(conf):  --disable-static
+BuildOption(conf):  --enable-dns-for-realm
+BuildOption(conf):  --disable-rpath
+BuildOption(conf):  --with-pam
+BuildOption(conf):  --enable-pkinit
+BuildOption(conf):  --with-crypto-impl=openssl
+BuildOption(conf):  --with-selinux
+BuildOption(conf):  --with-system-et
+BuildOption(conf):  --with-system-ss
+BuildOption(conf):  --with-system-verto
+BuildOption(conf):  --with-lmdb
+BuildOption(conf):  --localstatedir=%{_localstatedir}
+BuildOption(build):  -C src
+BuildOption(install):  -C src
 
-BuildOption(build): -C src
-BuildOption(install): -C src
-
-BuildRequires:  autoconf bison keyutils-devel
-BuildRequires:  pam-devel pkgconfig pkgconfig(com_err) pkgconfig(libselinux)
-BuildRequires:  pkgconfig(libssl) pkgconfig(libverto) pkgconfig(lmdb)
+BuildRequires:  autoconf
+BuildRequires:  bison
+BuildRequires:  pkgconfig(libkeyutils)
+BuildRequires:  pkgconfig(pam)
+BuildRequires:  pkgconfig
+BuildRequires:  pkgconfig(com_err)
+BuildRequires:  pkgconfig(libselinux)
+BuildRequires:  pkgconfig(libssl)
+BuildRequires:  pkgconfig(libverto)
+BuildRequires:  pkgconfig(lmdb)
 BuildRequires:  pkgconfig(ss)
 
 %if %{with systemd}
@@ -48,8 +64,11 @@ core libraries, clients, servers, and plugins.
 
 %package        devel
 Summary:        Development files for MIT Kerberos 5
-Requires:       %{name} = %{version}
-Requires:       keyutils-devel pkgconfig(com_err) pkgconfig(libverto) pkgconfig(ss)
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Requires:       pkgconfig(libkeyutils)
+Requires:       pkgconfig(com_err)
+Requires:       pkgconfig(libverto)
+Requires:       pkgconfig(ss)
 
 %description    devel
 This package contains the libraries, header files, and documentation needed
