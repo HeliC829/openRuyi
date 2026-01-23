@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
 # SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -15,25 +16,25 @@ URL:            https://github.com/google/leveldb
 Source:         https://github.com/google/leveldb/archive/refs/tags/%{version}.tar.gz
 BuildSystem:    cmake
 
-BuildOption(conf): -DBUILD_SHARED_LIBS:BOOL=ON
-BuildOption(conf): -DLEVELDB_BUILD_TESTS:BOOL=OFF
-BuildOption(conf): -DLEVELDB_BUILD_BENCHMARKS:BOOL=OFF
-BuildOption(conf): -DCMAKE_INSTALL_LIBDIR:PATH=%{_libdir}
+BuildOption(conf):  -DBUILD_SHARED_LIBS:BOOL=ON
+BuildOption(conf):  -DLEVELDB_BUILD_TESTS:BOOL=OFF
+BuildOption(conf):  -DLEVELDB_BUILD_BENCHMARKS:BOOL=OFF
+BuildOption(conf):  -DCMAKE_INSTALL_LIBDIR:PATH=%{_libdir}
 
 BuildRequires:  cmake
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
-BuildRequires:  snappy-devel
+BuildRequires:  cmake(Snappy)
 
 %description
 LevelDB is a fast key-value storage library written at Google that provides an
 ordered mapping from string keys to string values.
 
-%package devel
+%package        devel
 Summary:        Development files for %{name}
-Requires:       %{name} = %{version}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
-%description devel
+%description    devel
 This package contains the header files and development libraries for leveldb.
 
 %files
