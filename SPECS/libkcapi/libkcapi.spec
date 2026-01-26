@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
 # SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -13,27 +14,34 @@ Release:        %autorelease
 Summary:        Linux Kernel Crypto API User Space Interface Library
 License:        BSD-3-Clause OR GPL-2.0-only
 URL:            https://www.chronox.de/libkcapi/
+VCs:            git:https://github.com/smuellerDD/libkcapi
 #!RemoteAsset
 Source0:        https://www.chronox.de/libkcapi/releases/%{version}/libkcapi-%{version}.tar.xz
 BuildSystem:    autotools
 
-BuildOption(conf): --disable-silent-rules
-BuildOption(conf): --enable-kcapi-encapp
-BuildOption(conf): --enable-kcapi-dgstapp
-BuildOption(conf): --enable-kcapi-hasher
-BuildOption(conf): --enable-kcapi-rngapp
-BuildOption(conf): --enable-kcapi-speed
-BuildOption(conf): --enable-kcapi-test
-BuildOption(conf): --enable-shared
-BuildOption(conf): --disable-static
-BuildOption(conf): --enable-sum-prefix=
-BuildOption(conf): --enable-sum-dir=%{_libdir}
-BuildOption(conf): --with-pkgconfigdir=%{_libdir}/pkgconfig
+BuildOption(conf):  --disable-silent-rules
+BuildOption(conf):  --enable-kcapi-encapp
+BuildOption(conf):  --enable-kcapi-dgstapp
+BuildOption(conf):  --enable-kcapi-hasher
+BuildOption(conf):  --enable-kcapi-rngapp
+BuildOption(conf):  --enable-kcapi-speed
+BuildOption(conf):  --enable-kcapi-test
+BuildOption(conf):  --enable-shared
+BuildOption(conf):  --disable-static
+BuildOption(conf):  --enable-sum-prefix=
+BuildOption(conf):  --enable-sum-dir=%{_libdir}
+BuildOption(conf):  --with-pkgconfigdir=%{_libdir}/pkgconfig
 
-BuildRequires:  coreutils gcc hardlink libtool openssl perl
+BuildRequires:  coreutils
+BuildRequires:  gcc
+BuildRequires:  hardlink
+BuildRequires:  libtool
+BuildRequires:  openssl
+BuildRequires:  perl
 BuildRequires:  linux-headers >= 4.10.0
 %if %{with systemd}
 BuildRequires:  systemd
+
 Requires:       systemd
 %endif
 
@@ -44,7 +52,7 @@ API for developers.
 
 %package        devel
 Summary:        Development files for the %{name} package
-Requires:       %{name} = %{version}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    devel
 Header files and development libraries for applications that use %{name}.
