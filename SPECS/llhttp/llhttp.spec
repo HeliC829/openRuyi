@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
 # SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -23,11 +24,11 @@ BuildRequires:  gcc-c++
 This project is a port of http_parser to TypeScript. llparse is used to
 generate the output C source file, which can be compiled and linked.
 
-%package devel
+%package        devel
 Summary:        Development files for llhttp
-Requires:       %{name} = %{version}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
-%description devel
+%description    devel
 The llhttp-devel package contains libraries and header files for
 developing applications that use llhttp.
 
