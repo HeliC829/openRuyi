@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
 # SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -9,14 +10,16 @@ Name:           libmd
 Version:        1.1.0
 Release:        %autorelease
 Summary:        Message digest functions from BSD systems
-License:        BSD-2-Clause OR BSD-3-Clause OR ISC OR SUSE-Public-Domain
+License:        BSD-2-Clause OR BSD-3-Clause OR ISC OR LicenseRef-openRuyi-Public-Domain
 URL:            https://www.hadrons.org/software/libmd/
+VCS:            git:https://git.hadrons.org/git/libmd.git
 #!RemoteAsset
 Source0:        https://archive.hadrons.org/software/libmd/libmd-%{version}.tar.xz
 #!RemoteAsset
 Source1:        https://archive.hadrons.org/software/libmd/libmd-%{version}.tar.xz.asc
 Source2:        %{name}.keyring
 BuildSystem:    autotools
+
 BuildOption(conf):  --disable-static
 BuildOption(conf):  --disable-silent-rules
 
@@ -27,11 +30,11 @@ The libmd library provides a few message digest ("hash") functions, as
 found on various BSDs on a library with the same name and with a compatible
 API.
 
-%package devel
+%package        devel
 Summary:        Provides message digest functions from BSD systems
-Requires:       %{name} = %{version}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
-%description devel
+%description    devel
 The libmd library provides a few message digest ("hash") functions, as
 found on various BSDs on a library with the same name and with a compatible
 API.
