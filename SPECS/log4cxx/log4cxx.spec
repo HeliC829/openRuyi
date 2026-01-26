@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: (C) 2025, 2026 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2025, 2026 openRuyi Project Contributors
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 # SPDX-FileContributor: yyjeqhc <jialin.oerv@isrc.iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
@@ -10,6 +11,7 @@ Release:        %autorelease
 Summary:        A port to C++ of the Log4j project
 License:        Apache-2.0
 URL:            https://logging.apache.org/log4cxx/index.html
+VCS:            git:https://github.com/apache/logging-log4cxx.git
 #!RemoteAsset:  sha256:aa23f47c3164aa2cf848c2258b4b4bc372e7964d4a3ed47c2b4a4a915c5dfa37
 Source:         https://www.apache.org/dist/logging/log4cxx/%{version}/apache-log4cxx-%{version}.tar.gz
 BuildSystem:    cmake
