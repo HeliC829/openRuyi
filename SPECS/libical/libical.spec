@@ -2,29 +2,35 @@
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
 # SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
-Name:               libical
-Version:            3.0.20
-Release:            %autorelease
-Summary:            Reference implementation of the iCalendar data type and serialization format
-License:            LGPL-2.1-only OR MPL-2.0
-URL:                https://libical.github.io/libical/
+Name:           libical
+Version:        3.0.20
+Release:        %autorelease
+Summary:        Reference implementation of the iCalendar data type and serialization format
+License:        LGPL-2.1-only OR MPL-2.0
+URL:            https://libical.github.io/libical/
+VCS:            git:https://github.com/libical/libical
 #!RemoteAsset
-Source:             https://github.com/libical/libical/archive/v%{version}/libical-%{version}.tar.gz
+Source:         https://github.com/libical/libical/archive/v%{version}/libical-%{version}.tar.gz
 BuildSystem:    cmake
 
-BuildOption(conf): -DUSE_INTEROPERABLE_VTIMEZONES:BOOL=ON
-BuildOption(conf): -DICAL_ALLOW_EMPTY_PROPERTIES:BOOL=ON
-BuildOption(conf): -DGOBJECT_INTROSPECTION:BOOL=ON
-BuildOption(conf): -DICAL_GLIB:BOOL=ON
-BuildOption(conf): -DICAL_GLIB_VAPI:BOOL=ON
-BuildOption(conf): -DSHARED_ONLY:BOOL=ON
-BuildOption(conf): -DBUILD_DOCS:BOOL=OFF
-BuildOption(conf): -DENABLE_GTK_DOC=OFF
+BuildOption(conf):  -DUSE_INTEROPERABLE_VTIMEZONES:BOOL=ON
+BuildOption(conf):  -DICAL_ALLOW_EMPTY_PROPERTIES:BOOL=ON
+BuildOption(conf):  -DGOBJECT_INTROSPECTION:BOOL=ON
+BuildOption(conf):  -DICAL_GLIB:BOOL=ON
+BuildOption(conf):  -DICAL_GLIB_VAPI:BOOL=ON
+BuildOption(conf):  -DSHARED_ONLY:BOOL=ON
+BuildOption(conf):  -DBUILD_DOCS:BOOL=OFF
+BuildOption(conf):  -DENABLE_GTK_DOC=OFF
 
-BuildRequires:  gcc gcc-c++ cmake ninja pkgconfig
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  cmake
+BuildRequires:  ninja
+BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(gobject-2.0)
 BuildRequires:  pkgconfig(gobject-introspection-1.0)
 BuildRequires:  pkgconfig(libxml-2.0)
@@ -32,37 +38,40 @@ BuildRequires:  pkgconfig(icu-i18n)
 BuildRequires:  pkgconfig(icu-uc)
 BuildRequires:  perl(Getopt::Std)
 BuildRequires:  perl(lib)
-BuildRequires:  python3 python3-pip python3-pygobject
+BuildRequires:  python3
+BuildRequires:  python3-pip
+BuildRequires:  python3-pygobject
 BuildRequires:  python3-setuptools
 BuildRequires:  vala
+
 Requires:       tzdata
 
 %description
 Reference implementation of the iCalendar data type and serialization format
 used in dozens of calendaring and scheduling products.
 
-%package     devel
-Summary:         Development files for libical
-Requires:        %{name} = %{version}
+%package        devel
+Summary:        Development files for libical
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
-%description devel
+%description    devel
 The libical-devel package contains libraries and header files for developing
 applications that use libical.
 
-%package     glib
-Summary:         GObject wrapper for libical library
-Requires:        %{name} = %{version}
+%package        glib
+Summary:        GObject wrapper for libical library
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
-%description glib
+%description    glib
 This package provides a GObject wrapper for libical library with support
 of GObject Introspection.
 
-%package     glib-devel
-Summary:         Development files for building against %{name}-glib
-Requires:        %{name}-devel = %{version}
-Requires:        %{name}-glib = %{version}
+%package        glib-devel
+Summary:        Development files for building against %{name}-glib
+Requires:       %{name}-devel = %{version}-%{release}
+Requires:       %{name}-glib = %{version}-%{release}
 
-%description glib-devel
+%description    glib-devel
 Development files needed for building things which link against %{name}-glib.
 
 %files
