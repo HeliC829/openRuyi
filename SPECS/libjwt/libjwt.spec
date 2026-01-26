@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
 # SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -15,15 +16,15 @@ URL:            https://github.com/benmcollins/libjwt
 Source:         https://github.com/benmcollins/libjwt/releases/download/v%{version}/libjwt-%{version}.tar.xz
 BuildSystem:    cmake
 
-BuildOption(conf): -DBUILD_SHARED_LIBS:BOOL=ON
-BuildOption(conf): -DBUILD_STATIC_LIBS:BOOL=OFF
-BuildOption(conf): -DBUILD_EXAMPLES:BOOL=OFF
+BuildOption(conf):  -DBUILD_SHARED_LIBS:BOOL=ON
+BuildOption(conf):  -DBUILD_STATIC_LIBS:BOOL=OFF
+BuildOption(conf):  -DBUILD_EXAMPLES:BOOL=OFF
 
 BuildRequires:  cmake
-BuildRequires:  jansson-devel
+BuildRequires:  pkgconfig(jansson)
 BuildRequires:  gcc
 BuildRequires:  make
-BuildRequires:  openssl-devel
+BuildRequires:  pkgconfig(openssl)
 
 %description
 A Javascript Web Token library in C. libjwt provides a simple API for creating,
@@ -31,7 +32,7 @@ signing, and verifying JWTs.
 
 %package        devel
 Summary:        Development files for %{name}
-Requires:       %{name} = %{version}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    devel
 This package contains libraries and header files for developing applications
