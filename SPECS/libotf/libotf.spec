@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -10,15 +11,16 @@ Release:        %autorelease
 Summary:        A Library for handling OpenType Font
 License:        LGPL-2.1-or-later
 URL:            http://www.nongnu.org/m17n/
+# VCS: TODO: cvs -d :pserver:anonymous@cvs.m17n.org:/cvs/root co libotf
 #!RemoteAsset
 Source:         http://download.savannah.gnu.org/releases/m17n/libotf-%{version}.tar.gz
 BuildSystem:    autotools
 
-BuildOption(conf): --disable-static
+BuildOption(conf):  --disable-static
 
 BuildRequires:  gcc
 BuildRequires:  make
-BuildRequires:  freetype-devel
+BuildRequires:  pkgconfig(freetype2)
 
 Requires:       freetype
 
