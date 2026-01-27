@@ -1,5 +1,5 @@
-# SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
-# SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileCopyrightText: (C) 2025, 2026 Institute of Software, Chinese Academy of Sciences (ISCAS)
+# SPDX-FileCopyrightText: (C) 2025, 2026 openRuyi Project Contributors
 # SPDX-FileContributor: sunyuechi <sunyuechi@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
@@ -281,7 +281,6 @@ rm -rf %{buildroot}/%{_sbindir}/srp_daemon.sh
 %dir %{_sysconfdir}/rdma
 %dir %{_sysconfdir}/rdma/modules
 %dir %{_docdir}/rdma-core-%{version}
-%dir %{_udevrulesdir}
 %dir %{_modprobedir}
 %doc %{_docdir}/rdma-core-%{version}/70-persistent-ipoib.rules
 %doc %{_docdir}/rdma-core-%{version}/README.md
