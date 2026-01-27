@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -14,6 +15,21 @@ VCS:            git:https://github.com/containers/podman
 Source0:        https://github.com/containers/podman/archive/refs/tags/v%{version}.tar.gz
 BuildSystem:    autotools
 
+BuildOption(build):  BUILDFLAGS=-trimpath
+BuildOption(build):  PREFIX=%{_prefix}
+BuildOption(build):  BINDIR=%{_bindir}
+BuildOption(build):  TMPFILESDIR=%{_tmpfilesdir}
+BuildOption(build):  MANDIR=%{_mandir}
+BuildOption(build):  ETCDIR=%{_sysconfdir}
+BuildOption(build):  LIBEXECDIR=%{_libexecdir}
+BuildOption(install):  install.completions
+BuildOption(install):  PREFIX=%{_prefix}
+BuildOption(install):  BINDIR=%{_bindir}
+BuildOption(install):  TMPFILESDIR=%{_tmpfilesdir}
+BuildOption(install):  MANDIR=%{_mandir}
+BuildOption(install):  ETCDIR=%{_sysconfdir}
+BuildOption(install):  LIBEXECDIR=%{_libexecdir}
+
 BuildRequires:  gcc
 BuildRequires:  go
 BuildRequires:  groff
@@ -27,22 +43,6 @@ BuildRequires:  pkgconfig(sqlite3)
 BuildRequires:  pkgconfig(systemd)
 BuildRequires:  python
 BuildRequires:  systemd-rpm-macros
-
-BuildOption(build):  BUILDFLAGS=-trimpath
-BuildOption(build):  PREFIX=%{_prefix}
-BuildOption(build):  BINDIR=%{_bindir}
-BuildOption(build):  TMPFILESDIR=%{_tmpfilesdir}
-BuildOption(build):  MANDIR=%{_mandir}
-BuildOption(build):  ETCDIR=%{_sysconfdir}
-BuildOption(build):  LIBEXECDIR=%{_libexecdir}
-
-BuildOption(install):  install.completions
-BuildOption(install):  PREFIX=%{_prefix}
-BuildOption(install):  BINDIR=%{_bindir}
-BuildOption(install):  TMPFILESDIR=%{_tmpfilesdir}
-BuildOption(install):  MANDIR=%{_mandir}
-BuildOption(install):  ETCDIR=%{_sysconfdir}
-BuildOption(install):  LIBEXECDIR=%{_libexecdir}
 
 %description
 Podman (the POD MANager) is a tool for managing containers and images,
