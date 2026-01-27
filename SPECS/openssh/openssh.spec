@@ -17,6 +17,7 @@ Release:        %autorelease
 Summary:        An open source implementation of SSH protocol version 2
 License:        BSD-3-Clause AND BSD-2-Clause AND ISC AND SSH-OpenSSH AND ssh-keyscan AND sprintf AND LicenseRef-openRuyi-Public-Domain AND X11-distribute-modifications-variant
 URL:            http://www.openssh.com/portable.html
+VCS:            git:https://anongit.mindrot.org/openssh.git
 #!RemoteAsset
 Source0:        https://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-%{version}.tar.gz
 #!RemoteAsset
@@ -61,32 +62,31 @@ BuildOption(conf):  --with-libedit
 
 BuildRequires:  autoconf
 BuildRequires:  automake
-BuildRequires:  zlib-devel
-BuildRequires:  audit-devel
+BuildRequires:  pkgconfig(zlib)
+BuildRequires:  pkgconfig(audit)
 BuildRequires:  util-linux
 BuildRequires:  groff
-BuildRequires:  pam-devel
-BuildRequires:  openssl-devel
-BuildRequires:  systemd-devel
+BuildRequires:  pkgconfig(pam)
+BuildRequires:  pkgconfig(openssl)
+BuildRequires:  pkgconfig(systemd)
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  make
-#BuildRequires:  p11-kit-devel
+#BuildRequires:  pkgconfig(p11-kit-1)
 %if %{with fido2}
-BuildRequires:  libfido2-devel
+BuildRequires:  pkgconfig(libfido2)
 %endif
-BuildRequires:  libxcrypt-devel
+BuildRequires:  pkgconfig(libxcrypt)
 %if %{with kerberos}
-BuildRequires:  krb5-devel
+BuildRequires:  pkgconfig(krb5)
 %endif
-BuildRequires:  libedit-devel
-BuildRequires:  ncurses-devel
+BuildRequires:  pkgconfig(libedit)
+BuildRequires:  pkgconfig(ncurses)
 %if %{with selinux}
-BuildRequires:  libselinux-devel
-BuildRequires:  audit-devel
+BuildRequires:  pkgconfig(libselinux)
 %endif
 %if %{with xorg}
 BuildRequires:  xauth
-BuildRequires:  libX11-devel
+BuildRequires:  pkgconfig(x11)
 %endif
 
 Recommends:     p11-kit
@@ -94,7 +94,7 @@ Recommends:     p11-kit
 Requires:       openssl
 %if %{with selinux}
 Requires:       libselinux
-Requires:       audit-devel
+Requires:       pkgconfig(audit)
 %endif
 
 %description
@@ -138,6 +138,7 @@ Requires:       pam
 #Requires:       crypto-policies
 Requires(pre):  systemd-sysusers
 %systemd_requires
+
 %description    server
 OpenSSH is a free version of SSH (Secure SHell), a program for logging
 into and executing commands on a remote machine. This package contains
