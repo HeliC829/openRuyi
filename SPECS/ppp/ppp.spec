@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: yyjeqhc <jialin.oerv@isrc.iscas.ac.cn>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -10,6 +11,7 @@ Release:        %autorelease
 Summary:        The Point-to-Point Protocol daemon
 License:        BSD-3-Clause AND GPL-2.0-or-later AND LGPL-2.0-or-later
 URL:            http://www.samba.org/ppp
+VCS:            git:https://github.com/ppp-project/ppp.git
 #!RemoteAsset
 Source0:        https://github.com/ppp-project/ppp/archive/refs/tags/v%{version}.tar.gz
 Source1:        ppp.pam
