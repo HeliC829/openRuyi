@@ -3,6 +3,7 @@
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
 # SPDX-FileContributor: jingyupu <pujingyu@iscas.ac.cn>
 # SPDX-FileContributor: yyjeqhc <jialin.oerv@isrc.iscas.ac.cn>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -34,10 +35,10 @@ BuildRequires:  cmake
 BuildRequires:  gcc-c++
 BuildRequires:  qt6-macros
 BuildRequires:  desktop-file-utils
-BuildRequires:  qt6-base-devel >= %{version}
+BuildRequires:  pkgconfig(Qt6Core) >= %{version}
 BuildRequires:  qt6-base-private-devel
 BuildRequires:  qt6-base-static >= %{version}
-BuildRequires:  qt6-declarative-devel >= %{version}
+BuildRequires:  pkgconfig(Qt6Quick) >= %{version}
 BuildRequires:  qt6-declarative-static >= %{version}
 BuildRequires:  clang-devel
 BuildRequires:  llvm-devel
@@ -49,7 +50,7 @@ Qt Tools contains a set of applications to help with development.
 %package        devel
 Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} = %{version}-%{release}
-Requires:       qt6-base-devel
+Requires:       pkgconfig(Qt6Core)
 
 %description    devel
 Development files for %{name}.
@@ -90,7 +91,7 @@ Qt6 doc tools package.
 
 %package        examples
 Summary:        Programming examples for %{name}
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    examples
 Programming examples for %{name}.
