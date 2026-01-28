@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -10,19 +11,25 @@ Release:        %autorelease
 Summary:        Library implementing the DEFLATE compression algorithm
 License:        Zlib
 URL:            https://www.zlib.net/
+VCS:            git:https://github.com/madler/zlib.git
 #!RemoteAsset
 Source0:        https://zlib.net/zlib-%{version}.tar.gz
 #!RemoteAsset
 Source1:        https://zlib.net/zlib-%{version}.tar.gz.asc
 Source4:        LICENSE
+
 Patch1:         zlib-format.patch
 Patch2:         0001-Do-not-try-to-store-negative-values-in-unsigned-int.patch
 # we should simply rely on soname versioning to protect us
 Patch3:         zlib-no-version-check.patch
+
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  libtool
 BuildRequires:  pkgconfig
+
+# Forbid co-install with zlib-ng (symmetric conflict)
+Conflicts:      zlib-ng%{?_isa}
 
 %description
 zlib is a general-purpose lossless data-compression library,
@@ -30,23 +37,19 @@ implementing an API for the DEFLATE algorithm, the latter of
 which is being used by, for example, gzip and the ZIP archive
 format.
 
-%package -n libz1
-Summary:        Library implementing the DEFLATE compression algorithm
-Provides:       %{name} = %{version}-%{release}
-Obsoletes:      %{name} < %{version}-%{release}
-
-%description -n libz1
+%description
 zlib is a general-purpose lossless data-compression library,
 implementing an API for the DEFLATE algorithm, the latter of
 which is being used by, for example, gzip and the ZIP archive
 format.
 
-%package devel
+%package        devel
 Summary:        Development files for zlib, a data compression library
 Requires:       glibc-devel
-Requires:       libz1 = %{version}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
+Conflicts:      zlib-ng-devel
 
-%description devel
+%description    devel
 zlib is a general-purpose lossless data-compression library,
 implementing an API for the DEFLATE algorithm, the latter of
 which is being used by, for example, gzip and the ZIP archive
@@ -62,12 +65,12 @@ extreme cases.) zlib's memory footprint is also independent of the
 input data and can be reduced, if necessary, at some cost in
 compression.
 
-%package devel-static
+%package        devel-static
 Summary:        Static library for zlib
-Requires:       %{name}-devel = %{version}
+Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
 Provides:       %{name}-devel:%{_libdir}/libz.a
 
-%description devel-static
+%description    devel-static
 zlib is a general-purpose lossless data-compression library,
 implementing an API for the DEFLATE algorithm, the latter of
 which is being used by, for example, gzip and the ZIP archive
@@ -76,27 +79,27 @@ format.
 This subpackage contains the static version of the library
 used for development.
 
-%package -n libminizip1
+%package     -n minizip
 Summary:        Library for manipulation with .zip archives
 
-%description -n libminizip1
+%description -n minizip
 Minizip is a library for manipulation with files from .zip archives.
 
-%package -n minizip-devel
+%package     -n minizip-devel
 Summary:        Development files for the minizip library
-Requires:       %{name}-devel = %{version}
-Requires:       libminizip1 = %{version}
+Requires:       %{name}-devel%{?_isa} = %{version}-%{release}
+Requires:       minizip%{?_isa} = %{version}-%{release}
 Requires:       pkgconfig
 
 %description -n minizip-devel
 This package contains the libraries and header files needed for
 developing applications which use minizip.
 
-%package testsuite
+%package        testsuite
 Summary:        Provide the test examples to reproduce test suite
-Requires:       libz1 = %{version}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
-%description testsuite
+%description    testsuite
 To run the testsuite, execute %{_libexecdir}/%{name}/testsuite
 
 It should exit 0
@@ -145,7 +148,7 @@ install -D examplesh %{buildroot}%{_libexecdir}/%{name}/testsuite
 cd contrib/minizip
 %make_install
 
-%files -n libz1
+%files
 %license LICENSE
 %{_libdir}/libz.so.1.3.1
 %{_libdir}/libz.so.1
@@ -162,7 +165,7 @@ cd contrib/minizip
 %{_libdir}/libz.so
 %{_libdir}/pkgconfig/zlib.pc
 
-%files -n libminizip1
+%files -n minizip
 %doc contrib/minizip/MiniZip64_info.txt contrib/minizip/MiniZip64_Changes.txt
 %{_libdir}/libminizip.so.*
 
