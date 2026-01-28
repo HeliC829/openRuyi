@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
 # SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -11,33 +12,34 @@ Release:        %autorelease
 Summary:        An Open Source Probabilistic Information Retrieval Library
 License:        GPL-2.0-or-later
 URL:            https://www.xapian.org/
+VCS:            git:https://git.xapian.org/xapian
 #!RemoteAsset
 Source0:        https://oligarchy.co.uk/xapian/%{version}/xapian-core-%{version}.tar.xz
-
 BuildSystem:    autotools
 
-BuildOption(conf): --disable-static
-BuildOption(conf): --disable-rpath
+BuildOption(conf):  --disable-static
+BuildOption(conf):  --disable-rpath
 %ifnarch x86_64
-BuildOption(conf): --disable-sse
+BuildOption(conf):  --disable-sse
 %endif
 
-BuildRequires:    gcc-c++ libuuid zlib-devel
+BuildRequires:  gcc-c++
+BuildRequires:  libuuid
+BuildRequires:  pkgconfig(zlib)
 
 %description
 Xapian is a highly adaptable toolkit which allows developers to easily add advanced
 indexing and search facilities to their own applications.
 
-%package devel
+%package        devel
 Summary:        Development files for the Xapian library
-Requires:       %{name} = %{version}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       util-linux-devel
-Requires:       zlib-devel
+Requires:       pkgconfig(zlib)
 
-%description devel
+%description    devel
 This package provides the header files, libraries, and documentation for
 developing applications that use the Xapian library.
-
 
 %install -a
 # Remove the dev docs, we pick them up below
