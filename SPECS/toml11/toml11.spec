@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -12,10 +13,11 @@ License:        MIT
 URL:            https://github.com/ToruNiina/toml11
 #!RemoteAsset
 Source0:        https://github.com/ToruNiina/toml11/archive/refs/tags/v%{version}.tar.gz
+BuildSystem:    cmake
 
 BuildRequires:  gcc-c++
 BuildRequires:  cmake
-BuildSystem:    cmake
+
 
 %description
 @code{toml11} is a C++11 (or later) header-only toml parser/encoder
