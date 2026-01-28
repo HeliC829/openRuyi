@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Yafen Fang <yafen@iscas.ac.cn>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -10,10 +11,11 @@ Release:        %autorelease
 Summary:        Performance monitoring tools for Linux
 License:        GPL-2.0-or-later
 URL:            https://sysstat.github.io/
+VCS:            git:https://github.com/sysstat/sysstat.git
 #!RemoteAsset
 Source0:        https://github.com/sysstat/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
-
 BuildSystem:    autotools
+
 BuildOption(conf):  --enable-install-cron
 BuildOption(conf):  --enable-copy-only
 BuildOption(conf):  --disable-file-attr
@@ -30,6 +32,7 @@ BuildRequires:  lm_sensors-devel
 BuildRequires:  systemd
 BuildRequires:  make
 BuildRequires:  systemd-rpm-macros
+
 Requires:       findutils
 Requires:       xz
 %{?systemd_requires}
