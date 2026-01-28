@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Xuhai Chang <xuhai.oerv@isrc.iscas.ac.cn>
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -13,34 +14,36 @@ License:        GPL-2.0-only OR Apache-2.0 AND BSD-2-Clause
 URL:            https://github.com/facebook/rocksdb
 #!RemoteAsset
 Source:         https://github.com/facebook/rocksdb/archive/refs/tags/v10.5.1.tar.gz
+BuildSystem:    cmake
+
 Patch0:         0001-no_rpath.patch
 Patch1:         0002-disable_static.patch
 
+BuildOption(conf):  -DWITH_BZ2=ON
+BuildOption(conf):  -DWITH_SNAPPY=ON
+BuildOption(conf):  -DWITH_LZ4=ON
+BuildOption(conf):  -DWITH_ZSTD=ON
+BuildOption(conf):  -DWITH_ZLIB=ON
+BuildOption(conf):  -DZSTD_INCLUDE_DIRS=%{_includedir}
+BuildOption(conf):  -DWITH_BENCHMARK_TOOLS=ON
+BuildOption(conf):  -DWITH_CORE_TOOLS=ON
+BuildOption(conf):  -DWITH_TOOLS=ON
+BuildOption(conf):  -DUSE_RTTI=ON
+BuildOption(conf):  -DPORTABLE=1
+BuildOption(conf):  -DFAIL_ON_WARNINGS=OFF
+BuildOption(conf):  -DWITH_TESTS=ON
+
 BuildRequires:  gcc-c++
 BuildRequires:  cmake
-BuildRequires:  liburing-devel
-BuildRequires:  bzip2-devel
-BuildRequires:  lz4-devel
-BuildRequires:  snappy-devel
-BuildRequires:  zlib-devel
-BuildRequires:  gflags-devel
-BuildRequires:  zstd-devel
+BuildRequires:  pkgconfig(liburing)
+BuildRequires:  pkgconfig(bzip2)
+BuildRequires:  pkgconfig(liblz4)
+BuildRequires:  cmake(Snappy)
+BuildRequires:  pkgconfig(zlib)
+BuildRequires:  pkgconfig(gflags)
+BuildRequires:  pkgconfig(libzstd)
 BuildRequires:  perl
-BuildRequires:  python3-devel
-BuildSystem:    cmake
-BuildOption(conf): -DWITH_BZ2=ON
-BuildOption(conf): -DWITH_SNAPPY=ON
-BuildOption(conf): -DWITH_LZ4=ON
-BuildOption(conf): -DWITH_ZSTD=ON
-BuildOption(conf): -DWITH_ZLIB=ON
-BuildOption(conf): -DZSTD_INCLUDE_DIRS=%{_includedir}
-BuildOption(conf): -DWITH_BENCHMARK_TOOLS=ON
-BuildOption(conf): -DWITH_CORE_TOOLS=ON
-BuildOption(conf): -DWITH_TOOLS=ON
-BuildOption(conf): -DUSE_RTTI=ON
-BuildOption(conf): -DPORTABLE=1
-BuildOption(conf): -DFAIL_ON_WARNINGS=OFF
-BuildOption(conf): -DWITH_TESTS=ON
+BuildRequires:  pkgconfig(python3)
 
 %description
 RocksDB is a library that forms the core building block for a fast key value
@@ -50,11 +53,11 @@ Write-Amplification-Factor (WAF), Read-Amplification-Factor (RAF) and
 Space-Amplification-Factor (SAF). It has multi-threaded compaction, making it
 specially suitable for storing multiple terabytes of data in a single database.
 
-%package devel
+%package        devel
 Summary:        Development files for RocksDB
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
-%description devel
+%description    devel
 Development files for RocksDB.
 
 %install -a
