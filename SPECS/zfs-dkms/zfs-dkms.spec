@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Sun Yuechi <sunyuechi@iscas.ac.cn>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -11,7 +12,6 @@
 %define mkconf  scripts/dkms.mkconf
 
 Name:           %{module}-dkms
-
 Version:        2.4.0
 Release:        %autorelease
 Summary:        Kernel module(s) (dkms)
@@ -28,7 +28,8 @@ Requires:       perl
 Requires:       diffutils
 Requires:       linux-devel
 
-Provides:       %{module}-kmod = %{version}
+Provides:       %{module}-kmod = %{version}-%{release}
+
 AutoReqProv:    no
 
 %description
