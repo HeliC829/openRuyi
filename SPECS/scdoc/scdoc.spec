@@ -10,7 +10,7 @@ Version:        1.11.3
 Release:        %autorelease
 Summary:        Tool for generating roff manual pages
 License:        MIT
-URL:            https://git.sr.ht/~sircmpwn/%{name}
+URL:            https://git.sr.ht/~sircmpwn/scdoc
 #!RemoteAsset
 Source0:        %{url}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildSystem:    autotools
