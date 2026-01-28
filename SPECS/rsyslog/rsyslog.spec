@@ -135,7 +135,7 @@ This subpackage contains documentation for rsyslog.
 %if %{with elasticsearch}
 %package        elasticsearch
 Summary:        ElasticSearch output module for rsyslog
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    elasticsearch
 This subpackage provides the capability for rsyslog to feed logs directly
@@ -146,7 +146,7 @@ into Elasticsearch.
 %package        gnutls
 Summary:        TLS protocol support for rsyslog via GnuTLS library
 BuildRequires:  pkgconfig(gnutls)
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    gnutls
 This subpackage contains the rsyslog plugins that provide the ability
@@ -158,7 +158,7 @@ modules.
 %if %{with gssapi}
 %package        gssapi
 Summary:        GSSAPI authentication and encryption support for rsyslog
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 BuildRequires:  pkgconfig(krb5)
 
 %description    gssapi
@@ -171,7 +171,7 @@ authentication.
 %package        hiredis
 Summary:        Redis support for rsyslog
 BuildRequires:  pkgconfig(hiredis)
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    hiredis
 This subpackage provides output to Redis.
@@ -181,7 +181,7 @@ This subpackage provides output to Redis.
 %package        kafka
 Summary:        Provides the omkafka module
 BuildRequires:  pkgconfig(rdkafka)
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    kafka
 This subpackage provides module for Apache Kafka output.
@@ -193,7 +193,7 @@ Summary:        MongoDB support for rsyslog
 BuildRequires:  pkgconfig(libmongoc-1.0)
 BuildRequires:  snappy-devel
 BuildRequires:  pkgconfig(libsasl2)
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    mongodb
 This subpackage contains a dynamic shared object that will add MongoDB
@@ -204,7 +204,7 @@ database support to rsyslog.
 %package        mysql
 Summary:        MySQL support for rsyslog
 BuildRequires:  pkgconfig(libmariadb)
-Requires:       %{name} = %{version}-%{release}
+Requires:      %{name}%{?_isa} = %{version}-%{release}
 
 %description    mysql
 This subpackage contains a dynamic shared object that will add MySQL
@@ -215,7 +215,7 @@ database support to rsyslog.
 %package        openssl
 Summary:        TLS protocol support for rsyslog via OpenSSL library
 BuildRequires:  pkgconfig(openssl)
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 Requires:       openssl
 
 %description    openssl
@@ -229,7 +229,7 @@ modules.
 %package        pgsql
 Summary:        PostgresSQL support for rsyslog
 BuildRequires:  pkgconfig(libpq)
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    pgsql
 This subpackage contains a dynamic shared object that will add PostgreSQL
@@ -240,7 +240,7 @@ database support to rsyslog.
 %package        snmp
 Summary:        SNMP protocol support for rsyslog
 BuildRequires:  pkgconfig(netsnmp)
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    snmp
 This subpackage contains the rsyslog plugin that provides the ability
