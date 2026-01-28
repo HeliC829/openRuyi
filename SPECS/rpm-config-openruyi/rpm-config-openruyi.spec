@@ -1,23 +1,28 @@
 # SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Zheng Junjie <zhengjunjie@iscas.ac.cn>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
 # ignore the explicit bash requires from the kernel mod scripts
 %define __requires_exclude ^/bin/bash$
+
 Name:           rpm-config-openruyi
 Version:        20251216
 Release:        %autorelease
 Summary:        specific RPM configuration files
 License:        GPL-2.0-or-later
 URL:            https://git.oerv.ac.cn/openruyi/openruyi-repo
+BuildArch:      noarch
+
 BuildRequires:  gzip
 #!BuildIgnore:  rpm-config-openruyi
+
+Provides:       rpm-config
+
 # RPM owns the directories we need
 Requires:       rpm
-Provides:       rpm-config
-BuildArch:      noarch
 
 %sourcelist
 brp-openruyi
