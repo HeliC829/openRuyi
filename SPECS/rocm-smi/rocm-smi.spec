@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: CHEN Xuan <chenxuan@iscas.ac.cn>
 # SPDX-FileContributor: Yifan Xu <xuyifan@iscas.ac.cn>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -23,12 +24,9 @@ URL:            https://github.com/ROCm/rocm_smi_lib
 Source0:        %{url}/archive/refs/tags/rocm-%{version}.tar.gz
 BuildSystem:    cmake
 
-# SMI requires the AMDGPU kernel module, which only builds on:
-ExclusiveArch:  x86_64 aarch64 ppc64le riscv64
-
-BuildOption(conf):      -DFILE_REORG_BACKWARD_COMPATIBILITY=OFF
-BuildOption(conf):      -DCMAKE_SKIP_INSTALL_RPATH=TRUE
-BuildOption(conf):      -DBUILD_TESTS=%{?with_test:ON}%{!?with_test:OFF}
+BuildOption(conf):  -DFILE_REORG_BACKWARD_COMPATIBILITY=OFF
+BuildOption(conf):  -DCMAKE_SKIP_INSTALL_RPATH=TRUE
+BuildOption(conf):  -DBUILD_TESTS=%{?with_test:ON}%{!?with_test:OFF}
 
 BuildRequires:  cmake
 %if %{with doc}
