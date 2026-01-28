@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: yyjeqhc <1772413353@qq.com>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -12,13 +13,13 @@ License:        BSD-3-Clause
 URL:            https://github.com/mpeg5/xevd
 #!RemoteAsset
 Source:         https://github.com/mpeg5/xevd/archive/refs/tags/v%{version}.tar.gz
+BuildSystem:    cmake
+
 Patch0:         0001-xevd-fix-build-on-non-x86.patch
 Patch1:         0002-xevd-fix-neon-header.patch
 Patch2:         0003-xevd-link-libm.patch
 
-BuildSystem:    cmake
-
-BuildOption(conf): -DSET_PROF=BASE
+BuildOption(conf):  -DSET_PROF=BASE
 
 BuildRequires:  cmake >= 3.12
 BuildRequires:  gcc
