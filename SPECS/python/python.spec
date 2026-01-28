@@ -137,19 +137,19 @@ BuildOption(build):  regen-all PYTHON_FOR_REGEN="python%{pybasever}"
 
 BuildRequires:  unzip
 BuildRequires:  autoconf
-BuildRequires:  bzip2-devel
-BuildRequires:  expat-devel
+BuildRequires:  pkgconfig(bzip2)
+BuildRequires:  pkgconfig(expat)
 BuildRequires:  gdbm-devel
-BuildRequires:  libffi-devel
-BuildRequires:  ncurses-devel
+BuildRequires:  pkgconfig(libffi)
+BuildRequires:  pkgconfig(ncurses)
 BuildRequires:  make
-BuildRequires:  mpdecimal-devel
-BuildRequires:  openssl-devel
+BuildRequires:  pkgconfig(libmpdec)
+BuildRequires:  pkgconfig(openssl)
 BuildRequires:  pkgconfig
 BuildRequires:  python-rpm-macros
-BuildRequires:  sqlite-devel
-BuildRequires:  zlib-devel
-BuildRequires:  xz-devel
+BuildRequires:  pkgconfig(sqlite3)
+BuildRequires:  pkgconfig(zlib)
+BuildRequires:  pkgconfig(liblzma)
 
 %if %{with rpmwheels}
 # Python 3.12 removed the deprecated imp module,
