@@ -67,7 +67,7 @@ BuildRequires:  pkgconfig(python3)
 BuildRequires:  pkgconfig(libattr)
 # Conditional dependencies, disabled during bootstrap
 %if %{without bootstrap}
-BuildRequires:  pkgconfig(gobject-introspection)
+BuildRequires:  pkgconfig(gobject-introspection-1.0)
 BuildRequires:  pkgconfig(libselinux)
 %endif
 # Conditional dependencies for documentation
