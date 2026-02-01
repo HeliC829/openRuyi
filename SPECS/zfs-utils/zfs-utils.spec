@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: (C) 2025 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2025 openRuyi Project Contributors
 # SPDX-FileContributor: Sun Yuechi <sunyuechi@iscas.ac.cn>
+# SPDX-FileContributor: yyjeqhc <jialin.oerv@isrc.iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -76,8 +77,6 @@ This package contains the core ZFS libraries:
  * libnvpair: Solaris name-value library for packing and unpacking data
  * libuutil: Solaris userland utility library providing compatibility functions
  * libzfs: Native ZFS filesystem library for managing ZFS filesystems
-
-%ldconfig_scriptlets -n zfs-libs
 
 %package     -n zfs-devel
 Summary:        Development headers
