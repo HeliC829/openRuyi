@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: (C) 2025, 2026 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2025, 2026 openRuyi Project Contributors
 # SPDX-FileContributor: Yafen Fang <yafen@iscas.ac.cn>
+# SPDX-FileContributor: misaka00251 <liuxin@iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -15,13 +16,14 @@ License:        GPL-2.0-or-later
 URL:            https://github.com/osandov/blktests
 #!RemoteAsset
 Source0:        https://github.com/osandov/blktests/archive/%{commit}/%{name}-%{commit}.tar.gz
-
 BuildSystem:    autotools
-BuildOption(prep): -p1 -n %{name}-%{commit}
-BuildOption(build): CFLAGS="%{optflags} -g"
-BuildOption(install): prefix="%{_prefix}/lib"
+
+BuildOption(prep):  -p1 -n %{name}-%{commit}
+BuildOption(build):  CFLAGS="%{optflags} -g"
+BuildOption(install):  prefix="%{_prefix}/lib"
 
 BuildRequires:  gcc-c++
+
 Requires:       bash
 Requires:       coreutils
 Requires:       gawk
@@ -30,6 +32,7 @@ Requires:       fio
 Requires:       gcc
 Requires:       make
 Requires:       systemd-udev
+
 Recommends:     blktrace
 Recommends:     e2fsprogs
 Recommends:     xfsprogs
