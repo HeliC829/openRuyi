@@ -40,7 +40,7 @@ BuildRequires:  bash
 BuildRequires:  make
 BuildRequires:  perl-devel
 BuildRequires:  perl-macros
-BuildRequires:  pcre2-devel
+BuildRequires:  pkgconfig(libpcre2-posix)
 BuildRequires:  xz
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  perl(Error)
@@ -84,7 +84,7 @@ Requires:       less
 Requires:       openssh-clients
 Requires:       zlib
 
-%description core
+%description    core
 Git is a fast, scalable, distributed revision control system with an
 unusually rich command set that provides both high-level operations
 and full access to internals.
