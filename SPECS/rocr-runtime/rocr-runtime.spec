@@ -17,7 +17,9 @@
 %global enableimage 1
 %endif
 
-%global kfdtest 1
+# kfdtest build on x86_64 failed when using llvm static libs, disable it.
+# TODO: Re-enable it.
+%global kfdtest 0
 
 Name:           rocr-runtime
 Version:        %{rocm_version}
