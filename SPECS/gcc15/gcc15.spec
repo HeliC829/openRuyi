@@ -16,41 +16,25 @@
 
 %bcond_without bootstrap
 
-# Ada currently fails to build on a few platforms, enable it only
-# on those that work
-%define ada_arch x86_64 aarch64 riscv64
-
-%ifarch %ada_arch
-%define build_ada 0
-%else
-%define build_ada 0
-%endif
-
 %define quadmath_arch x86_64
-%define tsan_arch x86_64 aarch64 riscv64
-%define asan_arch x86_64 aarch64 riscv64
-%define hwasan_arch aarch64 x86_64
-%define itm_arch x86_64 aarch64 riscv64
-%define atomic_arch x86_64 aarch64 riscv64
-%define lsan_arch x86_64 aarch64 riscv64
-%define ubsan_arch x86_64 aarch64 riscv64
+%define tsan_arch x86_64 riscv64
+%define asan_arch x86_64 riscv64
+%define hwasan_arch x86_64
+%define itm_arch x86_64 riscv64
+%define atomic_arch x86_64 riscv64
+%define lsan_arch x86_64 riscv64
+%define ubsan_arch x86_64 riscv64
+
+# If we want to enable this we need to explicitly enable it
 %if 0%{?build_libvtv:1}
 %define vtv_arch x86_64
 %endif
 
-%define build_cp 1
 %define build_fortran 1
-%define build_objc 1
 %define build_objcp 1
 %define build_go 1
-%ifarch x86_64 aarch64 riscv64
 %define build_d 0
-%else
-%define build_d 0
-%endif
-
 %define build_m2 1
-
 %if %{build_objcp}
 %define build_cp 1
 %define build_objc 1
@@ -59,93 +43,41 @@
 # rust is still experimental
 %define build_rust 0
 
-# For optional compilers only build C, C++, Fortran, Ada and Go
-%if 0%{?build_optional_compiler_languages:1}
-%define build_objc 0
-%define build_objcp 0
-%define build_d 0
-%define build_rust 0
-%define build_m2 0
-%endif
-
 %define use_lto_bootstrap 0
-%ifarch x86_64 aarch64
+%ifarch x86_64
 %define use_lto_bootstrap %{with bootstrap}
 %endif
+
+# Bruh please make it work in the future?
+%define build_ada 0
 
 %define enable_plugins 1
 %define build_jit 0
 
-# Shared library SONAME versions
-%define libgcc_s 1
-%define libgomp_sover 1
-%define libstdcxx_sover 6
-%define libobjc_sover 4
-%define libgfortran_sover 5
-%define libquadmath_sover 0
-%define libasan_sover 8
-%define libtsan_sover 2
-%define libhwasan_sover 0
-%define libatomic_sover 1
-%define libitm_sover 1
-%define libubsan_sover 1
-%define liblsan_sover 0
-%define libvtv_sover 0
-%define libgo_sover 24
-%define libgphobos_sover 5
-%define libgdruntime_sover 5
-%define libgccjit_sover 0
-%define libm2_sover 20
+%define hostsuffix %{nil}
 
-# Shared library package suffix
-# This is used for the "non-standard" set of libraries, the standard
-# being defined by %%product_libs_gcc_ver, the GCC version that should
-# provide un-suffixed shared library packages following the shared-library
-# policy.  Even suffixed variants should provide the shared-library policy
-# mandated names and ensure they conflict with each other.
-# Individual shared libraries can be directed to be built from individual
-# gcc versions by defining %%product_libs_gcc_ver_libgcc_s1 for example,
-# generally %%product_libs_gcc_ver_%%name%%sover, similarly.
-
-%define itsme15 1
-%define plv_ %{!?product_libs_gcc_ver:15}%{?product_libs_gcc_ver}
-%define plv() %{expand:%%{!?itsme%{expand:%%{!?product_libs_gcc_ver_%{1}%{2}:%%{plv_}}%%{?product_libs_gcc_ver_%{1}%{2}}}:-gcc15}}
-
-%define libgcc_s_suffix %{plv libgcc_s %{libgcc_s}}
-%define libgomp_suffix %{plv libgomp %{libgomp_sover}}
-%define libstdcxx_suffix %{plv libstdcxx %{libstdcxx_sover}}
-%define libobjc_suffix %{plv libobjc %{libobjc_sover}}
-%define libgfortran_suffix %{plv libgfortran %{libgfortran_sover}}
-%define libquadmath_suffix %{plv libquadmath %{libquadmath_sover}}
-%define libasan_suffix %{plv libasan %{libasan_sover}}
-%define libtsan_suffix %{plv libtsan %{libtsan_sover}}
-%define libhwasan_suffix %{plv libhwasan %{libhwasan_sover}}
-%define libatomic_suffix %{plv libatomic %{libatomic_sover}}
-%define libitm_suffix %{plv libitm %{libitm_sover}}
-%define libubsan_suffix %{plv libubsan %{libubsan_sover}}
-%define liblsan_suffix %{plv liblsan %{liblsan_sover}}
-%define libvtv_suffix %{plv libvtv %{libvtv_sover}}
-%define libgo_suffix %{plv libgo %{libgo_sover}}
-%define libgphobos_suffix %{plv libgphobos %{libgphobos_sover}}
-%define libgdruntime_suffix %{plv libgdruntime %{libgdruntime_sover}}
-%define libgccjit_suffix %{plv libgccjit %{libgccjit_sover}}
-%define libm2_suffix %{plv libm2 %{libm2_sover}}
-
+%define binsuffix -15
+# libFOO runtime package suffix
+%define libsuffix -gcc15
 # libFOO-devel package suffix
 %define libdevel_suffix -gcc15
-%global disable_32bit 1
 %define biarch_targets x86_64
 
+%define gcc_dir_version %(echo %version |  sed 's/+.*//' | cut -d '.' -f 1)
+%define gcc_snapshot_revision %(echo %version | sed 's/[3-9]\.[0-9]\.[0-6]//' | sed 's/+/-/')
+
+
+Name:           gcc15
 URL:            https://gcc.gnu.org/
 Version:        15.2.0
 Release:        %autorelease
-%define gcc_dir_version %(echo %version |  sed 's/+.*//' | cut -d '.' -f 1)
-%define gcc_snapshot_revision %(echo %version | sed 's/[3-9]\.[0-9]\.[0-6]//' | sed 's/+/-/')
-%define binsuffix -15
+License:        GPL-3.0-or-later
+Summary:        The GNU C Compiler and Support Files
+#!RemoteAsset
+Source:         https://ftpmirror.gnu.org/gnu/gcc/gcc-%{version}/gcc-%{version}.tar.xz
 
-Name:           gcc15
 BuildRequires:  xz
-BuildRequires:  libzstd-devel
+BuildRequires:  pkgconfig(libzstd)
 # With generated files in src we could drop the following
 BuildRequires:  bison
 BuildRequires:  flex
@@ -154,13 +86,13 @@ BuildRequires:  texinfo
 # until here, but at least renaming and patching info files breaks this
 BuildRequires:  gcc-c++
 BuildRequires:  mpc-devel
-BuildRequires:  mpfr-devel
+BuildRequires:  pkgconfig(mpfr)
 BuildRequires:  perl
-BuildRequires:  zlib-devel
+BuildRequires:  pkgconfig(zlib)
 # for SDT markers in the C++ unwinder and gdb breakpoints on exceptions
-BuildRequires:  (systemtap-headers or systemtap-sdt-devel)
-BuildRequires:  isl-devel
-%define hostsuffix %{nil}
+BuildRequires:  systemtap-sdt-devel
+BuildRequires:  pkgconfig(isl)
+
 %if %{build_ada}
 %if 0%{?gcc_version:%{gcc_version}} > 14
 %define hostsuffix %{binsuffix}
@@ -174,90 +106,54 @@ BuildRequires:  gcc-ada
 %if %{build_d}
 BuildRequires:  gcc-d
 %endif
-%if 0%{?run_tests:1}
-BuildRequires:  dejagnu
-BuildRequires:  expect
-BuildRequires:  gdb
-BuildRequires:  timezone
-%if %{build_go}
-BuildRequires:  netcfg
-BuildRequires:  procps
-%endif
-%endif
 #!BuildIgnore: gcc-PIE
 
-%define separate_bi32 0
-%define separate_bi64 0
-%if 0%{!?disable_32bit:1}
-%ifarch x86_64
-%define separate_bi32 1
-%endif
-%define disable_multilib_arch %{nil}
-%else
-%define disable_multilib_arch x86_64
-%endif
-
-# Define two macros to trigger -32bit or -64bit package variants
-%define separate_biarch 0
-%if %{separate_bi32}
-%define separate_biarch 1
-%define separate_biarch_suffix -32bit
-%endif
-%if %{separate_bi64}
-%define separate_biarch 1
-%define separate_biarch_suffix -64bit
-%endif
-
-%ifarch aarch64 x86_64 riscv64
+%ifarch x86_64 riscv64
 # 64-bit is primary build target
 %define build_primary_64bit 1
 %else
 %define build_primary_64bit 0
 %endif
 
-%if !0%{?building_testsuite:1}
+# TODO: Revisit here
 Requires:       binutils
 Requires:       cpp15 = %{version}-%{release}
 Requires:       glibc-devel
-Requires:       libgcc_s%{libgcc_s} >= %{version}-%{release}
-Requires:       libgomp%{libgomp_sover} >= %{version}-%{release}
-%ifarch %asan_arch
-Requires:       libasan%{libasan_sover} >= %{version}-%{release}
+Requires:       libgomp%{libsuffix} >= %{version}-%{release}
+%ifarch %{asan_arch}
+Requires:       libasan%{libsuffix} >= %{version}-%{release}
 %endif
-%ifarch %tsan_arch
+%ifarch %{tsan_arch}
 %if %{build_primary_64bit}
-Requires:       libtsan%{libtsan_sover} >= %{version}-%{release}
+Requires:       libtsan%{libsuffix} >= %{version}-%{release}
 %endif
 %endif
-%ifarch %hwasan_arch
-Requires:       libhwasan%{libhwasan_sover} >= %{version}-%{release}
+%ifarch %{hwasan_arch}
+Requires:       libhwasan%{libsuffix} >= %{version}-%{release}
 %endif
-%ifarch %atomic_arch
-Requires:       libatomic%{libatomic_sover} >= %{version}-%{release}
+%ifarch %{atomic_arch}
+Requires:       libatomic%{libsuffix} >= %{version}-%{release}
 %endif
-%ifarch %itm_arch
-Requires:       libitm%{libitm_sover} >= %{version}-%{release}
+%ifarch %{itm_arch}
+Requires:       libitm%{libsuffix} >= %{version}-%{release}
 %endif
-%ifarch %lsan_arch
+%ifarch %{lsan_arch}
 %if %{build_primary_64bit}
-Requires:       liblsan%{liblsan_sover} >= %{version}-%{release}
+Requires:       liblsan%{libsuffix} >= %{version}-%{release}
 %endif
 %endif
-%ifarch %ubsan_arch
-Requires:       libubsan%{libubsan_sover} >= %{version}-%{release}
+%ifarch %{ubsan_arch}
+Requires:       libubsan%{libsuffix} >= %{version}-%{release}
 %endif
-%ifarch %vtv_arch
-Requires:       libvtv%{libvtv_sover} >= %{version}-%{release}
+%ifarch %{vtv_arch}
+Requires:       libvtv%{libsuffix} >= %{version}-%{release}
 %endif
-Suggests:       gcc15-info gcc15-locale
-%endif
+Suggests:       gcc15-doc
 
-#!RemoteAsset
-Source:         https://ftpmirror.gnu.org/gnu/gcc/gcc-%{version}/gcc-%{version}.tar.xz
+
 Patch2:         gcc-add-defaultsspec.diff
 Patch60:        gcc44-textdomain.patch
 Patch61:        gcc44-rename-info-files.patch
-
 # RVA23 Enablement Patches
 # Rebased against 15.2, 20250910
 Patch1001:      0001-PATCH-RISC-V-Imply-C-from-Zca-whenever-possible-PR11.patch
@@ -297,9 +193,6 @@ Patch1034:      0034-RISC-V-Update-Profiles-string-in-RV23.patch
 Patch1035:      0035-RISC-V-Add-Profiles-RVA-B23S64-support.patch
 Patch1036:      0036-RISC-V-check-if-we-can-vec_extract.patch
 
-License:        GPL-3.0-or-later
-Summary:        The GNU C Compiler and Support Files
-
 %description
 Core package for the GNU Compiler Collection, including the C language
 frontend.
@@ -308,462 +201,103 @@ Language frontends other than C are split to different sub-packages,
 namely gcc-ada, gcc-c++, gcc-fortran, gcc-obj, gcc-obj-c++, gcc-go,
 gcc-rust and gcc-m2.
 
-%package -n gcc15-32bit
-Summary:        The GNU C Compiler 32bit support
-Requires:       gcc15 = %{version}-%{release}
-Requires:       libgcc_s%{libgcc_s}-32bit >= %{version}-%{release}
-Requires:       libgomp%{libgomp_sover}-32bit >= %{version}-%{release}
-%ifarch %asan_arch
-Requires:       libasan%{libasan_sover}-32bit >= %{version}-%{release}
-%endif
-%ifarch %atomic_arch
-Requires:       libatomic%{libatomic_sover}-32bit >= %{version}-%{release}
-%endif
-%ifarch %itm_arch
-Requires:       libitm%{libitm_sover}-32bit >= %{version}-%{release}
-%endif
-%ifarch %ubsan_arch
-Requires:       libubsan%{libubsan_sover}-32bit >= %{version}-%{release}
-%endif
-%ifarch %vtv_arch
-Requires:       libvtv%{libvtv_sover}-32bit >= %{version}-%{release}
-%endif
-Requires:       glibc-devel-32bit glibc-32bit
-
-%description -n gcc15-32bit
-This package contains 32bit support for the GNU Compiler Collection.
-
-%package -n gcc15-64bit
-Summary:        The GNU C Compiler 64bit support
-Requires:       gcc15 = %{version}-%{release}
-Requires:       libgcc_s%{libgcc_s}-64bit >= %{version}-%{release}
-Requires:       libgomp%{libgomp_sover}-64bit >= %{version}-%{release}
-%ifarch %asan_arch
-Requires:       libasan%{libasan_sover}-64bit >= %{version}-%{release}
-%endif
-%ifarch %tsan_arch
-Requires:       libtsan%{libtsan_sover}-64bit >= %{version}-%{release}
-%endif
-%ifarch %hwasan_arch
-Requires:       libhwasan%{libhwasan_sover}-64bit >= %{version}-%{release}
-%endif
-%ifarch %atomic_arch
-Requires:       libatomic%{libatomic_sover}-64bit >= %{version}-%{release}
-%endif
-%ifarch %itm_arch
-Requires:       libitm%{libitm_sover}-64bit >= %{version}-%{release}
-%endif
-%ifarch %lsan_arch
-Requires:       liblsan%{liblsan_sover}-64bit >= %{version}-%{release}
-%endif
-%ifarch %ubsan_arch
-Requires:       libubsan%{libubsan_sover}-64bit >= %{version}-%{release}
-%endif
-%ifarch %vtv_arch
-Requires:       libvtv%{libvtv_sover}-64bit >= %{version}-%{release}
-%endif
-Requires:       glibc-devel-64bit
-
-%description -n gcc15-64bit
-This package contains 64bit support for the GNU Compiler Collection.
-
-%package devel
+%package        devel
 Summary:        GCC plugins development enviroment
-License:        GPL-3.0-or-later
 Requires:       gcc15 = %{version}-%{release}
-Requires:       gmp-devel
+Requires:       pkgconfig(gmp)
 Requires:       mpc-devel
 
-%description devel
+%description    devel
 Files required for developing and compiling GCC plugins.
 
-%package locale
-Summary:        Locale Data for the GNU Compiler Collection
-License:        GPL-3.0-or-later
-Requires:       gcc15 = %{version}-%{release}
-
-%description locale
-Locale data for the GNU Compiler Collection (GCC) to give error message
-in the current locale.
-
-%package PIE
-Summary:        A default configuration to build all binaries in PIE mode
-License:        GPL-3.0-or-later
-Requires:       gcc15 = %{version}-%{release}
-
-%description PIE
-This package contains a configuration file (spec) that changes the
-compilers default setting to build all ELF binaries in the Position
-Independend Executable (PIE) variant. This enables better address
-space randomization (ASLR).
-
-%package c++
+%package        c++
 Summary:        The GNU C++ Compiler
-License:        GPL-3.0-or-later
 Requires:       gcc15 = %{version}-%{release}
 Requires:       gcc15-c++ = %{version}-%{release}
-Requires:       libstdc++%{libstdcxx_sover}-devel%{libdevel_suffix} = %{version}-%{release}
+Requires:       libstdc++-devel%{libdevel_suffix} = %{version}-%{release}
 
-%description c++
+%description    c++
 This package contains the GNU compiler for C++.
 
-%package c++-32bit
-Summary:        The GNU C++ Compiler
-License:        GPL-3.0-or-later
-Requires:       gcc15-32bit = %{version}-%{release}
-Requires:       gcc15-c++ = %{version}-%{release}
-Requires:       libstdc++%{libstdcxx_sover}-devel%{libdevel_suffix}-32bit = %{version}-%{release}
+%package        lib
+Summary:        C compiler runtime library
 
-%description c++-32bit
-This package contains the GNU compiler for C++.
+%description    lib
+This package is needed for dynamically linked C programs.
 
-%package c++-64bit
-Summary:        The GNU C++ Compiler
-License:        GPL-3.0-or-later
-Requires:       gcc15-64bit = %{version}-%{release}
-Requires:       gcc15-c++ = %{version}-%{release}
-Requires:       libstdc++%{libstdcxx_sover}-devel%{libdevel_suffix}-64bit = %{version}-%{release}
+%package     -n libstdc++%{libsuffix}
+Summary:        The standard C++ shared library
+License:        GPL-3.0-or-later WITH GCC-exception-3.1
+# The std::chrono timezone database is provided by timezone
+# (/usr/share/zoneinfo/tzdata.zi), without that the tzdb is empty and
+# will only provide UTC.  We don't want a Requires here though, instead
+# the overall product needs to decide what to provide,
 
-%description c++-64bit
-This package contains the GNU compiler for C++.
+%description -n libstdc++%{libsuffix}
+The standard C++ library, needed for dynamically linked C++ programs.
 
-%package -n libstdc++%{libstdcxx_sover}-devel%{libdevel_suffix}
+%package     -n libstdc++-devel%{libdevel_suffix}
 Summary:        Include Files and Libraries mandatory for Development
 License:        GPL-3.0-or-later WITH GCC-exception-3.1
 Requires:       glibc-devel
-Requires:       libstdc++%{libstdcxx_sover} >= %{version}-%{release}
+Requires:       libstdc++%{libsuffix} >= %{version}-%{release}
 
-%description -n libstdc++%{libstdcxx_sover}-devel%{libdevel_suffix}
+%description -n libstdc++-devel%{libdevel_suffix}
 This package contains all the headers and libraries of the standard C++
 library. It is needed for compiling C++ code.
 
-%package -n libstdc++%{libstdcxx_sover}-devel%{libdevel_suffix}-32bit
-Summary:        Include Files and Libraries mandatory for Development
-License:        GPL-3.0-or-later WITH GCC-exception-3.1
-Requires:       glibc-devel-32bit glibc-32bit
-Requires:       libstdc++%{libstdcxx_sover}-32bit >= %{version}-%{release}
-
-%description -n libstdc++%{libstdcxx_sover}-devel%{libdevel_suffix}-32bit
-This package contains all the headers and libraries of the standard C++
-library. It is needed for compiling C++ code.
-
-%package -n libstdc++%{libstdcxx_sover}-devel%{libdevel_suffix}-64bit
-Summary:        Include Files and Libraries mandatory for Development
-License:        GPL-3.0-or-later WITH GCC-exception-3.1
-Requires:       glibc-devel-64bit
-Requires:       libstdc++%{libstdcxx_sover}-64bit >= %{version}-%{release}
-
-%description -n libstdc++%{libstdcxx_sover}-devel%{libdevel_suffix}-64bit
-This package contains all the headers and libraries of the standard C++
-library. It is needed for compiling C++ code.
-
-%package -n libstdc++%{libstdcxx_sover}-pp%{libstdcxx_suffix}
-Summary:        GDB pretty printers for the C++ standard library
-License:        GPL-3.0-or-later
-# The -pp packages are tied to a specific shared library
-Requires:       libstdc++%{libstdcxx_sover} = %{version}-%{release}
-Requires:       libstdc++%{libstdcxx_sover}-pp%{libstdcxx_suffix} = %{version}-%{release}
-Provides:       libstdc++%{libstdcxx_sover}-pp = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libstdc++%{libstdcxx_sover}-pp
-# packageand() does not work with versioned specifications so the fallback
-# is a Requires from libstdc++-devel to preserve previous behavior.
-Supplements:    (gdb and libstdc++%{libstdcxx_sover} = %{version}-%{release})
-
-%description -n libstdc++%{libstdcxx_sover}-pp%{libstdcxx_suffix}
-This package contains pretty printers for the C++ standard library usable
-from GDB.
-
-%package -n libstdc++%{libstdcxx_sover}-pp%{libstdcxx_suffix}-32bit
-Summary:        GDB pretty printers for the C++ standard library
-License:        GPL-3.0-or-later
-# The -pp packages are tied to a specific shared library
-Requires:       libstdc++%{libstdcxx_sover}-32bit = %{version}-%{release}
-Requires:       libstdc++%{libstdcxx_sover}-pp%{libstdcxx_suffix} = %{version}-%{release}
-Provides:       libstdc++%{libstdcxx_sover}-pp-32bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libstdc++%{libstdcxx_sover}-pp-32bit
-# packageand() does not work with versioned specifications so the fallback
-# is a Requires from libstdc++-devel to preserve previous behavior.
-Supplements:    (gdb and libstdc++%{libstdcxx_sover}-32bit = %{version}-%{release})
-
-%description -n libstdc++%{libstdcxx_sover}-pp%{libstdcxx_suffix}-32bit
-This package contains pretty printers for the C++ standard library usable
-from GDB.
-
-%package -n libstdc++%{libstdcxx_sover}-pp%{libstdcxx_suffix}-64bit
-Summary:        GDB pretty printers for the C++ standard library
-License:        GPL-3.0-or-later
-# The -pp packages are tied to a specific shared library
-Requires:       libstdc++%{libstdcxx_sover}-64bit = %{version}-%{release}
-Requires:       libstdc++%{libstdcxx_sover}-pp%{libstdcxx_suffix} = %{version}-%{release}
-Provides:       libstdc++%{libstdcxx_sover}-pp-64bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libstdc++%{libstdcxx_sover}-pp-64bit
-# packageand() does not work with versioned specifications so the fallback
-# is a Requires from libstdc++-devel to preserve previous behavior.
-Supplements:    (gdb and libstdc++%{libstdcxx_sover}-64bit = %{version}-%{release})
-
-%description -n libstdc++%{libstdcxx_sover}-pp%{libstdcxx_suffix}-64bit
-This package contains pretty printers for the C++ standard library usable
-from GDB.
-
-%package -n libgcc_s%{libgcc_s}%{libgcc_s_suffix}
-Summary:        C compiler runtime library
-License:        GPL-3.0-or-later WITH GCC-exception-3.1
-Provides:       libgcc_s%{libgcc_s} = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libgcc_s%{libgcc_s}
-
-%description -n libgcc_s%{libgcc_s}%{libgcc_s_suffix}
-Libgcc is needed for dynamically linked C programs.
-
-%package -n libgcc_s%{libgcc_s}%{libgcc_s_suffix}-32bit
-Summary:        C compiler runtime library
-License:        GPL-3.0-or-later WITH GCC-exception-3.1
-Provides:       libgcc_s%{libgcc_s}-32bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libgcc_s%{libgcc_s}-32bit
-
-%description -n libgcc_s%{libgcc_s}%{libgcc_s_suffix}-32bit
-Libgcc is needed for dynamically linked C programs.
-
-%package -n libgcc_s%{libgcc_s}%{libgcc_s_suffix}-64bit
-Summary:        C compiler runtime library
-License:        GPL-3.0-or-later WITH GCC-exception-3.1
-Provides:       libgcc_s%{libgcc_s}-64bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libgcc_s%{libgcc_s}-64bit
-
-%description -n libgcc_s%{libgcc_s}%{libgcc_s_suffix}-64bit
-Libgcc is needed for dynamically linked C programs.
-
-%package -n libgomp%{libgomp_sover}%{libgomp_suffix}
+%package     -n libgomp%{libsuffix}
 Summary:        The GNU compiler collection OpenMP runtime library
 License:        GPL-3.0-or-later WITH GCC-exception-3.1
-Provides:       libgomp%{libgomp_sover} = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libgomp%{libgomp_sover}
 
-%description -n libgomp%{libgomp_sover}%{libgomp_suffix}
+%description -n libgomp%{libsuffix}
 This is the OpenMP runtime library needed by OpenMP enabled programs
 that were built with the -fopenmp compiler option and by programs that
 were auto-parallelized via the -ftree-parallelize-loops compiler
 option.
 
-%package -n libgomp%{libgomp_sover}%{libgomp_suffix}-32bit
-Summary:        The GNU compiler collection OpenMP runtime library
-License:        GPL-3.0-or-later WITH GCC-exception-3.1
-Provides:       libgomp%{libgomp_sover}-32bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libgomp%{libgomp_sover}-32bit
-
-%description -n libgomp%{libgomp_sover}%{libgomp_suffix}-32bit
-This is the OpenMP runtime library needed by OpenMP enabled programs
-that were built with the -fopenmp compiler option and by programs that
-were auto-parallelized via the -ftree-parallelize-loops compiler
-option.
-
-
-%package -n libgomp%{libgomp_sover}%{libgomp_suffix}-64bit
-Summary:        The GNU compiler collection OpenMP runtime library
-License:        GPL-3.0-or-later WITH GCC-exception-3.1
-Provides:       libgomp%{libgomp_sover}-64bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libgomp%{libgomp_sover}-64bit
-
-%description -n libgomp%{libgomp_sover}%{libgomp_suffix}-64bit
-This is the OpenMP runtime library needed by OpenMP enabled programs
-that were built with the -fopenmp compiler option and by programs that
-were auto-parallelized via the -ftree-parallelize-loops compiler
-option.
-
-%package -n libstdc++%{libstdcxx_sover}%{libstdcxx_suffix}
-Summary:        The standard C++ shared library
-License:        GPL-3.0-or-later WITH GCC-exception-3.1
-Suggests:       libstdc++%{libstdcxx_sover}-locale
-Provides:       libstdc++%{libstdcxx_sover} = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libstdc++%{libstdcxx_sover}
-# The std::chrono timezone database is provided by timezone
-# (/usr/share/zoneinfo/tzdata.zi), without that the tzdb is empty and
-# will only provide UTC.  We don't want a Requires here though, instead
-# the overall product needs to decide what to provide,
-
-%description -n libstdc++%{libstdcxx_sover}%{libstdcxx_suffix}
-The standard C++ library, needed for dynamically linked C++ programs.
-
-
-%package -n libstdc++%{libstdcxx_sover}%{libstdcxx_suffix}-32bit
-Summary:        The standard C++ shared library
-License:        GPL-3.0-or-later WITH GCC-exception-3.1
-Suggests:       libstdc++%{libstdcxx_sover}-locale
-Provides:       libstdc++%{libstdcxx_sover}-32bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libstdc++%{libstdcxx_sover}-32bit
-# The std::chrono timezone database is provided by timezone
-# (/usr/share/zoneinfo/tzdata.zi), without that the tzdb is empty and
-# will only provide UTC.  We don't want a Requires here though, instead
-# the overall product needs to decide what to provide,
-
-%description -n libstdc++%{libstdcxx_sover}%{libstdcxx_suffix}-32bit
-The standard C++ library, needed for dynamically linked C++ programs.
-
-
-%package -n libstdc++%{libstdcxx_sover}%{libstdcxx_suffix}-64bit
-Summary:        The standard C++ shared library
-License:        GPL-3.0-or-later WITH GCC-exception-3.1
-Suggests:       libstdc++%{libstdcxx_sover}-locale
-Provides:       libstdc++%{libstdcxx_sover}-64bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libstdc++%{libstdcxx_sover}-64bit
-# The std::chrono timezone database is provided by timezone
-# (/usr/share/zoneinfo/tzdata.zi), without that the tzdb is empty and
-# will only provide UTC.  We don't want a Requires here though, instead
-# the overall product needs to decide what to provide,
-
-%description -n libstdc++%{libstdcxx_sover}%{libstdcxx_suffix}-64bit
-The standard C++ library, needed for dynamically linked C++ programs.
-
-%package -n libstdc++%{libstdcxx_sover}%{libstdcxx_suffix}-locale
-Summary:        Standard C++ Library Locales
-License:        GPL-3.0-or-later WITH GCC-exception-3.1
-Provides:       libstdc++%{libstdcxx_sover}-locale = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libstdc++%{libstdcxx_sover}-locale
-
-%description -n libstdc++%{libstdcxx_sover}%{libstdcxx_suffix}-locale
-The standard C++ library locale data.
-
-%package info
+%package        doc
 Summary:        Documentation for the GNU compiler collection
 License:        GFDL-1.2-only
 PreReq:         texinfo
 BuildArch:      noarch
 
-%description info
+%description    doc
 GNU info-pages for the GNU compiler collection covering both user-level
 and internals documentation.
 
-%package objc
+%package        objc
 Summary:        GNU Objective C Compiler
 License:        GPL-3.0-or-later
 Requires:       gcc15 = %{version}-%{release}
 Requires:       gcc15-objc = %{version}-%{release}
-Requires:       libobjc%{libobjc_sover} >= %{version}-%{release}
+Requires:       libobjc%{libsuffix} >= %{version}-%{release}
 
-%description objc
+%description    objc
 This package contains the GNU Objective C compiler. Objective C is an
 object oriented language, created by Next Inc. and used in their
 Nextstep OS. The source code is available in the gcc package.
 
-%package objc-32bit
-Summary:        GNU Objective C Compiler
-License:        GPL-3.0-or-later
-Requires:       gcc15-32bit = %{version}-%{release}
-Requires:       gcc15-objc = %{version}-%{release}
-Requires:       libobjc%{libobjc_sover}-32bit >= %{version}-%{release}
-
-%description objc-32bit
-This package contains the GNU Objective C compiler. Objective C is an
-object oriented language, created by Next Inc. and used in their
-Nextstep OS. The source code is available in the gcc package.
-
-%package objc-64bit
-Summary:        GNU Objective C Compiler
-License:        GPL-3.0-or-later
-Requires:       gcc15-64bit = %{version}-%{release}
-Requires:       gcc15-objc = %{version}-%{release}
-Requires:       libobjc%{libobjc_sover}-64bit >= %{version}-%{release}
-
-%description objc-64bit
-This package contains the GNU Objective C compiler. Objective C is an
-object oriented language, created by Next Inc. and used in their
-Nextstep OS. The source code is available in the gcc package.
-
-%package -n libobjc%{libobjc_sover}%{libobjc_suffix}
+%package     -n libobjc%{libsuffix}
 Summary:        Library for the GNU Objective C Compiler
 License:        GPL-3.0-or-later WITH GCC-exception-3.1
-Provides:       libobjc%{libobjc_sover} = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libobjc%{libobjc_sover}
 
-%description -n libobjc%{libobjc_sover}%{libobjc_suffix}
+%description -n libobjc%{libsuffix}
 The library for the GNU Objective C compiler.
 
-%package -n libobjc%{libobjc_sover}%{libobjc_suffix}-32bit
-Summary:        Library for the GNU Objective C Compiler
-License:        GPL-3.0-or-later WITH GCC-exception-3.1
-Provides:       libobjc%{libobjc_sover}-32bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libobjc%{libobjc_sover}-32bit
-
-%description -n libobjc%{libobjc_sover}%{libobjc_suffix}-32bit
-The library for the GNU Objective C compiler.
-
-%package -n libobjc%{libobjc_sover}%{libobjc_suffix}-64bit
-Summary:        Library for the GNU Objective C Compiler
-License:        GPL-3.0-or-later WITH GCC-exception-3.1
-Provides:       libobjc%{libobjc_sover}-64bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libobjc%{libobjc_sover}-64bit
-
-%description -n libobjc%{libobjc_sover}%{libobjc_suffix}-64bit
-The library for the GNU Objective C compiler.
-
-%package obj-c++
+%package        obj-c++
 Summary:        GNU Objective C++ Compiler
 License:        GPL-3.0-or-later
 Requires:       gcc15-c++ = %{version}-%{release}
 Requires:       gcc15-obj-c++ = %{version}-%{release}
 Requires:       gcc15-objc = %{version}-%{release}
 
-%description obj-c++
+%description    obj-c++
 This package contains the GNU Objective C++ compiler. Objective C++ is an
 object oriented language, created by Next Inc. and used in their
 Nextstep OS. The source code is available in the gcc package.
 
-%package obj-c++-32bit
-Summary:        GNU Objective C++ Compiler
-License:        GPL-3.0-or-later
-Requires:       gcc15-c++-32bit = %{version}-%{release}
-Requires:       gcc15-obj-c++ = %{version}-%{release}
-Requires:       gcc15-objc-32bit = %{version}-%{release}
-
-%description obj-c++-32bit
-This package contains the GNU Objective C++ compiler. Objective C++ is an
-object oriented language, created by Next Inc. and used in their
-Nextstep OS. The source code is available in the gcc package.
-
-%package obj-c++-64bit
-Summary:        GNU Objective C++ Compiler
-License:        GPL-3.0-or-later
-Requires:       gcc15-c++-64bit = %{version}-%{release}
-Requires:       gcc15-obj-c++ = %{version}-%{release}
-Requires:       gcc15-objc-64bit = %{version}-%{release}
-
-%description obj-c++-64bit
-This package contains the GNU Objective C++ compiler. Objective C++ is an
-object oriented language, created by Next Inc. and used in their
-Nextstep OS. The source code is available in the gcc package.
-
-%package -n cpp15
+%package     -n cpp15
 Summary:        The GCC Preprocessor
 License:        GPL-3.0-or-later
 
@@ -771,1035 +305,205 @@ License:        GPL-3.0-or-later
 This Package contains just the preprocessor that is used by the X11
 packages.
 
-%package ada
+%package        ada
 Summary:        GNU Ada Compiler Based on GCC (GNAT)
 License:        GPL-3.0-or-later
 Requires:       gcc15 = %{version}-%{release}
 Requires:       gcc15-ada = %{version}-%{release}
-Requires:       libada15 = %{version}-%{release}
 
-%description ada
+%description    ada
 This package contains an Ada compiler and associated development
 tools based on the GNU GCC technology.
 
-%package ada-32bit
-Summary:        GNU Ada Compiler Based on GCC (GNAT)
-License:        GPL-3.0-or-later
-Requires:       gcc15-32bit = %{version}-%{release}
-Requires:       gcc15-ada = %{version}-%{release}
-Requires:       libada15-32bit = %{version}-%{release}
-
-%description ada-32bit
-This package contains an Ada compiler and associated development
-tools based on the GNU GCC technology.
-
-%package ada-64bit
-Summary:        GNU Ada Compiler Based on GCC (GNAT)
-License:        GPL-3.0-or-later
-Requires:       gcc15-64bit = %{version}-%{release}
-Requires:       gcc15-ada = %{version}-%{release}
-Requires:       libada15-64bit = %{version}-%{release}
-
-%description ada-64bit
-This package contains an Ada compiler and associated development
-tools based on the GNU GCC technology.
-
-%package -n libada15
-Summary:        GNU Ada Runtime Libraries
-License:        GPL-3.0-or-later WITH GCC-exception-3.1
-Provides:       libgnarl-15 = %{version}-%{release}
-Conflicts:      libgnarl-15
-Provides:       libgnat-15 = %{version}-%{release}
-Conflicts:      libgnat-15
-
-%description -n libada15
-This package contains the shared libraries required to run programs
-compiled with the GNU Ada compiler (GNAT) if they are compiled to use
-shared libraries. It also contains the shared libraries for the
-Implementation of the Ada Semantic Interface Specification (ASIS), the
-implementation of Distributed Systems Programming (GLADE) and the Posix
-1003.5 Binding (Florist).
-
-%package -n libada15-32bit
-Summary:        GNU Ada Runtime Libraries
-License:        GPL-3.0-or-later WITH GCC-exception-3.1
-Provides:       libgnarl-15-32bit = %{version}-%{release}
-Conflicts:      libgnarl-15-32bit
-Provides:       libgnat-15-32bit = %{version}-%{release}
-Conflicts:      libgnat-15-32bit
-
-%description -n libada15-32bit
-This package contains the shared libraries required to run programs
-compiled with the GNU Ada compiler (GNAT) if they are compiled to use
-shared libraries. It also contains the shared libraries for the
-Implementation of the Ada Semantic Interface Specification (ASIS), the
-implementation of Distributed Systems Programming (GLADE) and the Posix
-1003.5 Binding (Florist).
-
-%package -n libada15-64bit
-Summary:        GNU Ada Runtime Libraries
-License:        GPL-3.0-or-later WITH GCC-exception-3.1
-Provides:       libgnarl-15-64bit = %{version}-%{release}
-Conflicts:      libgnarl-15-64bit
-Provides:       libgnat-15-64bit = %{version}-%{release}
-Conflicts:      libgnat-15-64bit
-
-%description -n libada15-64bit
-This package contains the shared libraries required to run programs
-compiled with the GNU Ada compiler (GNAT) if they are compiled to use
-shared libraries. It also contains the shared libraries for the
-Implementation of the Ada Semantic Interface Specification (ASIS), the
-implementation of Distributed Systems Programming (GLADE) and the Posix
-1003.5 Binding (Florist).
-
-%package fortran
+%package        fortran
 Summary:        The GNU Fortran Compiler and Support Files
 License:        GPL-3.0-or-later
 Requires:       gcc15 = %{version}-%{release}
 Requires:       gcc15-fortran = %{version}-%{release}
-Requires:       libgfortran%{libgfortran_sover} >= %{version}-%{release}
-%ifarch %quadmath_arch
-Requires:       libquadmath%{libquadmath_sover}-devel%{libdevel_suffix} = %{version}-%{release}
+Requires:       libgfortran%{libsuffix} >= %{version}-%{release}
+%ifarch %{quadmath_arch}
+Requires:       libquadmath-devel%{libdevel_suffix} = %{version}-%{release}
 %endif
 
-%description fortran
+%description    fortran
 This is the Fortran compiler of the GNU Compiler Collection (GCC).
 
-%package fortran-32bit
-Summary:        The GNU Fortran Compiler and Support Files
-License:        GPL-3.0-or-later
-Requires:       gcc15-32bit = %{version}-%{release}
-Requires:       gcc15-fortran = %{version}-%{release}
-Requires:       libgfortran%{libgfortran_sover}-32bit >= %{version}-%{release}
-%ifarch %quadmath_arch
-Requires:       libquadmath%{libquadmath_sover}-devel%{libdevel_suffix}-32bit = %{version}-%{release}
-%endif
-
-%description fortran-32bit
-This is the Fortran compiler of the GNU Compiler Collection (GCC).
-
-%package fortran-64bit
-Summary:        The GNU Fortran Compiler and Support Files
-License:        GPL-3.0-or-later
-Requires:       gcc15-64bit = %{version}-%{release}
-Requires:       gcc15-fortran = %{version}-%{release}
-Requires:       libgfortran%{libgfortran_sover}-64bit >= %{version}-%{release}
-%ifarch %quadmath_arch
-Requires:       libquadmath%{libquadmath_sover}-devel%{libdevel_suffix}-64bit = %{version}-%{release}
-%endif
-
-%description fortran-64bit
-This is the Fortran compiler of the GNU Compiler Collection (GCC).
-
-%package -n libgfortran%{libgfortran_sover}%{libgfortran_suffix}
+%package     -n libgfortran%{libsuffix}
 Summary:        The GNU Fortran Compiler Runtime Library
 License:        GPL-3.0-or-later WITH GCC-exception-3.1
-%ifarch %quadmath_arch
-Requires:       libquadmath%{libquadmath_sover} >= %{version}-%{release}
+%ifarch %{quadmath_arch}
+Requires:       libquadmath%{libsuffix} >= %{version}-%{release}
 %endif
-Provides:       libgfortran%{libgfortran_sover} = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libgfortran%{libgfortran_sover}
 
-%description -n libgfortran%{libgfortran_sover}%{libgfortran_suffix}
+%description -n libgfortran%{libsuffix}
 The runtime library needed to run programs compiled with the Fortran compiler
 of the GNU Compiler Collection (GCC).
 
-%package -n libgfortran%{libgfortran_sover}%{libgfortran_suffix}-32bit
-Summary:        The GNU Fortran Compiler Runtime Library
-License:        GPL-3.0-or-later WITH GCC-exception-3.1
-%ifarch %quadmath_arch
-Requires:       libquadmath%{libquadmath_sover}-32bit >= %{version}-%{release}
-%endif
-Provides:       libgfortran%{libgfortran_sover}-32bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libgfortran%{libgfortran_sover}-32bit
-
-%description -n libgfortran%{libgfortran_sover}%{libgfortran_suffix}-32bit
-The runtime library needed to run programs compiled with the Fortran compiler
-of the GNU Compiler Collection (GCC).
-
-%package -n libgfortran%{libgfortran_sover}%{libgfortran_suffix}-64bit
-Summary:        The GNU Fortran Compiler Runtime Library
-License:        GPL-3.0-or-later WITH GCC-exception-3.1
-%ifarch %quadmath_arch
-Requires:       libquadmath%{libquadmath_sover}-64bit >= %{version}-%{release}
-%endif
-Provides:       libgfortran%{libgfortran_sover}-64bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libgfortran%{libgfortran_sover}-64bit
-
-%description -n libgfortran%{libgfortran_sover}%{libgfortran_suffix}-64bit
-The runtime library needed to run programs compiled with the Fortran compiler
-of the GNU Compiler Collection (GCC).
-
-%package -n libquadmath%{libquadmath_sover}%{libquadmath_suffix}
+%package     -n libquadmath%{libsuffix}
 Summary:        The GNU Fortran Compiler Quadmath Runtime Library
 License:        LGPL-2.1-only
-Provides:       libquadmath%{libquadmath_sover} = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libquadmath%{libquadmath_sover}
 
-%description -n libquadmath%{libquadmath_sover}%{libquadmath_suffix}
+%description -n libquadmath%{libsuffix}
 The runtime library needed to run programs compiled with the Fortran compiler
 of the GNU Compiler Collection (GCC) and quadruple precision floating point
 operations.
 
-%package -n libquadmath%{libquadmath_sover}%{libquadmath_suffix}-32bit
-Summary:        The GNU Fortran Compiler Quadmath Runtime Library
-License:        LGPL-2.1-only
-Provides:       libquadmath%{libquadmath_sover}-32bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libquadmath%{libquadmath_sover}-32bit
-
-%description -n libquadmath%{libquadmath_sover}%{libquadmath_suffix}-32bit
-The runtime library needed to run programs compiled with the Fortran compiler
-of the GNU Compiler Collection (GCC) and quadruple precision floating point
-operations.
-
-%package -n libquadmath%{libquadmath_sover}%{libquadmath_suffix}-64bit
-Summary:        The GNU Fortran Compiler Quadmath Runtime Library
-License:        LGPL-2.1-only
-Provides:       libquadmath%{libquadmath_sover}-64bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libquadmath%{libquadmath_sover}-64bit
-
-%description -n libquadmath%{libquadmath_sover}%{libquadmath_suffix}-64bit
-The runtime library needed to run programs compiled with the Fortran compiler
-of the GNU Compiler Collection (GCC) and quadruple precision floating point
-operations.
-
-%package -n libquadmath%{libquadmath_sover}-devel%{libdevel_suffix}
+%package     -n libquadmath-devel%{libdevel_suffix}
 Summary:        The GNU Fortran Compiler Quadmath Runtime Library Development Files
 License:        LGPL-2.1-only
-Requires:       libquadmath%{libquadmath_sover} >= %{version}-%{release}
+Requires:       libquadmath%{libsuffix} >= %{version}-%{release}
 
-%description -n libquadmath%{libquadmath_sover}-devel%{libdevel_suffix}
+%description -n libquadmath-devel%{libdevel_suffix}
 The libquadmatah runtime library development files.
 
-%package -n libquadmath%{libquadmath_sover}-devel%{libdevel_suffix}-32bit
-Summary:        The GNU Fortran Compiler Quadmath Runtime Library Development Files
-License:        LGPL-2.1-only
-Requires:       libquadmath%{libquadmath_sover}-32bit >= %{version}-%{release}
-
-%description -n libquadmath%{libquadmath_sover}-devel%{libdevel_suffix}-32bit
-The libquadmatah runtime library development files.
-
-%package -n libquadmath%{libquadmath_sover}-devel%{libdevel_suffix}-64bit
-Summary:        The GNU Fortran Compiler Quadmath Runtime Library Development Files
-License:        LGPL-2.1-only
-Requires:       libquadmath%{libquadmath_sover}-64bit >= %{version}-%{release}
-
-%description -n libquadmath%{libquadmath_sover}-devel%{libdevel_suffix}-64bit
-The libquadmatah runtime library development files.
-
-%package -n libitm%{libitm_sover}%{libitm_suffix}
+%package     -n libitm%{libsuffix}
 Summary:        The GNU Compiler Transactional Memory Runtime Library
 License:        MIT
-Provides:       libitm%{libitm_sover} = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libitm%{libitm_sover}
 
-%description -n libitm%{libitm_sover}%{libitm_suffix}
+%description -n libitm%{libsuffix}
 The runtime library needed to run programs compiled with the
 -fgnu-tm option of the GNU Compiler Collection (GCC).
 
-%package -n libitm%{libitm_sover}%{libitm_suffix}-32bit
-Summary:        The GNU Compiler Transactional Memory Runtime Library
-License:        MIT
-Provides:       libitm%{libitm_sover}-32bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libitm%{libitm_sover}-32bit
-
-%description -n libitm%{libitm_sover}%{libitm_suffix}-32bit
-The runtime library needed to run programs compiled with the
--fgnu-tm option of the GNU Compiler Collection (GCC).
-
-%package -n libitm%{libitm_sover}%{libitm_suffix}-64bit
-Summary:        The GNU Compiler Transactional Memory Runtime Library
-License:        MIT
-Provides:       libitm%{libitm_sover}-64bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libitm%{libitm_sover}-64bit
-
-%description -n libitm%{libitm_sover}%{libitm_suffix}-64bit
-The runtime library needed to run programs compiled with the
--fgnu-tm option of the GNU Compiler Collection (GCC).
-
-%package -n libasan%{libasan_sover}%{libasan_suffix}
+%package     -n libasan%{libsuffix}
 Summary:        The GNU Compiler Address Sanitizer Runtime Library
 License:        MIT
-Provides:       libasan%{libasan_sover} = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libasan%{libasan_sover}
 
-%description -n libasan%{libasan_sover}%{libasan_suffix}
+%description -n libasan%{libsuffix}
 The runtime library needed to run programs compiled with the
 -fsanitize=address option of the GNU Compiler Collection (GCC).
 
-%package -n libasan%{libasan_sover}%{libasan_suffix}-32bit
-Summary:        The GNU Compiler Address Sanitizer Runtime Library
-License:        MIT
-Provides:       libasan%{libasan_sover}-32bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libasan%{libasan_sover}-32bit
-
-%description -n libasan%{libasan_sover}%{libasan_suffix}-32bit
-The runtime library needed to run programs compiled with the
--fsanitize=address option of the GNU Compiler Collection (GCC).
-
-%package -n libasan%{libasan_sover}%{libasan_suffix}-64bit
-Summary:        The GNU Compiler Address Sanitizer Runtime Library
-License:        MIT
-Provides:       libasan%{libasan_sover}-64bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libasan%{libasan_sover}-64bit
-
-%description -n libasan%{libasan_sover}%{libasan_suffix}-64bit
-The runtime library needed to run programs compiled with the
--fsanitize=address option of the GNU Compiler Collection (GCC).
-
-%package -n libtsan%{libtsan_sover}%{libtsan_suffix}
+%package     -n libtsan%{libsuffix}
 Summary:        The GNU Compiler Thread Sanitizer Runtime Library
 License:        MIT
-Provides:       libtsan%{libtsan_sover} = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libtsan%{libtsan_sover}
 
-%description -n libtsan%{libtsan_sover}%{libtsan_suffix}
+%description -n libtsan%{libsuffix}
 The runtime library needed to run programs compiled with the
 -fsanitize=thread option of the GNU Compiler Collection (GCC).
 
-%package -n libtsan%{libtsan_sover}%{libtsan_suffix}-32bit
-Summary:        The GNU Compiler Thread Sanitizer Runtime Library
-License:        MIT
-Provides:       libtsan%{libtsan_sover}-32bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libtsan%{libtsan_sover}-32bit
-
-%description -n libtsan%{libtsan_sover}%{libtsan_suffix}-32bit
-The runtime library needed to run programs compiled with the
--fsanitize=thread option of the GNU Compiler Collection (GCC).
-
-%package -n libtsan%{libtsan_sover}%{libtsan_suffix}-64bit
-Summary:        The GNU Compiler Thread Sanitizer Runtime Library
-License:        MIT
-Provides:       libtsan%{libtsan_sover}-64bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libtsan%{libtsan_sover}-64bit
-
-%description -n libtsan%{libtsan_sover}%{libtsan_suffix}-64bit
-The runtime library needed to run programs compiled with the
--fsanitize=thread option of the GNU Compiler Collection (GCC).
-
-%package -n libhwasan%{libhwasan_sover}%{libhwasan_suffix}
+%package     -n libhwasan%{libsuffix}
 Summary:        The GNU Compiler Hardware-assisted Address Sanitizer Runtime Library
 License:        MIT
-Provides:       libhwasan%{libhwasan_sover} = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libhwasan%{libhwasan_sover}
 
-%description -n libhwasan%{libhwasan_sover}%{libhwasan_suffix}
+%description -n libhwasan%{libsuffix}
 The runtime library needed to run programs compiled with the
 -fsanitize=hwaddress option of the GNU Compiler Collection (GCC).
 
-%package -n libhwasan%{libhwasan_sover}%{libhwasan_suffix}-32bit
-Summary:        The GNU Compiler Hardware-assisted Address Sanitizer Runtime Library
-License:        MIT
-Provides:       libhwasan%{libhwasan_sover}-32bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libhwasan%{libhwasan_sover}-32bit
-
-%description -n libhwasan%{libhwasan_sover}%{libhwasan_suffix}-32bit
-The runtime library needed to run programs compiled with the
--fsanitize=hwaddress option of the GNU Compiler Collection (GCC).
-
-%package -n libhwasan%{libhwasan_sover}%{libhwasan_suffix}-64bit
-Summary:        The GNU Compiler Hardware-assisted Address Sanitizer Runtime Library
-License:        MIT
-Provides:       libhwasan%{libhwasan_sover}-64bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libhwasan%{libhwasan_sover}-64bit
-
-%description -n libhwasan%{libhwasan_sover}%{libhwasan_suffix}-64bit
-The runtime library needed to run programs compiled with the
--fsanitize=hwaddress option of the GNU Compiler Collection (GCC).
-
-%package -n libatomic%{libatomic_sover}%{libatomic_suffix}
+%package     -n libatomic%{libsuffix}
 Summary:        The GNU Compiler Atomic Operations Runtime Library
 License:        GPL-3.0-or-later WITH GCC-exception-3.1
-Provides:       libatomic%{libatomic_sover} = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libatomic%{libatomic_sover}
 
-%description -n libatomic%{libatomic_sover}%{libatomic_suffix}
+%description -n libatomic%{libsuffix}
 The runtime library for atomic operations of the GNU Compiler Collection (GCC).
 
-%package -n libatomic%{libatomic_sover}%{libatomic_suffix}-32bit
-Summary:        The GNU Compiler Atomic Operations Runtime Library
-License:        GPL-3.0-or-later WITH GCC-exception-3.1
-Provides:       libatomic%{libatomic_sover}-32bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libatomic%{libatomic_sover}-32bit
-
-%description -n libatomic%{libatomic_sover}%{libatomic_suffix}-32bit
-The runtime library for atomic operations of the GNU Compiler Collection (GCC).
-
-%package -n libatomic%{libatomic_sover}%{libatomic_suffix}-64bit
-Summary:        The GNU Compiler Atomic Operations Runtime Library
-License:        GPL-3.0-or-later WITH GCC-exception-3.1
-Provides:       libatomic%{libatomic_sover}-64bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libatomic%{libatomic_sover}-64bit
-
-%description -n libatomic%{libatomic_sover}%{libatomic_suffix}-64bit
-The runtime library for atomic operations of the GNU Compiler Collection (GCC).
-
-%package -n liblsan%{liblsan_sover}%{liblsan_suffix}
+%package     -n liblsan%{libsuffix}
 Summary:        The GNU Compiler Leak Sanitizer Runtime Library
 License:        MIT
-Provides:       liblsan%{liblsan_sover} = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      liblsan%{liblsan_sover}
 
-%description -n liblsan%{liblsan_sover}%{liblsan_suffix}
+%description -n liblsan%{libsuffix}
 The runtime library needed to run programs compiled with the
 -fsanitize=leak option of the GNU Compiler Collection (GCC).
 
-%package -n liblsan%{liblsan_sover}%{liblsan_suffix}-32bit
-Summary:        The GNU Compiler Leak Sanitizer Runtime Library
-License:        MIT
-Provides:       liblsan%{liblsan_sover}-32bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      liblsan%{liblsan_sover}-32bit
-
-%description -n liblsan%{liblsan_sover}%{liblsan_suffix}-32bit
-The runtime library needed to run programs compiled with the
--fsanitize=leak option of the GNU Compiler Collection (GCC).
-
-%package -n liblsan%{liblsan_sover}%{liblsan_suffix}-64bit
-Summary:        The GNU Compiler Leak Sanitizer Runtime Library
-License:        MIT
-Provides:       liblsan%{liblsan_sover}-64bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      liblsan%{liblsan_sover}-64bit
-
-%description -n liblsan%{liblsan_sover}%{liblsan_suffix}-64bit
-The runtime library needed to run programs compiled with the
--fsanitize=leak option of the GNU Compiler Collection (GCC).
-
-%package -n libubsan%{libubsan_sover}%{libubsan_suffix}
+%package     -n libubsan%{libsuffix}
 Summary:        The GNU Compiler Undefined Sanitizer Runtime Library
 License:        MIT
-Provides:       libubsan%{libubsan_sover} = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libubsan%{libubsan_sover}
 
-%description -n libubsan%{libubsan_sover}%{libubsan_suffix}
+%description -n libubsan%{libsuffix}
 The runtime library needed to run programs compiled with the
 -fsanitize=undefined option of the GNU Compiler Collection (GCC).
 
-%package -n libubsan%{libubsan_sover}%{libubsan_suffix}-32bit
-Summary:        The GNU Compiler Undefined Sanitizer Runtime Library
-License:        MIT
-Provides:       libubsan%{libubsan_sover}-32bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libubsan%{libubsan_sover}-32bit
-
-%description -n libubsan%{libubsan_sover}%{libubsan_suffix}-32bit
-The runtime library needed to run programs compiled with the
--fsanitize=undefined option of the GNU Compiler Collection (GCC).
-
-%package -n libubsan%{libubsan_sover}%{libubsan_suffix}-64bit
-Summary:        The GNU Compiler Undefined Sanitizer Runtime Library
-License:        MIT
-Provides:       libubsan%{libubsan_sover}-64bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libubsan%{libubsan_sover}-64bit
-
-%description -n libubsan%{libubsan_sover}%{libubsan_suffix}-64bit
-The runtime library needed to run programs compiled with the
--fsanitize=undefined option of the GNU Compiler Collection (GCC).
-
-%package -n libvtv%{libvtv_sover}%{libvtv_suffix}
+%package     -n libvtv%{libsuffix}
 Summary:        The GNU Compiler Vtable Verifier Runtime Library
 License:        MIT
-Provides:       libvtv%{libvtv_sover} = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libvtv%{libvtv_sover}
 
-%description -n libvtv%{libvtv_sover}%{libvtv_suffix}
+%description -n libvtv%{libsuffix}
 The runtime library needed to run programs compiled with the
 -fvtable-verify option of the GNU Compiler Collection (GCC).
 
-%package -n libvtv%{libvtv_sover}%{libvtv_suffix}-32bit
-Summary:        The GNU Compiler Vtable Verifier Runtime Library
-License:        MIT
-Provides:       libvtv%{libvtv_sover}-32bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libvtv%{libvtv_sover}-32bit
-
-%description -n libvtv%{libvtv_sover}%{libvtv_suffix}-32bit
-The runtime library needed to run programs compiled with the
--fvtable-verify option of the GNU Compiler Collection (GCC).
-
-%package -n libvtv%{libvtv_sover}%{libvtv_suffix}-64bit
-Summary:        The GNU Compiler Vtable Verifier Runtime Library
-License:        MIT
-Provides:       libvtv%{libvtv_sover}-64bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libvtv%{libvtv_sover}-64bit
-
-%description -n libvtv%{libvtv_sover}%{libvtv_suffix}-64bit
-The runtime library needed to run programs compiled with the
--fvtable-verify option of the GNU Compiler Collection (GCC).
-
-%package go
+%package        go
 Summary:        GNU Go Compiler
 License:        GPL-3.0-or-later
 Requires:       gcc15 = %{version}-%{release}
 Requires:       gcc15-go = %{version}-%{release}
-Requires:       libgo%{libgo_sover} >= %{version}-%{release}
+Requires:       libgo%{libsuffix} >= %{version}-%{release}
 
-%description go
+%description    go
 This package contains a Go compiler and associated development
 files based on the GNU GCC technology.
 
-%package go-32bit
-Summary:        GNU Go Compiler
-License:        GPL-3.0-or-later
-Requires:       gcc15-32bit = %{version}-%{release}
-Requires:       gcc15-go = %{version}-%{release}
-Requires:       libgo%{libgo_sover}-32bit >= %{version}-%{release}
-
-%description go-32bit
-This package contains a Go compiler and associated development
-files based on the GNU GCC technology.
-
-%package go-64bit
-Summary:        GNU Go Compiler
-License:        GPL-3.0-or-later
-Requires:       gcc15-64bit = %{version}-%{release}
-Requires:       gcc15-go = %{version}-%{release}
-Requires:       libgo%{libgo_sover}-64bit >= %{version}-%{release}
-
-%description go-64bit
-This package contains a Go compiler and associated development
-files based on the GNU GCC technology.
-
-%package -n libgo%{libgo_sover}%{libgo_suffix}
+%package     -n libgo%{libsuffix}
 Summary:        GNU Go compiler runtime library
 License:        BSD-3-Clause
-Provides:       libgo%{libgo_sover} = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libgo%{libgo_sover}
 
-%description -n libgo%{libgo_sover}%{libgo_suffix}
+%description -n libgo%{libsuffix}
 Runtime library for the GNU Go language.
 
-%package -n libgo%{libgo_sover}%{libgo_suffix}-32bit
-Summary:        GNU Go compiler runtime library
-License:        BSD-3-Clause
-Provides:       libgo%{libgo_sover}-32bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libgo%{libgo_sover}-32bit
-
-%description -n libgo%{libgo_sover}%{libgo_suffix}-32bit
-Runtime library for the GNU Go language.
-
-%package -n libgo%{libgo_sover}%{libgo_suffix}-64bit
-Summary:        GNU Go compiler runtime library
-License:        BSD-3-Clause
-Provides:       libgo%{libgo_sover}-64bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libgo%{libgo_sover}-64bit
-
-%description -n libgo%{libgo_sover}%{libgo_suffix}-64bit
-Runtime library for the GNU Go language.
-
-%package d
+%package        d
 Summary:        GNU D Compiler
 License:        GPL-3.0-or-later
 Requires:       gcc15 = %{version}-%{release}
 Requires:       gcc15-d = %{version}-%{release}
-Requires:       libgdruntime%{libgdruntime_sover} >= %{version}-%{release}
-Requires:       libgphobos%{libgphobos_sover} >= %{version}-%{release}
 
-%description d
+%description   d
 This package contains a D compiler and associated development
 files based on the GNU GCC technology.
 
-%package d-32bit
-Summary:        GNU D Compiler
-License:        GPL-3.0-or-later
-Requires:       gcc15-32bit = %{version}-%{release}
-Requires:       gcc15-d = %{version}-%{release}
-Requires:       libgdruntime%{libgdruntime_sover}-32bit >= %{version}-%{release}
-Requires:       libgphobos%{libgphobos_sover}-32bit >= %{version}-%{release}
-
-%description d-32bit
-This package contains a D compiler and associated development
-files based on the GNU GCC technology.
-
-%package d-64bit
-Summary:        GNU D Compiler
-License:        GPL-3.0-or-later
-Requires:       gcc15-64bit = %{version}-%{release}
-Requires:       gcc15-d = %{version}-%{release}
-Requires:       libgdruntime%{libgdruntime_sover}-64bit >= %{version}-%{release}
-Requires:       libgphobos%{libgphobos_sover}-64bit >= %{version}-%{release}
-
-%description d-64bit
-This package contains a D compiler and associated development
-files based on the GNU GCC technology.
-
-%package -n libgphobos%{libgphobos_sover}%{libgphobos_suffix}
-Summary:        GNU D compiler runtime library
-License:        BSL-1.0
-Provides:       libgphobos%{libgphobos_sover} = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libgphobos%{libgphobos_sover}
-
-%description -n libgphobos%{libgphobos_sover}%{libgphobos_suffix}
-Runtime library for the GNU D language.
-
-%package -n libgphobos%{libgphobos_sover}%{libgphobos_suffix}-32bit
-Summary:        GNU D compiler runtime library
-License:        BSL-1.0
-Provides:       libgphobos%{libgphobos_sover}-32bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libgphobos%{libgphobos_sover}-32bit
-
-%description -n libgphobos%{libgphobos_sover}%{libgphobos_suffix}-32bit
-Runtime library for the GNU D language.
-
-%package -n libgphobos%{libgphobos_sover}%{libgphobos_suffix}-64bit
-Summary:        GNU D compiler runtime library
-License:        BSL-1.0
-Provides:       libgphobos%{libgphobos_sover}-64bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libgphobos%{libgphobos_sover}-64bit
-
-%description -n libgphobos%{libgphobos_sover}%{libgphobos_suffix}-64bit
-Runtime library for the GNU D language.
-
-%package -n libgdruntime%{libgdruntime_sover}%{libgdruntime_suffix}
-Summary:        GNU D compiler runtime library
-License:        BSL-1.0
-Provides:       libgdruntime%{libgdruntime_sover} = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libgdruntime%{libgdruntime_sover}
-
-%description -n libgdruntime%{libgdruntime_sover}%{libgdruntime_suffix}
-Runtime library for the GNU D language.
-
-%package -n libgdruntime%{libgdruntime_sover}%{libgdruntime_suffix}-32bit
-Summary:        GNU D compiler runtime library
-License:        BSL-1.0
-Provides:       libgdruntime%{libgdruntime_sover}-32bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libgdruntime%{libgdruntime_sover}-32bit
-
-%description -n libgdruntime%{libgdruntime_sover}%{libgdruntime_suffix}-32bit
-Runtime library for the GNU D language.
-
-%package -n libgdruntime%{libgdruntime_sover}%{libgdruntime_suffix}-64bit
-Summary:        GNU D compiler runtime library
-License:        BSL-1.0
-Provides:       libgdruntime%{libgdruntime_sover}-64bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libgdruntime%{libgdruntime_sover}-64bit
-
-%description -n libgdruntime%{libgdruntime_sover}%{libgdruntime_suffix}-64bit
-Runtime library for the GNU D language.
-
-%package -n libgccjit%{libgccjit_sover}%{libgccjit_suffix}
+%package     -n libgccjit%{libsuffix}
 Summary:        The GNU Compiler Collection JIT library
 License:        GPL-3.0-or-later
-Provides:       libgccjit%{libgccjit_sover} = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libgccjit%{libgccjit_sover}
 # At runtime the JIT needs to be able to invoke the assembler and
 # linker and find startfiles and libgcc.  The built-in driver knows
 # the compilers version install directory only so we require the
 # respective compiler libgccjit was built from.
 Requires:       gcc15
 
-%description -n libgccjit%{libgccjit_sover}%{libgccjit_suffix}
+%description -n libgccjit%{libsuffix}
 Support for embedding GCC inside programs and libraries
 
-%package -n libgccjit%{libgccjit_sover}-devel%{libdevel_suffix}
+%package     -n libgccjit-devel%{libdevel_suffix}
 Summary:        Support for embedding GCC inside programs and libraries
 License:        GPL-3.0-or-later
-Provides:       libgccjit%{libgccjit_sover}-devel = %{version}-%{release}
-# Only one gccjit package can be installed at the same time since
-# header files conflict
-Conflicts:      libgccjit%{libgccjit_sover}-devel
-Requires:       libgccjit%{libgccjit_sover} >= %{version}-%{release}
+Requires:       libgccjit%{libsuffix} >= %{version}-%{release}
 
-%description -n libgccjit%{libgccjit_sover}-devel%{libdevel_suffix}
+%description -n libgccjit-devel%{libdevel_suffix}
 Package contains header files and documentation for GCC JIT front-end.
 
-%package rust
+%package        rust
 Summary:        GNU Rust Compiler
 License:        GPL-3.0-or-later
 Requires:       gcc15 = %{version}-%{release}
 Requires:       gcc15-rust = %{version}-%{release}
 
-%description rust
+%description    rust
 This package contains a Rust compiler.
 
-%package rust-32bit
-Summary:        GNU Rust Compiler
-License:        GPL-3.0-or-later
-Requires:       gcc15-32bit = %{version}-%{release}
-Requires:       gcc15-rust = %{version}-%{release}
-
-%description rust-32bit
-This package contains a Rust compiler.
-
-%package rust-64bit
-Summary:        GNU Rust Compiler
-License:        GPL-3.0-or-later
-Requires:       gcc15-64bit = %{version}-%{release}
-Requires:       gcc15-rust = %{version}-%{release}
-
-%description rust-64bit
-This package contains a Rust compiler.
-
-%package m2
+%package        m2
 Summary:        GNU Modula-2 Compiler
 License:        GPL-3.0-or-later
 Requires:       gcc15 = %{version}-%{release}
 Requires:       gcc15-m2 = %{version}-%{release}
-Requires:       libm2cor%{libm2_sover} >= %{version}-%{release}
-Requires:       libm2iso%{libm2_sover} >= %{version}-%{release}
-Requires:       libm2log%{libm2_sover} >= %{version}-%{release}
-Requires:       libm2min%{libm2_sover} >= %{version}-%{release}
-Requires:       libm2pim%{libm2_sover} >= %{version}-%{release}
-Requires:       libstdc++%{libstdcxx_sover}-devel%{libdevel_suffix} = %{version}-%{release}
+Requires:       libm2%{libsuffix} >= %{version}-%{release}
+Requires:       libstdc++-devel%{libdevel_suffix} = %{version}-%{release}
 
-%description m2
+%description    m2
 This package contains a Modula-2 compiler.
 
-%package m2-32bit
-Summary:        GNU Modula-2 Compiler
-License:        GPL-3.0-or-later
-Requires:       gcc15-32bit = %{version}-%{release}
-Requires:       gcc15-m2 = %{version}-%{release}
-Requires:       libm2cor%{libm2_sover}-32bit >= %{version}-%{release}
-Requires:       libm2iso%{libm2_sover}-32bit >= %{version}-%{release}
-Requires:       libm2log%{libm2_sover}-32bit >= %{version}-%{release}
-Requires:       libm2min%{libm2_sover}-32bit >= %{version}-%{release}
-Requires:       libm2pim%{libm2_sover}-32bit >= %{version}-%{release}
-Requires:       libstdc++%{libstdcxx_sover}-devel%{libdevel_suffix}-32bit = %{version}-%{release}
-
-%description m2-32bit
-This package contains a Modula-2 compiler.
-
-%package m2-64bit
-Summary:        GNU Modula-2 Compiler
-License:        GPL-3.0-or-later
-Requires:       gcc15-64bit = %{version}-%{release}
-Requires:       gcc15-m2 = %{version}-%{release}
-Requires:       libm2cor%{libm2_sover}-64bit >= %{version}-%{release}
-Requires:       libm2iso%{libm2_sover}-64bit >= %{version}-%{release}
-Requires:       libm2log%{libm2_sover}-64bit >= %{version}-%{release}
-Requires:       libm2min%{libm2_sover}-64bit >= %{version}-%{release}
-Requires:       libm2pim%{libm2_sover}-64bit >= %{version}-%{release}
-Requires:       libstdc++%{libstdcxx_sover}-devel%{libdevel_suffix}-64bit = %{version}-%{release}
-
-%description m2-64bit
-This package contains a Modula-2 compiler.
-
-%package -n libm2log%{libm2_sover}%{libm2_suffix}
+%package     -n libm2%{libsuffix}
 Summary:        GNU Modula-2 compiler runtime library
 License:        BSL-1.0
-Provides:       libm2log%{libm2_sover} = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libm2log%{libm2_sover}
 
-%description -n libm2log%{libm2_sover}%{libm2_suffix}
+%description -n libm2%{libsuffix}
 Runtime library for the GNU Modula-2 language.
 
-%package -n libm2log%{libm2_sover}%{libm2_suffix}-32bit
-Summary:        GNU Modula-2 compiler runtime library
-License:        BSL-1.0
-Provides:       libm2log%{libm2_sover}-32bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libm2log%{libm2_sover}-32bit
 
-%description -n libm2log%{libm2_sover}%{libm2_suffix}-32bit
-Runtime library for the GNU Modula-2 language.
-
-%package -n libm2log%{libm2_sover}%{libm2_suffix}-64bit
-Summary:        GNU Modula-2 compiler runtime library
-License:        BSL-1.0
-Provides:       libm2log%{libm2_sover}-64bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libm2log%{libm2_sover}-64bit
-
-%description -n libm2log%{libm2_sover}%{libm2_suffix}-64bit
-Runtime library for the GNU Modula-2 language.
-
-%package -n libm2cor%{libm2_sover}%{libm2_suffix}
-Summary:        GNU Modula-2 compiler runtime library
-License:        BSL-1.0
-Provides:       libm2cor%{libm2_sover} = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libm2cor%{libm2_sover}
-
-%description -n libm2cor%{libm2_sover}%{libm2_suffix}
-Runtime library for the GNU Modula-2 language.
-
-%package -n libm2cor%{libm2_sover}%{libm2_suffix}-32bit
-Summary:        GNU Modula-2 compiler runtime library
-License:        BSL-1.0
-Provides:       libm2cor%{libm2_sover}-32bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libm2cor%{libm2_sover}-32bit
-
-%description -n libm2cor%{libm2_sover}%{libm2_suffix}-32bit
-Runtime library for the GNU Modula-2 language.
-
-%package -n libm2cor%{libm2_sover}%{libm2_suffix}-64bit
-Summary:        GNU Modula-2 compiler runtime library
-License:        BSL-1.0
-Provides:       libm2cor%{libm2_sover}-64bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libm2cor%{libm2_sover}-64bit
-
-%description -n libm2cor%{libm2_sover}%{libm2_suffix}-64bit
-Runtime library for the GNU Modula-2 language.
-
-%package -n libm2iso%{libm2_sover}%{libm2_suffix}
-Summary:        GNU Modula-2 compiler runtime library
-License:        BSL-1.0
-Provides:       libm2iso%{libm2_sover} = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libm2iso%{libm2_sover}
-
-%description -n libm2iso%{libm2_sover}%{libm2_suffix}
-Runtime library for the GNU Modula-2 language.
-
-%package -n libm2iso%{libm2_sover}%{libm2_suffix}-32bit
-Summary:        GNU Modula-2 compiler runtime library
-License:        BSL-1.0
-Provides:       libm2iso%{libm2_sover}-32bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libm2iso%{libm2_sover}-32bit
-
-%description -n libm2iso%{libm2_sover}%{libm2_suffix}-32bit
-Runtime library for the GNU Modula-2 language.
-
-%package -n libm2iso%{libm2_sover}%{libm2_suffix}-64bit
-Summary:        GNU Modula-2 compiler runtime library
-License:        BSL-1.0
-Provides:       libm2iso%{libm2_sover}-64bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libm2iso%{libm2_sover}-64bit
-
-%description -n libm2iso%{libm2_sover}%{libm2_suffix}-64bit
-Runtime library for the GNU Modula-2 language.
-
-%package -n libm2pim%{libm2_sover}%{libm2_suffix}
-Summary:        GNU Modula-2 compiler runtime library
-License:        BSL-1.0
-Provides:       libm2pim%{libm2_sover} = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libm2pim%{libm2_sover}
-
-%description -n libm2pim%{libm2_sover}%{libm2_suffix}
-Runtime library for the GNU Modula-2 language.
-
-%package -n libm2pim%{libm2_sover}%{libm2_suffix}-32bit
-Summary:        GNU Modula-2 compiler runtime library
-License:        BSL-1.0
-Provides:       libm2pim%{libm2_sover}-32bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libm2pim%{libm2_sover}-32bit
-
-%description -n libm2pim%{libm2_sover}%{libm2_suffix}-32bit
-Runtime library for the GNU Modula-2 language.
-
-%package -n libm2pim%{libm2_sover}%{libm2_suffix}-64bit
-Summary:        GNU Modula-2 compiler runtime library
-License:        BSL-1.0
-Provides:       libm2pim%{libm2_sover}-64bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libm2pim%{libm2_sover}-64bit
-
-%description -n libm2pim%{libm2_sover}%{libm2_suffix}-64bit
-Runtime library for the GNU Modula-2 language.
-
-%package -n libm2min%{libm2_sover}%{libm2_suffix}
-Summary:        GNU Modula-2 compiler runtime library
-License:        BSL-1.0
-Provides:       libm2min%{libm2_sover} = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libm2min%{libm2_sover}
-
-%description -n libm2min%{libm2_sover}%{libm2_suffix}
-Runtime library for the GNU Modula-2 language.
-
-%package -n libm2min%{libm2_sover}%{libm2_suffix}-32bit
-Summary:        GNU Modula-2 compiler runtime library
-License:        BSL-1.0
-Provides:       libm2min%{libm2_sover}-32bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libm2min%{libm2_sover}-32bit
-
-%description -n libm2min%{libm2_sover}%{libm2_suffix}-32bit
-Runtime library for the GNU Modula-2 language.
-
-%package -n libm2min%{libm2_sover}%{libm2_suffix}-64bit
-Summary:        GNU Modula-2 compiler runtime library
-License:        BSL-1.0
-Provides:       libm2min%{libm2_sover}-64bit = %{version}-%{release}
-# Only one package may provide this - allows multiple gcc versions
-# to co-exist without an overly large list of provides/obsoletes
-Conflicts:      libm2min%{libm2_sover}-64bit
-
-%description -n libm2min%{libm2_sover}%{libm2_suffix}-64bit
-Runtime library for the GNU Modula-2 language.
-
-%package -n gcc15-testresults
-Summary:        Testsuite results
-License:        Public-Domain
-
-%description -n gcc15-testresults
-Results from running the gcc and target library testsuites.
-
-
-
-
-# Define the canonical target and host architecture
-#   %%gcc_target_arch  is supposed to be the full target triple
-#   %%cross_arch       is supposed to be the rpm target variant arch
-#   %%TARGET_ARCH      will be the canonicalized target CPU part
-#   %%HOST_ARCH        will be the canonicalized host CPU part
-%if 0%{?gcc_target_arch:1}
-%define TARGET_ARCH %(echo %{cross_arch})
-%else
 %define TARGET_ARCH %(echo %{_target_cpu})
-%endif
-%if 0%{?disable_32bit:1}
-%define biarch 0
-%else
-%define biarch %(case " %{biarch_targets} " in (*" %{TARGET_ARCH} "*) echo 1;; (*) echo 0;; esac)
-%endif
-
 %define HOST_ARCH %(echo %{_target_cpu})
+
 %define GCCDIST %{HOST_ARCH}-openruyi-linux
 
 %define libsubdir %{_libdir}/gcc/%{GCCDIST}/%{gcc_dir_version}
 %define gxxinclude %{_prefix}/include/c++/%{gcc_dir_version}
-
-# Versionspecific directories
 %define versmainlibdir %{libsubdir}
-%define versmainlibdirbi32 %{libsubdir}/32
-%define versmainlibdirbi64 %{libsubdir}/64
-%if %{build_primary_64bit}
-%define versmainlibdirbi %{versmainlibdirbi32}
-%else
-%define versmainlibdirbi %{versmainlibdirbi64}
-%endif
-
 %define mainlibdir %{_libdir}
-%define mainlibdirbi32 %{_prefix}/lib
-%define mainlibdirbi64 %{_prefix}/lib64
-%if %{build_primary_64bit}
-%define mainlibdirbi %{mainlibdirbi32}
-%else
-%define mainlibdirbi %{mainlibdirbi64}
-%endif
-
-# Now define a few macros that make it easy to package libs and
-# related files just to the right package, without caring for the
-# exact path the files are in.
-#   %%mainlib  package X from all dirs that belong to the main package
-#   %%biarchlib   package X from all dirs that belong to the -32/64bit package
-%define mainlib() %{mainlibdir}/%1\
-%{nil}
-%define biarchlib() %{nil}
-%if %{biarch}
-%if !%{separate_biarch}
-%define mainlib() %{mainlibdir}/%1\
-%{mainlibdirbi}/%1\
-%{nil}
-%else
-%define biarchlib() %{mainlibdirbi}/%1\
-%{nil}
-%endif
-%endif
-
-%define versmainlib() %{versmainlibdir}/%1\
-%{nil}
-%define versbiarchlib() %{nil}
-%if %{biarch}
-%if !%{separate_biarch}
-%define versmainlib() %{versmainlibdir}/%1\
-%{versmainlibdirbi}/%1\
-%{nil}
-%else
-%define versbiarchlib() %{versmainlibdirbi}/%1\
-%{nil}
-%endif
-%endif
 
 # Synchronize output by lines, useful for configure output
 %define make_output_sync -Oline
@@ -1833,10 +537,6 @@ for flag in $RPM_OPT_FLAGS; do
     -fno-rtti|-fno-exceptions|-Wmissing-format-attribute|-fstack-protector*) ;;
     -ffortify=*|-Wall|-m32|-m64) ;;
     -Werror=format-security) ;;
-%if 0%{?gcc_target_arch:1}
-    # Kill all -march/tune/cpu because that screws building the target libs
-    -march=*|-mtune=*|-mcpu=*) ;;
-%endif
   *) add_flag=$flag ;;
   esac
   if test -n "$add_flag"; then
@@ -1883,9 +583,7 @@ languages=$languages,m2
 
 # In general we want to ship release checking enabled compilers
 # which is the default for released compilers
-#ENABLE_CHECKING="--enable-checking=yes"
 ENABLE_CHECKING="--enable-checking=release"
-#ENABLE_CHECKING=""
 
 # Work around tail/head -1 changes
 export _POSIX2_VERSION=199209
@@ -1895,8 +593,6 @@ mkdir -p host-tools/bin
 # Using the host gnatmake like
 #   CC="gcc%%{hostsuffix}" GNATBIND="gnatbind%%{hostsuffix}"
 #   GNATMAKE="gnatmake%%{hostsuffix}"
-# doesn't work due to PR33857, so an un-suffixed gnatmake has to be
-# available
 %if %{build_ada}
 cp -a /usr/bin/gnatmake%{hostsuffix} host-tools/bin/gnatmake
 cp -a /usr/bin/gnatlink%{hostsuffix} host-tools/bin/gnatlink
@@ -1906,12 +602,6 @@ cp -a /usr/bin/gcc%{hostsuffix} host-tools/bin/gcc
 cp -a /usr/bin/g++%{hostsuffix} host-tools/bin/g++
 ln -sf /usr/%{_lib} host-tools/%{_lib}
 export PATH="`pwd`/host-tools/bin:$PATH"
-%endif
-
-# libsanitizer needs <crypt.h> and since the glibc/libxcrypt split
-# we don't have that yet in a pure cross environment
-%if 0%{?gcc_target_arch:1}
-  CONFARGS="$CONFARGS --disable-libsanitizer"
 %endif
 
 export CARGO=/bin/true
@@ -1963,64 +653,15 @@ export CARGO=/bin/true
 %endif
   --enable-version-specific-runtime-libs \
   --with-gcc-major-version-only \
-%if 0%{!?gcc_target_arch:1}
   --enable-linker-build-id \
-%else
-%if 0%{?gcc_target_glibc:1}
-  --enable-linker-build-id \
-%endif
-%endif
   --enable-linux-futex \
-%ifarch x86_64 aarch64
+%ifarch x86_64
   --enable-gnu-indirect-function \
 %endif
   --program-suffix=%{binsuffix} \
-%ifarch %{disable_multilib_arch}
-  --disable-multilib \
-%endif
-%if 0%{!?gcc_target_arch:1}
   --without-system-libunwind \
-%endif
-%if 0%{?gcc_target_arch:1}
-  --program-prefix=%{gcc_target_arch}- \
-  --target=%{gcc_target_arch} \
-  --disable-nls \
-%if 0%{?sysroot:1}
-  --with-sysroot=%sysroot \
-%endif
-%if 0%{?build_sysroot:1}
-  --with-build-sysroot=%{build_sysroot} \
-%else
-%if 0%{?sysroot:1}
-  --with-build-sysroot=%{sysroot} \
-%endif
-%endif
-%if 0%{?binutils_os:1}
-  --with-build-time-tools=/usr/%{binutils_os}/bin \
-%endif
-%if 0%{?gcc_target_newlib}
-  --with-newlib \
-%if 0%{?gcc_libc_bootstrap:1}
-  --disable-gcov \
-%endif
-%else
-%if 0%{?gcc_libc_bootstrap:1}
-  --disable-gcov --disable-threads --disable-shared \
-  --disable-libmudflap --disable-libssp --disable-libgomp \
-  --disable-libquadmath --disable-libatomic \
-  --without-headers --with-newlib \
-%endif
-%endif
-%endif
-%if "%{TARGET_ARCH}" == "aarch64"
-  --enable-fix-cortex-a53-835769 \
-  --enable-fix-cortex-a53-843419 \
-%endif
 %if "%{TARGET_ARCH}" == "x86_64"
-%ifnarch %{disable_multilib_arch}
-  --enable-multilib \
-  --with-arch-32=x86-64-v2 \
-%endif
+  --disable-multilib \
   --with-arch=x86-64-v2 \
   --with-tune=generic \
 %endif
@@ -2047,43 +688,18 @@ export CARGO=/bin/true
   }
 
 STAGE1_FLAGS="-g -O2"
-%if 0%{?do_profiling} && !0%{?building_testsuite:1}
-%ifarch x86_64 aarch64
-%if %{with bootstrap}
-%define use_pgo_bootstrap 1
-%endif
-%endif
-%endif
-%{?use_pgo_bootstrap:setarch `arch` -R} make %{?make_output_sync} %{?use_pgo_bootstrap:profiledbootstrap} STAGE1_CFLAGS="$STAGE1_FLAGS" BOOT_CFLAGS="$optflags" %{?_smp_mflags}
+
+make %{?make_output_sync} STAGE1_CFLAGS="$STAGE1_FLAGS" BOOT_CFLAGS="$optflags" %{?_smp_mflags}
 make info
-%if 0%{?run_tests:1}
-echo "Run testsuite"
-(make -C %{GCCDIST}/libstdc++-v3 check-abi || true)
-mv %{GCCDIST}/libstdc++-v3/testsuite/libstdc++.log %{GCCDIST}/libstdc++-v3/testsuite/libstdc++-abi.log
-mv %{GCCDIST}/libstdc++-v3/testsuite/libstdc++.sum %{GCCDIST}/libstdc++-v3/testsuite/libstdc++-abi.sum
-# asan needs a whole shadow address space
-ulimit -v unlimited || true
-make -k check %{?_smp_mflags} || true
-mkdir ../testresults
-../contrib/test_summary | tee ../testresults/test_summary.txt
-%endif
 
 %install
 export NO_BRP_CHECK_BYTECODE_VERSION=true
 cd obj-%{GCCDIST}
 # Work around tail/head -1 changes
 export _POSIX2_VERSION=199209
-export LIBRARY_PATH=%{buildroot}/%{libsubdir}:%{buildroot}/%{mainlibdirbi}
+export LIBRARY_PATH=%{buildroot}/%{libsubdir}
 
 %make_install
-
-# # verify libasan really ended up with libstdc++ as NEEDED.
-# %ifarch %asan_arch
-#   readelf -d %{buildroot}/%{versmainlibdir}/libasan.so.%{libasan_sover}* | grep 'NEEDED.*libstdc++' || exit 1
-# %if %{biarch}
-#   readelf -d %{buildroot}/%{versmainlibdirbi}/libasan.so.%{libasan_sover}* | grep 'NEEDED.*libstdc++' || exit 1
-# %endif
-# %endif
 
 # Remove some useless .la files
 for lib in libobjc libgfortran libquadmath libcaf_single \
@@ -2092,19 +708,9 @@ for lib in libobjc libgfortran libquadmath libcaf_single \
     libstdc++fs libgdruntime libgphobos libstdc++exp \
     libm2cor libm2iso libm2log libm2min libm2pim; do
   rm -f %{buildroot}/%{versmainlibdir}/$lib.la
-%if %{biarch}
-  rm -f %{buildroot}/%{versmainlibdirbi}/$lib.la
-%endif
 done
 
 mkdir -p %{buildroot}/%{_libdir}
-%if %{biarch}
-%if %{build_primary_64bit}
-mkdir -p %{buildroot}/%{_prefix}/lib
-%else
-mkdir -p %{buildroot}/%{_prefix}/lib64
-%endif
-%endif
 
 %if %{build_cp}
 # Merge multilib c++config.h to allow omitting the duplicate and
@@ -2157,7 +763,7 @@ for libname in \
 %if %{build_fortran}
   libgfortran \
 %endif
-%ifarch %quadmath_arch
+%ifarch %{quadmath_arch}
   libquadmath \
 %endif
 %if %{build_objc}
@@ -2181,28 +787,28 @@ for libname in \
   libm2pim \
   libm2min \
 %endif
-%ifarch %atomic_arch
+%ifarch %{atomic_arch}
   libatomic \
 %endif
-%ifarch %itm_arch
+%ifarch %{itm_arch}
   libitm \
 %endif
-%ifarch %asan_arch
+%ifarch %{asan_arch}
   libasan \
 %endif
-%ifarch %tsan_arch
+%ifarch %{tsan_arch}
   libtsan \
 %endif
-%ifarch %lsan_arch
+%ifarch %{lsan_arch}
   liblsan \
 %endif
-%ifarch %ubsan_arch
+%ifarch %{ubsan_arch}
   libubsan \
 %endif
-%ifarch %hwasan_arch
+%ifarch %{hwasan_arch}
   libhwasan \
 %endif
-%ifarch %vtv_arch
+%ifarch %{vtv_arch}
   libvtv \
 %endif
     ; do
@@ -2213,17 +819,6 @@ for libname in \
     ln -sf %{mainlibdir}/`readlink %{buildroot}/%{versmainlibdir}/$libname.so | sed -e 's/\(.*\.so\.[^\.]*\).*/\1/'`  \
          %{buildroot}/%{versmainlibdir}/$libname.so
   fi
-%if %{biarch}
-  if test -d %{buildroot}/%{versmainlibdirbi}; then
-    for lib in `find %{buildroot}/%{versmainlibdirbi} -maxdepth 1 -name "$libname.so.*"`; do
-      mv $lib %{buildroot}/%{mainlibdirbi}/
-    done
-    if test -L %{buildroot}/%{versmainlibdirbi}/$libname.so; then
-      ln -sf %{mainlibdirbi}/`readlink %{buildroot}/%{versmainlibdirbi}/$libname.so | sed -e 's/\(.*\.so\.[^\.]*\).*/\1/'`  \
-         %{buildroot}/%{versmainlibdirbi}/$libname.so
-    fi
-  fi
-%endif
 done
 %if %{build_cp}
 # And we want to move the shlib gdb pretty printers to a more sane
@@ -2231,66 +826,24 @@ done
 mkdir -p %{buildroot}/%{_datadir}/gdb/auto-load%{mainlibdir}
 mv %{buildroot}/%{mainlibdir}/libstdc++.so.*-gdb.py %{buildroot}/%{_datadir}/gdb/auto-load%{mainlibdir}/
 sed -i -e '/^libdir/s/\/gcc\/%{GCCDIST}\/%{gcc_dir_version}//g' %{buildroot}/%{_datadir}/gdb/auto-load%{mainlibdir}/libstdc++.so.*-gdb.py
-%if %{biarch}
-  if test -d %{buildroot}/%{versmainlibdirbi}; then
-    mkdir -p %{buildroot}/%{_datadir}/gdb/auto-load%{mainlibdirbi}
-    mv %{buildroot}/%{mainlibdirbi}/libstdc++.so.*-gdb.py %{buildroot}/%{_datadir}/gdb/auto-load%{mainlibdirbi}/
-    sed -i -e '/^libdir/s/\/gcc\/%{GCCDIST}\/%{gcc_dir_version}//g' %{buildroot}/%{_datadir}/gdb/auto-load%{mainlibdirbi}/libstdc++.so.*-gdb.py
-  fi
-%endif
 %endif
 
-# Move libgcc_s around
+# Do something about libgcc_s
+chmod a+x %{buildroot}/%{_lib}/libgcc_s.so.1
 if test -L %{buildroot}/%{_lib}/libgcc_s.so; then
   rm -f %{buildroot}/%{_lib}/libgcc_s.so
-  ln -sf /%{_lib}/libgcc_s.so.%{libgcc_s} %{buildroot}/%{versmainlibdir}/libgcc_s.so
+  cp %{buildroot}/%{_lib}/libgcc_s.so.1 %{buildroot}/%{versmainlibdir}/libgcc_s.so
+  strip -g %{buildroot}/%{versmainlibdir}/libgcc_s.so
 else
   mv %{buildroot}/%{_lib}/libgcc_s.so %{buildroot}/%{versmainlibdir}/
 fi
-chmod a+x %{buildroot}/%{_lib}/libgcc_s.so.%{libgcc_s}
-%if 0%{?usrmerged}
-mv %{buildroot}/%{_lib}/libgcc_s.so.%{libgcc_s} %{buildroot}/%{_slibdir}/libgcc_s.so.%{libgcc_s}
-%endif
-%if %{biarch}
-%if %{build_primary_64bit}
-if test -L %{buildroot}/lib/libgcc_s.so; then
-  rm -f %{buildroot}/lib/libgcc_s.so
-  ln -sf /lib/libgcc_s.so.%{libgcc_s} %{buildroot}/%{versmainlibdirbi32}/libgcc_s.so
-else
-  mv %{buildroot}/lib/libgcc_s.so %{buildroot}/%{versmainlibdirbi32}/
-fi
-ln -sf %{versmainlibdirbi32}/libgcc_s.so %{buildroot}/%{versmainlibdirbi32}/libgcc_s_32.so
-chmod a+x %{buildroot}/lib/libgcc_s.so.%{libgcc_s}
-%if 0%{?usrmerged}
-mv %{buildroot}/lib/libgcc_s.so.%{libgcc_s} %{buildroot}/%{slibdir}/libgcc_s.so.%{libgcc_s}
-%endif
-%else
-# 32-bit biarch systems
-if test -L %{buildroot}/lib64/libgcc_s.so; then
-  rm -f %{buildroot}/lib64/libgcc_s.so
-  ln -sf /lib64/libgcc_s.so.%{libgcc_s} %{buildroot}/%{versmainlibdirbi64}/libgcc_s.so
-else
-  mv %{buildroot}/lib64/libgcc_s.so %{buildroot}/%{versmainlibdirbi64}/
-fi
-ln -sf %{versmainlibdirbi64}/libgcc_s.so %{buildroot}/%{versmainlibdirbi64}/libgcc_s_64.so
-chmod a+x %{buildroot}/lib64/libgcc_s.so.%{libgcc_s}
-%if 0%{?usrmerged}
-mv %{buildroot}/lib64/libgcc_s.so.%{libgcc_s} %{buildroot}/%{slibdir64}/libgcc_s.so.%{libgcc_s}
-%endif
-%endif
-%endif
+mv %{buildroot}/%{_lib}/libgcc_s.so.1 %{buildroot}/%{_slibdir}/libgcc_s.so.1
 
 %if %{build_ada}
 mv %{buildroot}/%{libsubdir}/adalib/lib*-*.so %{buildroot}/%{_libdir}
 ln -sf %{_libdir}/libgnarl%{binsuffix}.so %{buildroot}/%{libsubdir}/adalib/libgnarl.so
 ln -sf %{_libdir}/libgnat%{binsuffix}.so %{buildroot}/%{libsubdir}/adalib/libgnat.so
 chmod a+x %{buildroot}/%{_libdir}/libgna*-*.so
-%if %{biarch}
-mv %{buildroot}/%{versmainlibdirbi}/adalib/lib*-*.so %{buildroot}/%{mainlibdirbi}/
-ln -sf %{mainlibdirbi}/libgnarl%{binsuffix}.so %{buildroot}/%{versmainlibdirbi}/adalib/libgnarl.so
-ln -sf %{mainlibdirbi}/libgnat%{binsuffix}.so %{buildroot}/%{versmainlibdirbi}/adalib/libgnat.so
-chmod a+x %{buildroot}/%{mainlibdirbi}/libgna*-*.so
-%endif
 %endif
 
 rm -f %{buildroot}/%{_prefix}/bin/c++%{binsuffix}
@@ -2302,29 +855,10 @@ for l in `find %{buildroot} -name '*.la'`; do
       -e '/^dependency_libs/s| -L/usr/%{GCCDIST}/bin||g' \
       -e '/^dependency_libs/s|-lm \(-lm \)*|-lm |' \
       -e '/^dependency_libs/s|-L[^ ]* ||g' \
-%if %{biarch}
-%if %{build_primary_64bit}
-      -e '/^libdir/s|%{_libdir}/32|%{_prefix}/lib|' \
-      -e '/^libdir/s|lib64/\.\./||' \
-%else
-      -e '/^libdir/s|%{_libdir}/64|%{_prefix}/lib64|' \
-%endif
-%endif
       < $l  > $l.new
   mv $l.new $l
 done
 
-# The spec for the PIE subpackage
-cat > %{buildroot}/%{libsubdir}/defaults.spec <<EOF
-*default_spec:
-%%{pie|fpic|fPIC|fpie|fPIE|no-pie|fno-pic|fno-PIC|fno-pie|fno-PIE|shared|static|static-pie|nostdlib|nodefaultlibs|nostartfiles:;:-fPIE}%%{fno-pic|fno-PIC|fno-pie|fno-PIE|pie|no-pie|shared|static|static-pie|nostdlib|nodefaultlibs|nostartfiles:;: -pie}
-EOF
-
-%if 0%{?run_tests:1}
-cp `find . -name "*.sum"` ../testresults/
-cp `find . -name "*.log"  \! -name "config.log" | grep -v 'acats.\?/tests' | grep -v libbacktrace` ../testresults/
-chmod 644 ../testresults/*
-%endif
 # Remove files that we do not need to clean up filelist
 
 # Preserve %{GCCDIST}-gcc%{binsuffix} binary for libgccjit as it is used as a driver
@@ -2370,13 +904,6 @@ rm -f %{buildroot}/%{_mandir}/man7/fsf-funding.7
 rm -f %{buildroot}/%{_mandir}/man7/gfdl.7
 rm -f %{buildroot}/%{_mandir}/man7/gpl.7
 rm -f %{buildroot}/%{_libdir}/libiberty.a
-%if %{biarch}
-%if %{build_primary_64bit}
-rm -f %{buildroot}/%{_prefix}/lib/libiberty.a
-%else
-rm -f %{buildroot}/%{_prefix}/lib64/libiberty.a
-%endif
-%endif
 rm -f %{buildroot}/%{libsubdir}/liblto_plugin.a
 rm -f %{buildroot}/%{libsubdir}/liblto_plugin.la
 %if %{build_go}
@@ -2408,10 +935,10 @@ mv %{buildroot}/%{_infodir}/m2.info %{buildroot}/%{_infodir}/m2%{binsuffix}.info
 %endif
 
 cd ..
+%find_lang gcc%{binsuffix} --generate-subpackages
+# Will output gcc15-langpack-be already exists error
 %find_lang cpplib%{binsuffix}
-%find_lang gcc%{binsuffix}
 %find_lang libstdc++
-cat cpplib%{binsuffix}.lang gcc%{binsuffix}.lang > gcc15-locale.lang
 
 %files -f floatn-fixes.list
 %defattr(-,root,root)
@@ -2420,13 +947,6 @@ cat cpplib%{binsuffix}.lang gcc%{binsuffix}.lang > gcc15-locale.lang
 %dir %{libsubdir}
 %dir %{libsubdir}/include
 %dir %{libsubdir}/include-fixed
-%if %{biarch}
-%if %{build_primary_64bit}
-%dir %{libsubdir}/32
-%else
-%dir %{libsubdir}/64
-%endif
-%endif
 %{_prefix}/bin/gcc%{binsuffix}
 %{_prefix}/bin/%{GCCDIST}-gcc%{binsuffix}
 %{_prefix}/bin/gcov%{binsuffix}
@@ -2602,120 +1122,68 @@ cat cpplib%{binsuffix}.lang gcc%{binsuffix}.lang > gcc15-locale.lang
 %{libsubdir}/include/avx512bitalgvlintrin.h
 %{libsubdir}/include/usermsrintrin.h
 %endif
-%ifarch %asan_arch
+%ifarch %{asan_arch}
 %{libsubdir}/include/sanitizer
 %endif
 %if %{build_fortran}
 %{libsubdir}/include/ISO_Fortran_binding.h
 %endif
-%versmainlib *crt*.o
-%versmainlib libgcc*.a
-%versmainlib libgcov.a
-%versmainlib libgcc_s*.so
-%versmainlib libgomp.so
-%versmainlib libgomp.a
-%versmainlib libgomp.spec
-%ifarch %itm_arch
-%versmainlib libitm.so
-%versmainlib libitm.a
-%versmainlib libitm.spec
+%{versmainlibdir}/*crt*.o
+%{versmainlibdir}/libgcc*.a
+%{versmainlibdir}/libgcov.a
+%{versmainlibdir}/libgcc_s*.so
+%{versmainlibdir}/libgomp.so
+%{versmainlibdir}/libgomp.a
+%{versmainlibdir}/libgomp.spec
+%ifarch %{itm_arch}
+%{versmainlibdir}/libitm.so
+%{versmainlibdir}/libitm.a
+%{versmainlibdir}/libitm.spec
 %endif
-%ifarch %atomic_arch
-%versmainlib libatomic.so
-%versmainlib libatomic.a
+%ifarch %{atomic_arch}
+%{versmainlibdir}/libatomic.so
+%{versmainlibdir}/libatomic.a
 %endif
-%ifarch %asan_arch
-%versmainlib libasan.so
-%versmainlib libasan.a
-%versmainlib libasan_preinit.o
+%ifarch %{asan_arch}
+%{versmainlibdir}/libasan.so
+%{versmainlibdir}/libasan.a
+%{versmainlibdir}/libasan_preinit.o
 %endif
-%ifarch %tsan_arch
-%if %build_primary_64bit
-%versmainlib libtsan.so
-%versmainlib libtsan.a
-%versmainlib libtsan_preinit.o
-%endif
-%endif
-%ifarch %lsan_arch
-%if %build_primary_64bit
-%versmainlib liblsan.so
-%versmainlib liblsan.a
-%versmainlib liblsan_preinit.o
+%ifarch %{tsan_arch}
+%if %{build_primary_64bit}
+%{versmainlibdir}/libtsan.so
+%{versmainlibdir}/libtsan.a
+%{versmainlibdir}/libtsan_preinit.o
 %endif
 %endif
-%ifarch %ubsan_arch
-%versmainlib libubsan.so
-%versmainlib libubsan.a
+%ifarch %{lsan_arch}
+%if %{build_primary_64bit}
+%{versmainlibdir}/liblsan.so
+%{versmainlibdir}/liblsan.a
+%{versmainlibdir}/liblsan_preinit.o
 %endif
-%ifarch %hwasan_arch
-%versmainlib libhwasan.so
-%versmainlib libhwasan.a
-%versmainlib libhwasan_preinit.o
 %endif
-%ifarch %asan_arch %ubsan_arch %tsan_arch %lsan_arch %hwasan_arch
-%versmainlib libsanitizer.spec
+%ifarch %{ubsan_arch}
+%{versmainlibdir}/libubsan.so
+%{versmainlibdir}/libubsan.a
 %endif
-%ifarch %vtv_arch
-%versmainlib libvtv.so
-%versmainlib libvtv.a
+%ifarch %{hwasan_arch}
+%{versmainlibdir}/libhwasan.so
+%{versmainlibdir}/libhwasan.a
+%{versmainlibdir}/libhwasan_preinit.o
+%endif
+%ifarch %{asan_arch} %{ubsan_arch} %{tsan_arch} %{lsan_arch} %{hwasan_arch}
+%{versmainlibdir}/libsanitizer.spec
+%endif
+%ifarch %{vtv_arch}
+%{versmainlibdir}/libvtv.so
+%{versmainlibdir}/libvtv.a
 %endif
 %doc %{_mandir}/man1/gcc%{binsuffix}.1.gz
 %doc %{_mandir}/man1/gcov%{binsuffix}.1.gz
 %doc %{_mandir}/man1/gcov-dump%{binsuffix}.1.gz
 %doc %{_mandir}/man1/gcov-tool%{binsuffix}.1.gz
 %doc %{_mandir}/man1/lto-dump%{binsuffix}.1.gz
-
-%if %{separate_biarch}
-%files -n gcc15%{separate_biarch_suffix}
-%defattr(-,root,root)
-%versbiarchlib *crt*.o
-%versbiarchlib libgcc*.a
-%versbiarchlib libgcov.a
-%versbiarchlib libgcc_s*.so
-%versbiarchlib libgomp.so
-%versbiarchlib libgomp.a
-%versbiarchlib libgomp.spec
-%ifarch %itm_arch
-%versbiarchlib libitm.so
-%versbiarchlib libitm.a
-%versbiarchlib libitm.spec
-%endif
-%ifarch %atomic_arch
-%versbiarchlib libatomic.a
-%versbiarchlib libatomic.so
-%endif
-%ifarch %asan_arch
-%versbiarchlib libasan.a
-%versbiarchlib libasan.so
-%versbiarchlib libasan_preinit.o
-%endif
-%ifarch %ubsan_arch
-%versbiarchlib libubsan.a
-%versbiarchlib libubsan.so
-%endif
-%ifarch %tsan_arch
-%if %separate_bi64
-%versbiarchlib libtsan.a
-%versbiarchlib libtsan.so
-%versbiarchlib libtsan_preinit.o
-%endif
-%endif
-%ifarch %lsan_arch
-%if %separate_bi64
-%versbiarchlib liblsan.a
-%versbiarchlib liblsan.so
-%versbiarchlib liblsan_preinit.o
-%endif
-%endif
-# libhwasan.{a,so} is not built in 32-bit mode
-%ifarch %asan_arch %ubsan_arch %tsan_arch %lsan_arch %hwasan_arch
-%versbiarchlib libsanitizer.spec
-%endif
-%ifarch %vtv_arch
-%versbiarchlib libvtv.a
-%versbiarchlib libvtv.so
-%endif
-%endif
 
 %if %{enable_plugins}
 %files devel
@@ -2726,15 +1194,6 @@ cat cpplib%{binsuffix}.lang gcc%{binsuffix}.lang > gcc15-locale.lang
 %exclude %{libsubdir}/plugin/m2rte.so
 %endif
 %endif
-
-%files locale -f gcc15-locale.lang
-
-%files -n libstdc++%{libstdcxx_sover}%{libstdcxx_suffix}-locale -f libstdc++.lang
-
-%files PIE
-%defattr(-,root,root)
-%dir %{libsubdir}
-%{libsubdir}/defaults.spec
 
 %if %{build_cp}
 %files c++
@@ -2747,37 +1206,9 @@ cat cpplib%{binsuffix}.lang gcc%{binsuffix}.lang > gcc15-locale.lang
 %{libsubdir}/cc1plus
 %{libsubdir}/g++-mapper-server
 
-%if %{separate_biarch}
-%files c++%{separate_biarch_suffix}
+%files -n libstdc++%{libsuffix} -f libstdc++.lang
 %defattr(-,root,root)
-# empty - only for the dependency
-%endif
-
-%files -n libstdc++%{libstdcxx_sover}%{libstdcxx_suffix}
-%defattr(-,root,root)
-%mainlib libstdc++.so.%{libstdcxx_sover}*
-
-%if %{separate_biarch}
-%files -n libstdc++%{libstdcxx_sover}%{libstdcxx_suffix}%{separate_biarch_suffix}
-%defattr(-,root,root)
-%biarchlib libstdc++.so.%{libstdcxx_sover}*
-%endif
-
-%files -n libstdc++%{libstdcxx_sover}-devel%{libdevel_suffix}
-%defattr(-,root,root)
-%dir %{_libdir}/gcc
-%dir %{_libdir}/gcc/%{GCCDIST}
-%dir %{libsubdir}
-%versmainlib libstdc++.a
-%versmainlib libstdc++fs.a
-%versmainlib libstdc++exp.a
-%versmainlib libstdc++.so
-%versmainlib libsupc++.a
-%versmainlib libstdc++.modules.json
-%{_prefix}/include/c++
-
-%files -n libstdc++%{libstdcxx_sover}-pp%{libstdcxx_suffix}
-%defattr(-,root,root)
+%{mainlibdir}/libstdc++.so.*
 %dir %{_datadir}/gdb
 %dir %{_datadir}/gdb/auto-load
 %dir %{_datadir}/gdb/auto-load%{_prefix}
@@ -2785,156 +1216,78 @@ cat cpplib%{binsuffix}.lang gcc%{binsuffix}.lang > gcc15-locale.lang
 %{_datadir}/gdb/auto-load/%{mainlibdir}/libstdc++.so.*-gdb.py
 %{_datadir}/gcc%{binsuffix}
 
-%if %{separate_biarch}
-%files -n libstdc++%{libstdcxx_sover}-devel%{libdevel_suffix}%{separate_biarch_suffix}
+%files lib
+%defattr(-,root,root)
+%{_slibdir}/libgcc_s.so.1
+
+%files -n libstdc++-devel%{libdevel_suffix}
 %defattr(-,root,root)
 %dir %{_libdir}/gcc
 %dir %{_libdir}/gcc/%{GCCDIST}
 %dir %{libsubdir}
-%versbiarchlib libstdc++.a
-%versbiarchlib libstdc++fs.a
-%versbiarchlib libstdc++exp.a
-%versbiarchlib libstdc++.so
-%versbiarchlib libsupc++.a
-%versbiarchlib libstdc++.modules.json
-
-%files -n libstdc++%{libstdcxx_sover}-pp%{libstdcxx_suffix}%{separate_biarch_suffix}
-%defattr(-,root,root)
-%dir %{_datadir}/gdb/auto-load/%{mainlibdirbi}
-%{_datadir}/gdb/auto-load/%{mainlibdirbi}/libstdc++.so.*-gdb.py
-%endif
+%{versmainlibdir}/libstdc++.a
+%{versmainlibdir}/libstdc++fs.a
+%{versmainlibdir}/libstdc++exp.a
+%{versmainlibdir}/libstdc++.so
+%{versmainlibdir}/libsupc++.a
+%{versmainlibdir}/libstdc++.modules.json
+%{_prefix}/include/c++
 %endif
 
-%files -n libgcc_s%{libgcc_s}%{libgcc_s_suffix}
+%files -n libgomp%{libsuffix}
 %defattr(-,root,root)
-%{_slibdir}/libgcc_s.so.%{libgcc_s}
-%if %{biarch}
+%{mainlibdir}/libgomp.so.*
+
+%ifarch %{asan_arch}
+%files -n libasan%{libsuffix}
+%defattr(-,root,root)
+%{mainlibdir}/libasan.so.*
+%endif
+
+%ifarch %{lsan_arch}
 %if %{build_primary_64bit}
-%if !%{separate_bi32}
-%{slibdir}/libgcc_s.so.%{libgcc_s}
-%endif
-%else
-%if !%{separate_bi64}
-%{slibdir64}/libgcc_s.so.%{libgcc_s}
-%endif
-%endif
-%endif
-
-%if %{separate_bi64}
-%files -n libgcc_s%{libgcc_s}%{libgcc_s_suffix}-64bit
+%files -n liblsan%{libsuffix}
 %defattr(-,root,root)
-%{slibdir64}/libgcc_s.so.%{libgcc_s}
+%{mainlibdir}/liblsan.so.*
+%endif
 %endif
 
-%if %{separate_bi32}
-%files -n libgcc_s%{libgcc_s}%{libgcc_s_suffix}-32bit
+%ifarch %{tsan_arch}
+%if %{build_primary_64bit}
+%files -n libtsan%{libsuffix}
 %defattr(-,root,root)
-%{slibdir}/libgcc_s.so.%{libgcc_s}
+%{mainlibdir}/libtsan.so.*
+%endif
 %endif
 
-%files -n libgomp%{libgomp_sover}%{libgomp_suffix}
+%ifarch %{hwasan_arch}
+%files -n libhwasan%{libsuffix}
 %defattr(-,root,root)
-%mainlib libgomp.so.%{libgomp_sover}*
+%{mainlibdir}/libhwasan.so.*
+%endif
 
-%if %{separate_biarch}
-%files -n libgomp%{libgomp_sover}%{libgomp_suffix}%{separate_biarch_suffix}
+%ifarch %{atomic_arch}
+%files -n libatomic%{libsuffix}
 %defattr(-,root,root)
-%biarchlib libgomp.so.%{libgomp_sover}*
+%{mainlibdir}/libatomic.so.*
 %endif
 
-%ifarch %asan_arch
-%files -n libasan%{libasan_sover}%{libasan_suffix}
+%ifarch %{itm_arch}
+%files -n libitm%{libsuffix}
 %defattr(-,root,root)
-%mainlib libasan.so.%{libasan_sover}*
+%{mainlibdir}/libitm.so.*
+%endif
 
-%if %{separate_biarch}
-%files -n libasan%{libasan_sover}%{libasan_suffix}%{separate_biarch_suffix}
+%ifarch %{ubsan_arch}
+%files -n libubsan%{libsuffix}
 %defattr(-,root,root)
-%biarchlib libasan.so.%{libasan_sover}*
-%endif
+%{mainlibdir}/libubsan.so.*
 %endif
 
-%ifarch %lsan_arch
-%if %build_primary_64bit
-%files -n liblsan%{liblsan_sover}%{liblsan_suffix}
+%ifarch %{vtv_arch}
+%files -n libvtv%{libsuffix}
 %defattr(-,root,root)
-%mainlib liblsan.so.%{liblsan_sover}*
-%endif
-
-%if %{separate_biarch} && %{separate_bi64}
-%files -n liblsan%{liblsan_sover}%{liblsan_suffix}%{separate_biarch_suffix}
-%defattr(-,root,root)
-%biarchlib liblsan.so.%{liblsan_sover}*
-%endif
-%endif
-
-%ifarch %tsan_arch
-%if %build_primary_64bit
-%files -n libtsan%{libtsan_sover}%{libtsan_suffix}
-%defattr(-,root,root)
-%mainlib libtsan.so.%{libtsan_sover}*
-%endif
-
-%if %{separate_biarch} && %{separate_bi64}
-%files -n libtsan%{libtsan_sover}%{libtsan_suffix}%{separate_biarch_suffix}
-%defattr(-,root,root)
-%biarchlib libtsan.so.%{libtsan_sover}*
-%endif
-%endif
-
-%ifarch %hwasan_arch
-%files -n libhwasan%{libhwasan_sover}%{libhwasan_suffix}
-%defattr(-,root,root)
-%mainlib libhwasan.so.%{libhwasan_sover}*
-%endif
-
-%ifarch %atomic_arch
-%files -n libatomic%{libatomic_sover}%{libatomic_suffix}
-%defattr(-,root,root)
-%mainlib libatomic.so.%{libatomic_sover}*
-
-%if %{separate_biarch}
-%files -n libatomic%{libatomic_sover}%{libatomic_suffix}%{separate_biarch_suffix}
-%defattr(-,root,root)
-%biarchlib libatomic.so.%{libatomic_sover}*
-%endif
-%endif
-
-%ifarch %itm_arch
-%files -n libitm%{libitm_sover}%{libitm_suffix}
-%defattr(-,root,root)
-%mainlib libitm.so.%{libitm_sover}*
-
-%if %{separate_biarch}
-%files -n libitm%{libitm_sover}%{libitm_suffix}%{separate_biarch_suffix}
-%defattr(-,root,root)
-%biarchlib libitm.so.%{libitm_sover}*
-%endif
-%endif
-
-%ifarch %ubsan_arch
-%files -n libubsan%{libubsan_sover}%{libubsan_suffix}
-%defattr(-,root,root)
-%mainlib libubsan.so.%{libubsan_sover}*
-
-%if %{separate_biarch}
-%files -n libubsan%{libubsan_sover}%{libubsan_suffix}%{separate_biarch_suffix}
-%defattr(-,root,root)
-%biarchlib libubsan.so.%{libubsan_sover}*
-%endif
-%endif
-
-%ifarch %vtv_arch
-%files -n libvtv%{libvtv_sover}%{libvtv_suffix}
-%defattr(-,root,root)
-%mainlib libvtv.so.%{libvtv_sover}*
-
-%if %{separate_biarch}
-%files -n libvtv%{libvtv_sover}%{libvtv_suffix}%{separate_biarch_suffix}
-%defattr(-,root,root)
-%biarchlib libvtv.so.%{libvtv_sover}*
-%endif
-
+%{mainlibdir}/libvtv.so.*
 %endif
 
 %if %{build_fortran}
@@ -2944,61 +1297,31 @@ cat cpplib%{binsuffix}.lang gcc%{binsuffix}.lang > gcc15-locale.lang
 %{_prefix}/bin/gfortran%{binsuffix}
 %{libsubdir}/f951
 %{libsubdir}/finclude/*
-%versmainlib libgfortran.a
-%versmainlib libgfortran.so
-%versmainlib libgfortran.spec
-%versmainlib libcaf_single.a
+%{versmainlibdir}/libgfortran.a
+%{versmainlibdir}/libgfortran.so
+%{versmainlibdir}/libgfortran.spec
+%{versmainlibdir}/libcaf_single.a
 %doc %{_mandir}/man1/gfortran%{binsuffix}.1.gz
 
-%if %{separate_biarch}
-%files fortran%{separate_biarch_suffix}
+%files -n libgfortran%{libsuffix}
 %defattr(-,root,root)
-%dir %{versmainlibdirbi}/finclude
-%{versmainlibdirbi}/finclude/*
-%versbiarchlib libgfortran.a
-%versbiarchlib libgfortran.so
-%versbiarchlib libgfortran.spec
-%versbiarchlib libcaf_single.a
+%{mainlibdir}/libgfortran.so.*
 %endif
 
-%files -n libgfortran%{libgfortran_sover}%{libgfortran_suffix}
+%ifarch %{quadmath_arch}
+%files -n libquadmath%{libsuffix}
 %defattr(-,root,root)
-%mainlib libgfortran.so.%{libgfortran_sover}*
+%{mainlibdir}/libquadmath.so.*
 
-%if %{separate_biarch}
-%files -n libgfortran%{libgfortran_sover}%{libgfortran_suffix}%{separate_biarch_suffix}
-%defattr(-,root,root)
-%biarchlib libgfortran.so.%{libgfortran_sover}*
-%endif
-
-%ifarch %quadmath_arch
-%files -n libquadmath%{libquadmath_sover}%{libquadmath_suffix}
-%defattr(-,root,root)
-%mainlib libquadmath.so.%{libquadmath_sover}*
-
-%if %{separate_biarch}
-%files -n libquadmath%{libquadmath_sover}%{libquadmath_suffix}%{separate_biarch_suffix}
-%defattr(-,root,root)
-%biarchlib libquadmath.so.%{libquadmath_sover}*
-%endif
-
-%files -n libquadmath%{libquadmath_sover}-devel%{libdevel_suffix}
+%files -n libquadmath-devel%{libdevel_suffix}
 %defattr(-,root,root)
 %{libsubdir}/include/quadmath.h
 %{libsubdir}/include/quadmath_weak.h
-%versmainlib libquadmath.a
-%versmainlib libquadmath.so
-
-%if %{separate_biarch}
-%files -n libquadmath%{libquadmath_sover}-devel%{libdevel_suffix}%{separate_biarch_suffix}
-%defattr(-,root,root)
-%versbiarchlib libquadmath.a
-%versbiarchlib libquadmath.so
-%endif
-%endif
+%{versmainlibdir}/libquadmath.a
+%{versmainlibdir}/libquadmath.so
 %endif
 
-%files info
+%files doc
 %defattr(-,root,root)
 %doc %{_infodir}/cpp%{binsuffix}.info*.gz
 %doc %{_infodir}/cppinternals%{binsuffix}.info*.gz
@@ -3006,12 +1329,12 @@ cat cpplib%{binsuffix}.lang gcc%{binsuffix}.lang > gcc15-locale.lang
 %doc %{_infodir}/gccint%{binsuffix}.info*.gz
 %doc %{_infodir}/gccinstall%{binsuffix}.info*.gz
 %doc %{_infodir}/libgomp%{binsuffix}.info*.gz
-%ifarch %itm_arch
+%ifarch %{itm_arch}
 %doc %{_infodir}/libitm%{binsuffix}.info*.gz
 %endif
 %if %{build_fortran}
 %doc %{_infodir}/gfortran%{binsuffix}.info*.gz
-%ifarch %quadmath_arch
+%ifarch %{quadmath_arch}
 %doc %{_infodir}/libquadmath%{binsuffix}.info*.gz
 %endif
 %endif
@@ -3027,7 +1350,7 @@ cat cpplib%{binsuffix}.lang gcc%{binsuffix}.lang > gcc15-locale.lang
 %doc %{_infodir}/m2%{binsuffix}.info*gz
 %endif
 
-%files -n cpp15
+%files -n cpp15 -f cpplib%{binsuffix}.lang
 %defattr(-,root,root)
 %dir %{_libdir}/gcc
 %dir %{_libdir}/gcc/%{GCCDIST}
@@ -3041,37 +1364,18 @@ cat cpplib%{binsuffix}.lang gcc%{binsuffix}.lang > gcc15-locale.lang
 %defattr(-,root,root)
 %{libsubdir}/cc1obj
 %{libsubdir}/include/objc
-%versmainlib libobjc.a
-%versmainlib libobjc.so
+%{versmainlibdir}/libobjc.a
+%{versmainlibdir}/libobjc.so
 
-%if %{separate_biarch}
-%files objc%{separate_biarch_suffix}
+%files -n libobjc%{libsuffix}
 %defattr(-,root,root)
-%versbiarchlib libobjc.a
-%versbiarchlib libobjc.so
-%endif
-
-%files -n libobjc%{libobjc_sover}%{libobjc_suffix}
-%defattr(-,root,root)
-%mainlib libobjc.so.%{libobjc_sover}*
-
-%if %{separate_biarch}
-%files -n libobjc%{libobjc_sover}%{libobjc_suffix}%{separate_biarch_suffix}
-%defattr(-,root,root)
-%biarchlib libobjc.so.%{libobjc_sover}*
-%endif
+%{mainlibdir}/libobjc.so.*
 %endif
 
 %if %{build_objcp}
 %files obj-c++
 %defattr(-,root,root)
 %{libsubdir}/cc1objplus
-
-%if %{separate_biarch}
-%files obj-c++%{separate_biarch_suffix}
-%defattr(-,root,root)
-# empty - only for the dependency
-%endif
 %endif
 
 %if %{build_ada}
@@ -3082,6 +1386,8 @@ cat cpplib%{binsuffix}.lang gcc%{binsuffix}.lang > gcc15-locale.lang
 %dir %{libsubdir}
 %{_prefix}/bin/gnat*
 %dir %{versmainlibdir}/adalib
+%{mainlibdir}/libgnarl%{binsuffix}.so
+%{mainlibdir}/libgnat%{binsuffix}.so
 %{versmainlibdir}/adainclude
 %{versmainlibdir}/adalib/*.ali
 %{versmainlibdir}/adalib/*.a
@@ -3089,30 +1395,6 @@ cat cpplib%{binsuffix}.lang gcc%{binsuffix}.lang > gcc15-locale.lang
 %{versmainlibdir}/adalib/libgnat.so
 %{versmainlibdir}/gnat1
 %{versmainlibdir}/ada_target_properties
-
-%if %{separate_biarch}
-%files ada%{separate_biarch_suffix}
-%defattr(-,root,root)
-%dir %{versmainlibdirbi}/adalib
-%{versmainlibdirbi}/adainclude
-%{versmainlibdirbi}/adalib/*.ali
-%{versmainlibdirbi}/adalib/*.a
-%{versmainlibdirbi}/adalib/libgnarl.so
-%{versmainlibdirbi}/adalib/libgnat.so
-%{versmainlibdirbi}/ada_target_properties
-%endif
-
-%files -n libada15
-%defattr(-,root,root)
-%mainlib libgnarl%{binsuffix}.so
-%mainlib libgnat%{binsuffix}.so
-
-%if %{separate_biarch}
-%files -n libada15%{separate_biarch_suffix}
-%defattr(-,root,root)
-%biarchlib libgnarl%{binsuffix}.so
-%biarchlib libgnat%{binsuffix}.so
-%endif
 %endif
 
 %if %{build_go}
@@ -3122,40 +1404,22 @@ cat cpplib%{binsuffix}.lang gcc%{binsuffix}.lang > gcc15-locale.lang
 %{_prefix}/bin/go%{binsuffix}
 %{_prefix}/bin/gofmt%{binsuffix}
 %{libsubdir}/go1
-%versmainlib libgo.a
-%versmainlib libgo.so
-%versmainlib libgobegin.a
-%versmainlib libgolibbegin.a
-%versmainlibdir/buildid
-%versmainlibdir/cgo
-%dir %mainlibdir/go
-%dir %mainlibdir/go/%{gcc_dir_version}
-%mainlibdir/go/%{gcc_dir_version}/%{GCCDIST}
+%{versmainlibdir}/libgo.a
+%{versmainlibdir}/libgo.so
+%{versmainlibdir}/libgobegin.a
+%{versmainlibdir}/libgolibbegin.a
+%{versmainlibdir}/buildid
+%{versmainlibdir}/cgo
+%dir %{mainlibdir}/go
+%dir %{mainlibdir}/go/%{gcc_dir_version}
+%{mainlibdir}/go/%{gcc_dir_version}/%{GCCDIST}
 %doc %{_mandir}/man1/gccgo%{binsuffix}.1.gz
 %doc %{_mandir}/man1/go%{binsuffix}.1.gz
 %doc %{_mandir}/man1/gofmt%{binsuffix}.1.gz
 
-%if %{separate_biarch}
-%files go%{separate_biarch_suffix}
+%files -n libgo%{libsuffix}
 %defattr(-,root,root)
-%versbiarchlib libgo.a
-%versbiarchlib libgo.so
-%versbiarchlib libgobegin.a
-%versbiarchlib libgolibbegin.a
-%dir %mainlibdirbi/go
-%dir %mainlibdirbi/go/%{gcc_dir_version}
-%mainlibdirbi/go/%{gcc_dir_version}/%{GCCDIST}
-%endif
-
-%files -n libgo%{libgo_sover}%{libgo_suffix}
-%defattr(-,root,root)
-%mainlib libgo.so.%{libgo_sover}*
-
-%if %{separate_biarch}
-%files -n libgo%{libgo_sover}%{libgo_suffix}%{separate_biarch_suffix}
-%defattr(-,root,root)
-%biarchlib libgo.so.%{libgo_sover}*
-%endif
+%{mainlibdir}/libgo.so.*
 %endif
 
 %if %{build_d}
@@ -3163,51 +1427,23 @@ cat cpplib%{binsuffix}.lang gcc%{binsuffix}.lang > gcc15-locale.lang
 %defattr(-,root,root)
 %{_prefix}/bin/gdc%{binsuffix}
 %{libsubdir}/d21
-%versmainlib libgphobos.a
-%versmainlib libgphobos.so
-%versmainlib libgdruntime.a
-%versmainlib libgdruntime.so
-%versmainlib libgphobos.spec
+%{versmainlibdir}/libgphobos.a
+%{versmainlibdir}/libgphobos.so
+%{versmainlibdir}/libgdruntime.a
+%{versmainlibdir}/libgdruntime.so
+%{versmainlibdir}/libgphobos.spec
 %{versmainlibdir}/include/d
 %doc %{_mandir}/man1/gdc%{binsuffix}.1.gz
-
-%if %{separate_biarch}
-%files d%{separate_biarch_suffix}
-%defattr(-,root,root)
-%versbiarchlib libgphobos.a
-%versbiarchlib libgphobos.so
-%versbiarchlib libgdruntime.a
-%versbiarchlib libgdruntime.so
-%versbiarchlib libgphobos.spec
-%endif
-
-%files -n libgphobos%{libgphobos_sover}%{libgphobos_suffix}
-%defattr(-,root,root)
-%mainlib libgphobos.so.%{libgphobos_sover}*
-
-%if %{separate_biarch}
-%files -n libgphobos%{libgphobos_sover}%{libgphobos_suffix}%{separate_biarch_suffix}
-%defattr(-,root,root)
-%biarchlib libgphobos.so.%{libgphobos_sover}*
-%endif
-
-%files -n libgdruntime%{libgdruntime_sover}%{libgdruntime_suffix}
-%defattr(-,root,root)
-%mainlib libgdruntime.so.%{libgdruntime_sover}*
-
-%if %{separate_biarch}
-%files -n libgdruntime%{libgdruntime_sover}%{libgdruntime_suffix}%{separate_biarch_suffix}
-%defattr(-,root,root)
-%biarchlib libgdruntime.so.%{libgdruntime_sover}*
-%endif
+%{mainlibdir}/libgphobos.so.*
+%{mainlibdir}/libgdruntime.so.*
 %endif
 
 %if %{build_jit}
-%files -n libgccjit%{libgccjit_sover}%{libgccjit_suffix}
+%files -n libgccjit%{libsuffix}
 %defattr(-,root,root)
-%{_prefix}/%{_lib}/libgccjit.so.%{libgccjit_sover}*
+%{_prefix}/%{_lib}/libgccjit.so.*
 
-%files -n libgccjit%{libgccjit_sover}-devel%{libdevel_suffix}
+%files -n libgccjit-devel%{libdevel_suffix}
 %defattr(-,root,root)
 %doc gcc/jit/docs/examples
 %{_prefix}/%{_lib}/libgccjit.so
@@ -3232,91 +1468,25 @@ cat cpplib%{binsuffix}.lang gcc%{binsuffix}.lang > gcc15-locale.lang
 %{libsubdir}/plugin/m2rte.so
 %endif
 %{versmainlibdir}/m2
-%versmainlib libm2log.a
-%versmainlib libm2log.so
-%versmainlib libm2cor.a
-%versmainlib libm2cor.so
-%versmainlib libm2iso.a
-%versmainlib libm2iso.so
-%versmainlib libm2pim.a
-%versmainlib libm2pim.so
-%versmainlib libm2min.a
-%versmainlib libm2min.so
+%{versmainlibdir}/libm2log.a
+%{versmainlibdir}/libm2log.so
+%{versmainlibdir}/libm2cor.a
+%{versmainlibdir}/libm2cor.so
+%{versmainlibdir}/libm2iso.a
+%{versmainlibdir}/libm2iso.so
+%{versmainlibdir}/libm2pim.a
+%{versmainlibdir}/libm2pim.so
+%{versmainlibdir}/libm2min.a
+%{versmainlibdir}/libm2min.so
 %doc %{_mandir}/man1/gm2%{binsuffix}.1.gz
 
-%if %{separate_biarch}
-%files m2%{separate_biarch_suffix}
+%files -n libm2%{libsuffix}
 %defattr(-,root,root)
-%{versmainlibdirbi}/m2
-%versbiarchlib libm2log.a
-%versbiarchlib libm2log.so
-%versbiarchlib libm2cor.a
-%versbiarchlib libm2cor.so
-%versbiarchlib libm2iso.a
-%versbiarchlib libm2iso.so
-%versbiarchlib libm2pim.a
-%versbiarchlib libm2pim.so
-%versbiarchlib libm2min.a
-%versbiarchlib libm2min.so
-%endif
-
-%files -n libm2log%{libm2_sover}%{libm2_suffix}
-%defattr(-,root,root)
-%mainlib libm2log.so.%{libm2_sover}*
-
-%if %{separate_biarch}
-%files -n libm2log%{libm2_sover}%{libm2_suffix}%{separate_biarch_suffix}
-%defattr(-,root,root)
-%biarchlib libm2log.so.%{libm2_sover}*
-%endif
-
-%files -n libm2cor%{libm2_sover}%{libm2_suffix}
-%defattr(-,root,root)
-%mainlib libm2cor.so.%{libm2_sover}*
-
-%if %{separate_biarch}
-%files -n libm2cor%{libm2_sover}%{libm2_suffix}%{separate_biarch_suffix}
-%defattr(-,root,root)
-%biarchlib libm2cor.so.%{libm2_sover}*
-%endif
-
-%files -n libm2iso%{libm2_sover}%{libm2_suffix}
-%defattr(-,root,root)
-%mainlib libm2iso.so.%{libm2_sover}*
-
-%if %{separate_biarch}
-%files -n libm2iso%{libm2_sover}%{libm2_suffix}%{separate_biarch_suffix}
-%defattr(-,root,root)
-%biarchlib libm2iso.so.%{libm2_sover}*
-%endif
-
-%files -n libm2pim%{libm2_sover}%{libm2_suffix}
-%defattr(-,root,root)
-%mainlib libm2pim.so.%{libm2_sover}*
-
-%if %{separate_biarch}
-%files -n libm2pim%{libm2_sover}%{libm2_suffix}%{separate_biarch_suffix}
-%defattr(-,root,root)
-%biarchlib libm2pim.so.%{libm2_sover}*
-%endif
-
-%files -n libm2min%{libm2_sover}%{libm2_suffix}
-%defattr(-,root,root)
-%mainlib libm2min.so.%{libm2_sover}*
-
-%if %{separate_biarch}
-%files -n libm2min%{libm2_sover}%{libm2_suffix}%{separate_biarch_suffix}
-%defattr(-,root,root)
-%biarchlib libm2min.so.%{libm2_sover}*
-%endif
-%endif
-
-%if 0%{?run_tests:1}
-%files -n gcc15-testresults
-%defattr(-,root,root)
-%doc testresults/test_summary.txt
-%doc testresults/*.sum
-%doc testresults/*.log
+%{mainlibdir}/libm2log.so.*
+%{mainlibdir}/libm2cor.so.*
+%{mainlibdir}/libm2iso.so.*
+%{mainlibdir}/libm2pim.so.*
+%{mainlibdir}/libm2min.so.*
 %endif
 
 %changelog
