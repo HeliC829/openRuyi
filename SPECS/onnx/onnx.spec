@@ -1,18 +1,24 @@
 # SPDX-FileCopyrightText: (C) 2026 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2026 openRuyi Project Contributors
 # SPDX-FileContributor: yyjeqhc <jialin.oerv@isrc.iscas.ac.cn>
+# SPDX-FileContributor: Xuhai Chang <xuhai.oerv@isrc.iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
 Name:           onnx
-Version:        1.20.0
+Version:        1.20.1
 Release:        %autorelease
 Summary:        Open standard for machine learning interoperability
 License:        Apache-2.0
 URL:            https://github.com/onnx/onnx
-#!RemoteAsset:  sha256:e9e9273cd39d460348aa3e2eb370a444b510e138c5f45dfa86ce50461901257b
+#!RemoteAsset:  sha256:9bcd6473c689b1ac3aeba8df572891756e01c1a151ae788df5cbc7a4499e5db5
 Source:         https://github.com/onnx/onnx/archive/refs/tags/v%{version}.tar.gz
 BuildSystem:    cmake
+
+# Build shared libraries instead of static
+Patch0:         0001-Build-shared-libraries.patch
+# Add onnxruntime_fix.h for compatibility with onnxruntime
+Patch1:         0002-Add-onnxruntime-fix.patch
 
 BuildOption(conf):  -DBUILD_ONNX_PYTHON=ON
 BuildOption(conf):  -DPYTHON_EXECUTABLE=%{__python3}
@@ -36,6 +42,8 @@ BuildRequires:  python3dist(wheel)
 BuildRequires:  python3dist(numpy)
 BuildRequires:  python3dist(protobuf)
 BuildRequires:  python3dist(pillow)
+BuildRequires:  python3dist(ml-dtypes)
+BuildRequires:  python3dist(typing-extensions)
 BuildRequires:  pyproject-rpm-macros
 
 %description
@@ -45,6 +53,7 @@ definitions of built-in operators and standard data types.
 
 %package        devel
 Summary:        Development files for %{name}
+Requires:       %{name}%{?_isa} = %{version}-%{release}
 
 %description    devel
 Development files for %{name}.
@@ -77,6 +86,10 @@ install -p "./onnx/"*.proto -t "%{buildroot}/%{_includedir}/onnx/"
 %check
 # TODO: skip tests as some deps we don't have yet.
 # export LD_LIBRARY_PATH=%{buildroot}/%{_libdir}
+
+%files
+%{_libdir}/libonnx.so.*
+%{_libdir}/libonnx_proto.so.*
 
 %files devel
 %{_libdir}/libonnx.so
