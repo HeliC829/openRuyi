@@ -60,7 +60,7 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 This package contains tools to assemble the local initrd and host configuration.
 
 %install -a
-echo -e "#!/bin/bash\nDRACUT_VERSION=%{version}-%{rbrelease}" > %{buildroot}%{_prefix}/lib/dracut/dracut-version.sh
+echo -e "#!/bin/bash\nDRACUT_VERSION=%{version}-%{release}" > %{buildroot}%{_prefix}/lib/dracut/dracut-version.sh
 
 # No dash for now
 rm -fr -- %{buildroot}%{_prefix}/lib/dracut/modules.d/10dash
