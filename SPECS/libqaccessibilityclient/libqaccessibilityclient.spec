@@ -22,7 +22,7 @@ BuildOption(conf):  -DQt6_FOUND=TRUE
 BuildRequires:  cmake
 BuildRequires:  extra-cmake-modules
 BuildRequires:  gcc-c++
-BuildRequires:  kf6-filesystem
+BuildRequires:  kf6-rpm-macros
 BuildRequires:  cmake(Qt6Widgets)
 BuildRequires:  cmake(Qt6Test)
 

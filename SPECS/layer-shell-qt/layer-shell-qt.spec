@@ -15,7 +15,7 @@ Source0:        https://download.kde.org/unstable/plasma/%{version}/layer-shell-
 BuildSystem:    cmake
 
 BuildRequires:  extra-cmake-modules
-BuildRequires:  kf6-filesystem
+BuildRequires:  kf6-rpm-macros
 BuildRequires:  qt6-base-private-devel
 BuildRequires:  cmake(Qt6Gui)
 BuildRequires:  cmake(Qt6Qml)
