@@ -11,7 +11,7 @@
 
 %bcond ffmpeg 0
 
-Name:           qt6-multimedia
+Name:           qt6-qtmultimedia
 Version:        6.10.1
 Release:        %autorelease
 Summary:        Qt6 - Multimedia support
