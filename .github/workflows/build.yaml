@@ -17,12 +17,13 @@ on:
     paths:
      - 'SPECS/**'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    concurrency:
-      group: pr-build-check
-      cancel-in-progress: true
     steps:
     - uses: actions/checkout@v3
       with:
