@@ -52,8 +52,6 @@
 %bcond system_onnx 0
 # TODO: opentelemetry not included in openRuyi
 %bcond system_opentelemetry 0
-# TODO: sympy not included in openRuyi
-%bcond system_sympy 0
 # TODO: tensorpipe not included in openRuyi
 %bcond system_tensorpipe 0
 
@@ -143,6 +141,7 @@ BuildRequires:  python3dist(pip)
 BuildRequires:  python3dist(pybind11)
 BuildRequires:  python3dist(pyyaml)
 BuildRequires:  python3dist(setuptools)
+BuildRequires:  python3dist(sympy)
 # TODO: enable on openRuyi
 # BuildRequires:  python3dist(sphinx)
 BuildRequires:  python3dist(typing-extensions)
@@ -170,10 +169,6 @@ BuildRequires:  openmpi-devel
 
 %if %{with system_flatbuffers}
 BuildRequires:  pkgconfig(flatbuffers)
-%endif
-
-%if %{with sympy}
-BuildRequires:  python3dist(sympy)
 %endif
 
 %if %{with rocm}
@@ -286,12 +281,8 @@ sed -i -e 's@"gfx1100", "gfx1101", "gfx1200", "gfx1201", "gfx908",@"gfx1100", "g
 # Need to pip this
 sed -i -e '/fsspec/d' setup.py
 
-%if %{with system_sympy}
+# Use system sympy
 sed -i -e 's@sympy==1.13.1@sympy>=1.13.1@' setup.py
-%else
-# Need to pip this
-sed -i -e '/sympy/d' setup.py
-%endif
 
 # A new dependency
 # Connected to USE_FLASH_ATTENTION, since this is off, do not need it
