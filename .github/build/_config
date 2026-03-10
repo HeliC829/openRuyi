@@ -9,8 +9,7 @@ Repotype: rpm-md sha512:rsyncable:zchunk:compression-zstd:filelists-ex
 Release: <CI_CNT>.<B_CNT>%%{?dist}
 PublishFilter: .*-bootstrap.*
 
-# use zlib, not zlib-ng
-Prefer: zlib-devel zlib pytest
+Prefer: zlib-ng-compat-devel zlib-ng-compat pytest
 # use ninja, not samurai-ninja
 Prefer: ninja
 Prefer: shadow
@@ -32,7 +31,7 @@ Preinstall: audit
 Preinstall: rpm-build file rpm glibc libxml2 libeconf
 Preinstall: gmp
 
-Preinstall: libselinux pcre2 util-linux libcap zlib lua bzip2 libgcrypt
+Preinstall: libselinux pcre2 util-linux libcap zlib-ng-compat lua bzip2 libgcrypt
 Preinstall: bash coreutils cpio rpm-config-openruyi 
 Preinstall: zstd xz libgomp-gcc15 libgpg-error gzip tar patch
 Preinstall: lz4
