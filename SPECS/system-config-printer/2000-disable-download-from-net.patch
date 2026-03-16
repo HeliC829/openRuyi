@@ -1,0 +1,35 @@
+diff --git a/Makefile.am b/Makefile.am
+index 4e181de..6a49ff0 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -306,7 +306,7 @@ EXTRA_DIST+=man/system-config-printer.xml
+ 
+ # The man pages are generated from DocBook XML.
+ .stamp-man-pages-built: $(top_srcdir)/man/system-config-printer.xml
+-	xmlto man -o man $<
++	xmlto --skip-validation man -o man $<
+ 	touch .stamp-man-pages-built
+ 
+ $(man_MANS): .stamp-man-pages-built
+diff --git a/Makefile.in b/Makefile.in
+index f23323f..d9b8e20 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -808,7 +808,7 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
+ 	done; \
+ 	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign Makefile'; \
+ 	$(am__cd) $(top_srcdir) && \
+-	  $(AUTOMAKE) --foreign Makefile
++	  automake --foreign Makefile
+ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
+ 	@case '$?' in \
+ 	  *config.status*) \
+@@ -2014,7 +2014,7 @@ system-config-printer.appdata.xml: system-config-printer.appdata.xml.in
+ 
+ # The man pages are generated from DocBook XML.
+ @XMLTO_TRUE@.stamp-man-pages-built: $(top_srcdir)/man/system-config-printer.xml
+-@XMLTO_TRUE@	xmlto man -o man $<
++@XMLTO_TRUE@	xmlto --skip-validation man -o man $<
+ @XMLTO_TRUE@	touch .stamp-man-pages-built
+ 
+ @XMLTO_TRUE@$(man_MANS): .stamp-man-pages-built
