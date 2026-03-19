@@ -249,7 +249,9 @@ end
 %ifarch x86_64 ppc64 sparc64 s390x aarch64 ppc64le mips64 mips64el riscv64
 %attr(555,root,root) /usr/%{_lib}
 %dir %attr(555,root,root) /usr/lib
+%dir /usr/lib/sysusers.d
 %dir /usr/lib/tmpfiles.d
+%dir /usr/lib/systemd
 %dir /usr/lib/udev
 %dir /usr/lib/udev/rules.d
 %else
