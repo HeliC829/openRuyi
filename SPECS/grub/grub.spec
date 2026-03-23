@@ -28,6 +28,9 @@ Source1:        grub.default
 # https://gitlab.freedesktop.org/gnu-grub/grub/-/merge_requests/10
 Patch0:         skip-efi_uga.patch
 
+# https://gitlab.freedesktop.org/gnu-grub/grub/-/merge_requests/14
+Patch1:         blsuki-append-version.patch
+
 BuildRequires:  autoconf
 BuildRequires:  automake
 BuildRequires:  bison
