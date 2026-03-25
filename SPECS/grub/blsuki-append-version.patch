@@ -1,7 +1,7 @@
-From 2611b589ad198f10783506fbc1da1843379927a7 Mon Sep 17 00:00:00 2001
+From 063422dbf8fa2492b15d2b4516197ff3726f73ab Mon Sep 17 00:00:00 2001
 From: Vivian Wang <wangruikang@iscas.ac.cn>
 Date: Mon, 23 Mar 2026 12:40:55 +0800
-Subject: [PATCH 1/3] blsuki: Skip UKI if no PRETTY_NAME is found
+Subject: [PATCH v2 1/3] blsuki: Skip UKI if no PRETTY_NAME is found
 
 If no PRETTY_NAME can be found, we can't get a title for this entry.
 Skip it in this case to avoid passing on the NULL title.
@@ -32,21 +32,21 @@ index 4133d3111..7e6de863a 100644
 2.53.0
 
 
-From 8b9f924301a7b5268e2ba62bc412234641718f8d Mon Sep 17 00:00:00 2001
+From b1c4786741a2d7a856dddc2e4c85561802a603bc Mon Sep 17 00:00:00 2001
 From: Vivian Wang <wangruikang@iscas.ac.cn>
 Date: Mon, 23 Mar 2026 11:33:20 +0800
-Subject: [PATCH 2/3] blsuki: Append version after title for BLS entries
+Subject: [PATCH v2 2/3] blsuki: Append version after title for BLS entries
 
 According to BLS, the title field is not necessarily unique. Add the
 version in parentheses after if it's available in order to disambiguate.
 
 Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
 ---
- grub-core/commands/blsuki.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ grub-core/commands/blsuki.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/grub-core/commands/blsuki.c b/grub-core/commands/blsuki.c
-index 7e6de863a..9d7c0f8f2 100644
+index 7e6de863a..8d6ebe8a6 100644
 --- a/grub-core/commands/blsuki.c
 +++ b/grub-core/commands/blsuki.c
 @@ -956,6 +956,8 @@ bls_create_entry (grub_blsuki_entry_t *entry)
@@ -66,31 +66,26 @@ index 7e6de863a..9d7c0f8f2 100644
    hotkey = blsuki_get_val (entry, "grub_hotkey", NULL);
    users = blsuki_expand_val (blsuki_get_val (entry, "grub_users", NULL));
    classes = blsuki_make_list (entry, "grub_class", NULL);
-@@ -999,7 +1002,18 @@ bls_create_entry (grub_blsuki_entry_t *entry)
+@@ -999,6 +1002,14 @@ bls_create_entry (grub_blsuki_entry_t *entry)
    if (argv == NULL)
      goto finish;
  
--  argv[0] = (title != NULL) ? title : linux_path;
-+  if (title != NULL)
++  if (title != NULL && version != NULL)
 +    {
-+      if (version != NULL)
-+        full_title = grub_xasprintf ("%s (%s)", title, version);
-+      else
-+        {
-+          full_title = title;
-+          title = NULL;
-+        }
++      title = grub_xasprintf ("%s (%s)", title, version);
++
++      /* Save grub_xasprintf() result for freeing later */
++      full_title = title;
 +    }
 +
-+  argv[0] = (full_title != NULL) ? full_title : linux_path;
+   argv[0] = (title != NULL) ? title : linux_path;
    for (i = 1; i < argc; i++)
      argv[i] = args[i - 1];
-   argv[argc] = NULL;
-@@ -1025,6 +1039,7 @@ bls_create_entry (grub_blsuki_entry_t *entry)
+@@ -1025,6 +1036,7 @@ bls_create_entry (grub_blsuki_entry_t *entry)
    grub_normal_add_menu_entry (argc, argv, classes, id, users, hotkey, NULL, src, 0, entry);
  
   finish:
-+  grub_free (title);
++  grub_free (full_title);
    grub_free (linux_cmd);
    grub_free (dt_cmd);
    grub_free (initrd_cmd);
@@ -98,10 +93,10 @@ index 7e6de863a..9d7c0f8f2 100644
 2.53.0
 
 
-From 916c9adbcc2945dcee53a8fa56ad13cf359cd4b0 Mon Sep 17 00:00:00 2001
+From 259769448123f180441831278c08527b5f594f4c Mon Sep 17 00:00:00 2001
 From: Vivian Wang <wangruikang@iscas.ac.cn>
 Date: Mon, 23 Mar 2026 12:43:13 +0800
-Subject: [PATCH 3/3] blsuki: Append uname after title for UKI entries
+Subject: [PATCH v2 3/3] blsuki: Append uname after title for UKI entries
 
 Similarly to BLS entries, the .osrel PRETTY_NAME for a UKI is not
 necessarily unique. Append the version from the .uname section, if it
@@ -109,14 +104,14 @@ exists, to disambiguate.
 
 Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
 ---
- grub-core/commands/blsuki.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ grub-core/commands/blsuki.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
 diff --git a/grub-core/commands/blsuki.c b/grub-core/commands/blsuki.c
-index 9d7c0f8f2..dc8b781bf 100644
+index 8d6ebe8a6..eca207e7a 100644
 --- a/grub-core/commands/blsuki.c
 +++ b/grub-core/commands/blsuki.c
-@@ -1062,6 +1062,8 @@ uki_create_entry (grub_blsuki_entry_t *entry)
+@@ -1059,6 +1059,8 @@ uki_create_entry (grub_blsuki_entry_t *entry)
    char *title = NULL;
    char *options = NULL;
    char *osrel, *osrel_line;
@@ -125,35 +120,28 @@ index 9d7c0f8f2..dc8b781bf 100644
    char *key = NULL;
    char *value = NULL;
    char *src = NULL;
-@@ -1094,12 +1096,22 @@ uki_create_entry (grub_blsuki_entry_t *entry)
+@@ -1091,6 +1093,16 @@ uki_create_entry (grub_blsuki_entry_t *entry)
        goto finish;
      }
  
 +  uname = blsuki_get_val (entry, ".uname", NULL);
 +
 +  if (uname != NULL)
-+    full_title = grub_xasprintf ("%s (%s)", title, uname);
-+  else
 +    {
++      title = grub_xasprintf ("%s (%s)", title, uname);
++
++      /* Save grub_xasprintf() result for freeing later */
 +      full_title = title;
-+      title = NULL;
 +    }
 +
    options = blsuki_get_val (entry, ".cmdline", NULL);
  
    argv = grub_zalloc (2 * sizeof (char *));
-   if (argv == NULL)
-     goto finish;
--  argv[0] = title;
-+  argv[0] = full_title;
- 
-   blsuki_save_default = grub_env_get_bool ("blsuki_save_default", false);
-   src = grub_xasprintf ("%schainloader (%s)%s/%s%s%s\n",
-@@ -1112,6 +1124,7 @@ uki_create_entry (grub_blsuki_entry_t *entry)
+@@ -1109,6 +1121,7 @@ uki_create_entry (grub_blsuki_entry_t *entry)
    grub_normal_add_menu_entry (1, argv, NULL, id, NULL, NULL, NULL, src, 0, entry);
  
   finish:
-+  grub_free (title);
++  grub_free (full_title);
    grub_free (argv);
    grub_free (src);
    grub_free (options);
