@@ -66,7 +66,9 @@ install -pm0644 docs/*.3 "%{buildroot}/%{_mandir}/man3/"
 %{_libdir}/libbrotlicommon.so
 %{_libdir}/libbrotlidec.so
 %{_libdir}/libbrotlienc.so
-%{_libdir}/pkgconfig/*.pc
+%{_libdir}/pkgconfig/libbrotlicommon.pc
+%{_libdir}/pkgconfig/libbrotlidec.pc
+%{_libdir}/pkgconfig/libbrotlienc.pc
 %{_mandir}/man3/*.3*
 
 %changelog
