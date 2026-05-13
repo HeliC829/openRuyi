@@ -37,9 +37,10 @@ Patch0001:      0002-Fix-riscv64-chacha-crash-due-to-unalign.patch
 Patch0002:      0003-openssl-4.0-POST-CLANG-FORMAT-WEBKIT.patch
 # https://github.com/openssl/openssl/pull/30787
 Patch0003:      0004-RISC-V-Port-dot-asm-ChaCha20-assembly-implementation.patch
-# Unsubmit PR: GHASH multi-block aggregation for RISC-V with Zbc/Zvbc/Zvkg
-# Currently we only finish Zbc part, and not ready for upstream yet.
+# https://github.com/openssl/openssl/pull/31178
 Patch0004:      0005-RISC-V-GHASH-multi-block-aggregation.patch
+Patch0005:      0006-RISC-V-GHASH-Zvbc-multi-block-aggregation.patch
+Patch0006:      0007-RISC-V-GHASH-Zvkg-multi-block-aggregation.patch
 
 BuildOption(check):  LD_LIBRARY_PATH="$PWD"
 
