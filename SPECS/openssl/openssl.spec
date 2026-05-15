@@ -17,34 +17,18 @@
 %global _test_target test
 
 Name:           openssl
-Version:        3.5.2
+Version:        3.6.2
 Release:        %autorelease
 Summary:        Cryptography and SSL/TLS Toolkit
 License:        Apache-2.0
 URL:            https://www.openssl.org/
 VCS:            git:https://github.com/openssl/openssl.git
-#!RemoteAsset:  sha256:c53a47e5e441c930c3928cf7bf6fb00e5d129b630e0aa873b08258656e7345ec
+#!RemoteAsset:  sha256:aaf51a1fe064384f811daeaeb4ec4dce7340ec8bd893027eee676af31e83a04f
 Source:         https://www.openssl.org/source/%{name}-%{version}.tar.gz
 BuildSystem:    autotools
 
-# Use the shared jitterentropy library instead of static
-Patch0000:      0001-openssl-shared-jitterentropy.patch
-# https://github.com/openssl/openssl/pull/28684
-Patch0001:      0002-Fix-riscv64-chacha-crash-due-to-unalign.patch
-# https://github.com/openssl/openssl/pull/29242
-# Since openssl have a lot of code, we only apply clang-format to
-# the files that we will modified in the patch.
-Patch0002:      0003-openssl-4.0-POST-CLANG-FORMAT-WEBKIT.patch
-# https://github.com/openssl/openssl/pull/30787
-Patch0003:      0004-RISC-V-Port-dot-asm-ChaCha20-assembly-implementation.patch
-# https://github.com/openssl/openssl/pull/31178
-Patch0004:      0005-RISC-V-GHASH-multi-block-aggregation.patch
-Patch0005:      0006-RISC-V-GHASH-Zvbc-multi-block-aggregation.patch
-Patch0006:      0007-RISC-V-GHASH-Zvkg-multi-block-aggregation.patch
-
 BuildOption(check):  LD_LIBRARY_PATH="$PWD"
 
-BuildRequires:  gcc
 BuildRequires:  jitterentropy-devel
 BuildRequires:  make
 BuildRequires:  perl
@@ -60,6 +44,16 @@ OpenSSL contains an implementation of the SSL and TLS protocols.
 %package        devel
 Summary:        Development files for building with OpenSSL
 Requires:       %{name}%{?_isa} = %{version}-%{release}
+
+%patchlist
+# Use the shared jitterentropy library instead of static
+0001-openssl-shared-jitterentropy.patch
+# https://github.com/openssl/openssl/pull/30787
+0004-RISC-V-Port-dot-asm-ChaCha20-assembly-implementation.patch
+# https://github.com/openssl/openssl/pull/31178
+0005-RISC-V-GHASH-multi-block-aggregation.patch
+0006-RISC-V-GHASH-Zvbc-multi-block-aggregation.patch
+0007-RISC-V-GHASH-Zvkg-multi-block-aggregation.patch
 
 %description    devel
 This package contains the header files, pkgconfig/cmake files, development
