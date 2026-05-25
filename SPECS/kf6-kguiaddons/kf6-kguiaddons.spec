@@ -8,21 +8,24 @@
 
 %define rname kguiaddons
 
-# Full KF6 version (e.g. 6.22.0)
+# Full KF6 version (e.g. 6.26.0)
 # %%{!?_kf6_version: %%global _kf6_version %%{version}}
-%global _kf6_version 6.22.0
+%global _kf6_version 6.26.0
 
 Name:           kf6-kguiaddons
-Version:        6.22.0
+Version:        6.26.0
 Release:        %autorelease
 Summary:        Utilities for graphical user interfaces
 License:        LGPL-2.1-or-later
 URL:            https://www.kde.org
 VCS:            git:https://invent.kde.org/frameworks/kguiaddons
-#!RemoteAsset:  sha256:b7652bcebebfc8c1fda2893c1aeff4136c586ee77ffc6e589e3634f0e5539eef
-Source:         https://download.kde.org/stable/frameworks/6.22/%{rname}-%{version}.tar.xz
+#!RemoteAsset:  sha256:8375342f852104f36fd72a6870eb9795183af4516592cd6fa73445ea6b813172
+Source:         https://download.kde.org/stable/frameworks/6.26/%{rname}-%{version}.tar.xz
+BuildSystem:    cmake
 
-BuildRequires:  fdupes
+BuildOption(conf):  -DBUILD_TESTING=OFF
+BuildOption(conf):  -DBUILD_PYTHON_BINDINGS=OFF
+
 BuildRequires:  kf6-extra-cmake-modules >= %{_kf6_version}
 BuildRequires:  pkgconfig
 BuildRequires:  qt6-qtbase-private-devel >= %{qt6_version}
@@ -55,15 +58,6 @@ Obsoletes:      kguiaddons < %{version}-%{release}
 The KDE GUI addons provide utilities for graphical user interfaces in the areas
 of colors, fonts, text, images, keyboard input.
 
-%package        imports
-Summary:        QtQuick bindings for utilities for graphical user interfaces
-Requires:       %{name}%{?_isa} = %{version}-%{release}
-
-%description    imports
-The KDE GUI addons provide utilities for graphical user interfaces in the areas
-of colors, fonts, text, images, keyboard input. This package provides QtQuick
-bindings to use these GUI addons with QML and QtQuick applications.
-
 %package        devel
 Summary:        Utilities for graphical user interfaces: Build Environment
 Requires:       %{name}%{?_isa} = %{version}-%{release}
@@ -72,31 +66,15 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 The KDE GUI addons provide utilities for graphical user interfaces in the areas
 of colors, fonts, text, images, keyboard input. Development files.
 
-%prep
-%autosetup -p1 -n %{rname}-%{version}
-
-%build
-%cmake_kf6 \
-  -DBUILD_PYTHON_BINDINGS=OFF
-
-%kf6_build
-
-%install
-%kf6_install
-
-%fdupes %{buildroot}
-
 %files
-%license LICENSES/*
 %doc README.md
+%license LICENSES/*
 %{_kf6_applicationsdir}/google-maps-geo-handler.desktop
 %{_kf6_applicationsdir}/openstreetmap-geo-handler.desktop
 %{_kf6_applicationsdir}/wheelmap-geo-handler.desktop
 %{_kf6_bindir}/kde-geo-uri-handler
 %{_kf6_debugdir}/kguiaddons.categories
 %{_kf6_libdir}/libKF6GuiAddons.so.*
-
-%files imports
 %{_kf6_qmldir}/org/kde/guiaddons/
 
 %files devel
