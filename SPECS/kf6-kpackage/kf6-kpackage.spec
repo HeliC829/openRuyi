@@ -7,20 +7,22 @@
 %define qt6_version 6.8.0
 
 %define rname kpackage
-# Full KF6 version (e.g. 6.22.0)
+# Full KF6 version (e.g. 6.26.0)
 %{!?_kf6_version: %global _kf6_version %{version}}
 
 Name:           kf6-kpackage
-Version:        6.22.0
+Version:        6.26.0
 Release:        %autorelease
 Summary:        Non-binary asset user-installable package managing framework
 License:        GPL-2.0-or-later AND LGPL-2.0-or-later
 URL:            https://www.kde.org
 VCS:            git:https://invent.kde.org/frameworks/kpackage
-#!RemoteAsset
-Source:         https://download.kde.org/stable/frameworks/6.22/%{rname}-%{version}.tar.xz
+#!RemoteAsset:  sha256:313cda4a335ecdb67bb8e2fcc15bdeb5970db17d5597282ca655bf97a98abab5
+Source:         https://download.kde.org/stable/frameworks/6.26/%{rname}-%{version}.tar.xz
+BuildSystem:    cmake
 
-BuildRequires:  fdupes
+BuildOption(conf):  -DBUILD_TESTING=OFF
+
 BuildRequires:  kf6-extra-cmake-modules >= %{_kf6_version}
 BuildRequires:  cmake(KF6Archive) >= %{_kf6_version}
 BuildRequires:  cmake(KF6CoreAddons) >= %{_kf6_version}
@@ -50,24 +52,14 @@ non-binary assets.
 
 Development files.
 
-%prep
-%autosetup -p1 -n %{rname}-%{version}
-
-%build
-%cmake_kf6
-
-%kf6_build
-
-%install
-%kf6_install
-
+%install -a
 # todo: fix the name error.
 # Avoid illegal package names
 rm -rf $RPM_BUILD_ROOT%{_datadir}/locale/*@*
 # Use langpacks macro to auto-split translations
-%find_lang %{name}6 --with-qt --all-name --generate-subpackages
+%find_lang %{name} --with-qt --all-name --generate-subpackages
 
-%files -f %{name}6.lang
+%files -f %{name}.lang
 %license LICENSES/*.txt
 %doc README.md
 %{_kf6_libdir}/libKF6Package.so.*
@@ -83,4 +75,4 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/locale/*@*
 %{_kf6_libdir}/libKF6Package.so
 
 %changelog
-%{?autochangelog}
+%autochangelog
