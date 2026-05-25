@@ -14,18 +14,18 @@
 %bcond jxl 1
 %bcond jp2 1
 
-# Full KF6 version (e.g. 6.22.0)
+# Full KF6 version (e.g. 6.26.0)
 %{!?_kf6_version: %global _kf6_version %{version}}
 
 Name:           kf6-kimageformats
-Version:        6.22.0
+Version:        6.26.0
 Release:        %autorelease
 Summary:        Image format plugins for Qt
 License:        LGPL-2.1-or-later
 URL:            https://www.kde.org
 VCS:            git:https://invent.kde.org/frameworks/kimageformats.git
-#!RemoteAsset:  sha256:d6eede9a75aa4b33c3e8afdebdcc9664cf423effeabe684b21dc1cc9728a2073
-Source:         https://download.kde.org/stable/frameworks/6.22/%{rname}-%{version}.tar.xz
+#!RemoteAsset:  sha256:c192552ee1831fd5e09af4e3633bb24726dfb4031170c4285024683bedaf9972
+Source:         https://download.kde.org/stable/frameworks/6.26/%{rname}-%{version}.tar.xz
 BuildSystem:    cmake
 
 BuildOption(conf):  -DBUILD_TESTING=OFF
@@ -124,6 +124,7 @@ to provide additional image format plugins for QtGui.
 %{_kf6_plugindir}/imageformats/kimg_raw.so
 %{_kf6_plugindir}/imageformats/kimg_rgb.so
 %{_kf6_plugindir}/imageformats/kimg_sct.so
+%{_kf6_plugindir}/imageformats/kimg_tim.so
 %{_kf6_plugindir}/imageformats/kimg_tga.so
 %{_kf6_plugindir}/imageformats/kimg_xcf.so
 
