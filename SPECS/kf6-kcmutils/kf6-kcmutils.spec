@@ -10,23 +10,24 @@
 # Internal QML import
 %global __requires_exclude qt6qmlimport\\(org\\.kde\\.kcmutils\\.private.*\\)
 
-# Full KF6 version (e.g. 6.22.0)
+# Full KF6 version (e.g. 6.26.0)
 %{!?_kf6_version: %global _kf6_version %{version}}
 
 Name:           kf6-kcmutils
-Version:        6.22.0
+Version:        6.26.0
 Release:        %autorelease
 Summary:        Classes to work with KCModules
 License:        LGPL-2.1-or-later
 URL:            https://www.kde.org
 VCS:            git:https://invent.kde.org/frameworks/kcmutils
-#!RemoteAsset:  sha256:c6ed2d3be1f0e4efc91abca48afd64ff0c8917fbb6bc3c0b9725c66b3b9e3993
-Source:         https://download.kde.org/stable/frameworks/6.22/%{rname}-%{version}.tar.xz
+#!RemoteAsset:  sha256:6d0810649b71528124cdf9dbdeb8b3c6c6d31d787325ca3e4a20c536ecbdf2d9
+Source:         https://download.kde.org/stable/frameworks/6.26/%{rname}-%{version}.tar.xz
 BuildSystem:    cmake
 
 BuildOption(conf):  -DBUILD_TESTING=OFF
 
 BuildRequires:  kf6-extra-cmake-modules >= %{_kf6_version}
+BuildRequires:  kf6-kirigami >= %{_kf6_version}
 BuildRequires:  cmake(KF6ConfigWidgets) >= %{_kf6_version}
 BuildRequires:  cmake(KF6CoreAddons) >= %{_kf6_version}
 BuildRequires:  cmake(KF6GuiAddons) >= %{_kf6_version}
