@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: (C) 2026 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2026 openRuyi Project Contributors
+# SPDX-FileContributor: panglars <panghao.riscv@isrc.iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -28,6 +29,7 @@ Requires:       crate(windows-sys-0.59/win32-foundation) >= 0.59.0
 Requires:       crate(windows-sys-0.59/win32-globalization) >= 0.59.0
 Requires:       crate(windows-sys-0.59/win32-system-com) >= 0.59.0
 Requires:       crate(windows-sys-0.59/win32-ui-shell) >= 0.59.0
+Provides:       crate(dirs-sys) = %{version}
 Provides:       crate(%{pkgname})
 Provides:       crate(%{pkgname}/default)
 
