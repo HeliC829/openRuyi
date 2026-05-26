@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: (C) 2026 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2026 openRuyi Project Contributors
+# SPDX-FileContributor: panglars <panghao.riscv@isrc.iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -26,6 +27,7 @@ Requires:       crate(quote-1.0/default) >= 1.0.45
 Requires:       crate(syn-2.0/default) >= 2.0.117
 Requires:       crate(syn-2.0/extra-traits) >= 2.0.117
 Requires:       crate(syn-2.0/full) >= 2.0.117
+Provides:       crate(darling-core) = %{version}
 Provides:       crate(%{pkgname})
 Provides:       crate(%{pkgname}/default)
 Provides:       crate(%{pkgname}/diagnostics)
