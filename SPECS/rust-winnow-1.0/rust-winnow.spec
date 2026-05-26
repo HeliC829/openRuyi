@@ -5,22 +5,23 @@
 # SPDX-License-Identifier: MulanPSL-2.0
 
 %global crate_name winnow
-%global full_version 1.0.0
+%global full_version 1.0.2
 %global pkgname winnow-1.0
 
 Name:           rust-winnow-1.0
-Version:        1.0.0
+Version:        1.0.2
 Release:        %autorelease
 Summary:        Rust crate "winnow"
 License:        MIT
 URL:            https://github.com/winnow-rs/winnow
-#!RemoteAsset:  sha256:a90e88e4667264a994d34e6d1ab2d26d398dcdca8b7f52bec8668957517fc7d8
+#!RemoteAsset:  sha256:2ee1708bef14716a11bae175f579062d4554d95be2c6829f518df847b7b3fdd0
 Source:         https://crates.io/api/v1/crates/%{crate_name}/%{full_version}/download#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    rustcrates
 
 BuildRequires:  rust-rpm-macros
 
+Provides:       crate(winnow) = %{version}
 Provides:       crate(%{pkgname})
 Provides:       crate(%{pkgname}/alloc)
 Provides:       crate(%{pkgname}/ascii)
