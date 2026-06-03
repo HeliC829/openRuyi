@@ -59,6 +59,10 @@ Source0:        https://github.com/systemd/systemd/archive/v%{version}/%{name}-%
 Source1:        systemd-user.pam
 BuildSystem:    meson
 
+# Enable only mandatory RV extensions in UEFI spec for systemd-boot
+# Picked from https://github.com/systemd/systemd/pull/42467
+Patch0:         0001-boot-enable-only-IMAFDCZicsrZifencei-for-RISC-V.patch
+
 BuildOption(conf):  -Dmode=release
 BuildOption(conf):  -Dsbat-distro-url='%{_vendor_url}'
 BuildOption(conf):  -Drc-local=/etc/rc.d/rc.local
