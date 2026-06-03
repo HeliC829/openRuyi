@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: (C) 2026 Institute of Software, Chinese Academy of Sciences (ISCAS)
 # SPDX-FileCopyrightText: (C) 2026 openRuyi Project Contributors
+# SPDX-FileContributor: panglars <panghao.riscv@isrc.iscas.ac.cn>
 #
 # SPDX-License-Identifier: MulanPSL-2.0
 
@@ -21,6 +22,7 @@ BuildSystem:    rustcrates
 BuildRequires:  rust-rpm-macros
 
 Requires:       crate(num-traits-0.2) >= 0.2.19
+Provides:       crate(chrono) = %{version}
 Provides:       crate(%{pkgname})
 Provides:       crate(%{pkgname}/internal-bench)
 Provides:       crate(%{pkgname}/alloc)
@@ -79,8 +81,8 @@ This metapackage enables feature "defmt" for the Rust chrono crate, by pulling i
 %package     -n %{name}+iana-time-zone
 Summary:        Date and time library for Rust - feature "iana-time-zone"
 Requires:       crate(%{pkgname})
-Requires:       crate(iana-time-zone-0.1/default) >= 0.1.64
-Requires:       crate(iana-time-zone-0.1/fallback) >= 0.1.64
+Requires:       crate(iana-time-zone-0.1/default) >= 0.1.65
+Requires:       crate(iana-time-zone-0.1/fallback) >= 0.1.65
 Provides:       crate(%{pkgname}/iana-time-zone)
 
 %description -n %{name}+iana-time-zone
@@ -89,7 +91,7 @@ This metapackage enables feature "iana-time-zone" for the Rust chrono crate, by 
 %package     -n %{name}+js-sys
 Summary:        Date and time library for Rust - feature "js-sys"
 Requires:       crate(%{pkgname})
-Requires:       crate(js-sys-0.3/default) >= 0.3.0
+Requires:       crate(js-sys-0.3/default) >= 0.3.98
 Provides:       crate(%{pkgname}/js-sys)
 
 %description -n %{name}+js-sys
@@ -152,7 +154,7 @@ This metapackage enables feature "rkyv-validation" for the Rust chrono crate, by
 %package     -n %{name}+serde
 Summary:        Date and time library for Rust - feature "serde"
 Requires:       crate(%{pkgname})
-Requires:       crate(serde-1.0) >= 1.0.99
+Requires:       crate(serde-1.0) >= 1.0.228
 Provides:       crate(%{pkgname}/serde)
 
 %description -n %{name}+serde
@@ -161,7 +163,7 @@ This metapackage enables feature "serde" for the Rust chrono crate, by pulling i
 %package     -n %{name}+wasm-bindgen
 Summary:        Date and time library for Rust - feature "wasm-bindgen"
 Requires:       crate(%{pkgname})
-Requires:       crate(wasm-bindgen-0.2/default) >= 0.2.0
+Requires:       crate(wasm-bindgen-0.2/default) >= 0.2.121
 Provides:       crate(%{pkgname}/wasm-bindgen)
 
 %description -n %{name}+wasm-bindgen
@@ -180,7 +182,7 @@ This metapackage enables feature "wasmbind" for the Rust chrono crate, by pullin
 %package     -n %{name}+windows-link
 Summary:        Date and time library for Rust - feature "windows-link" and 1 more
 Requires:       crate(%{pkgname})
-Requires:       crate(windows-link-0.2/default) >= 0.2.0
+Requires:       crate(windows-link-0.2/default) >= 0.2.1
 Provides:       crate(%{pkgname}/winapi)
 Provides:       crate(%{pkgname}/windows-link)
 
