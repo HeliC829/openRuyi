@@ -201,6 +201,10 @@ Patch4:         0004-hw-riscv-server_platform_ref.c-add-riscv-iommu-sys.patch
 Patch5:         0005-docs-add-rvsp-ref.rst.patch
 Patch6:         0006-target-riscv-update-satp_mode-to-SV48-for-rvsp-ref.patch
 
+# RISC-V KVM virt machine ACPI table fixes
+Patch7:         0007-hw-riscv-virt-acpi-build.c-Use-kvm-timer-fr.patch
+Patch8:         0008-hw-riscv-virt-acpi-build-Fix-RINTC-PLIC-con.patch
+
 BuildRequires:  hostname
 BuildRequires:  meson
 BuildRequires:  bison
