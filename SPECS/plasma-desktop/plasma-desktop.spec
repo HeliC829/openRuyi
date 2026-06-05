@@ -19,13 +19,13 @@
 %{!?_plasma6_version: %define _plasma6_version %(echo %{_plasma6_bugfix} | awk -F. '{print $1"."$2}')}
 
 Name:           plasma-desktop
-Version:        6.5.5
+Version:        6.6.5
 Release:        %autorelease
 Summary:        The KDE Plasma Workspace Components
 License:        GPL-2.0-only
 URL:            https://www.kde.org
 VCS:            git:https://invent.kde.org/plasma/plasma-desktop.git
-#!RemoteAsset:  sha256:db3fc69388f752aa18d62f449880d7f75a2f65fab5d4bffec3d8a896459d3a4d
+#!RemoteAsset:  sha256:9b79d12c42fff8cbe7c63b41aae340d4ff7ba8c94f2bd335cdcce248bbf40385
 Source:         https://invent.kde.org/plasma/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz
 BuildSystem:    cmake
 
@@ -272,8 +272,15 @@ rm -rf $RPM_BUILD_ROOT%{_kf6_htmldir}/*@*
 %{_kf6_plugindir}/kf6/kded/kded_touchpad.so
 %{_kf6_plugindir}/kf6/krunner/
 %{_kf6_plugindir}/plasma/applets/org.kde.panel.so
+%{_kf6_plugindir}/plasma/applets/org.kde.plasma.keyboardlayout.so
 %{_kf6_plugindir}/plasma/applets/org.kde.plasma.kicker.so
 %{_kf6_plugindir}/plasma/applets/org.kde.plasma.kickoff.so
+%{_kf6_plugindir}/plasma/applets/org.kde.plasma.kimpanel.so
+%{_kf6_plugindir}/plasma/applets/org.kde.plasma.marginsseparator.so
+%{_kf6_plugindir}/plasma/applets/org.kde.plasma.pager.so
+%{_kf6_plugindir}/plasma/applets/org.kde.plasma.showActivityManager.so
+%{_kf6_plugindir}/plasma/applets/org.kde.plasma.showdesktop.so
+%{_kf6_plugindir}/plasma/applets/org.kde.plasma.taskmanager.so
 %{_kf6_plugindir}/plasma/applets/org.kde.plasma.trash.so
 %{_kf6_plugindir}/plasma/applets/org.kde.plasma.windowlist.so
 %dir %{_kf6_plugindir}/plasma/kcms/desktop/
