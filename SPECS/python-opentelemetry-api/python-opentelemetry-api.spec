@@ -44,8 +44,8 @@ sed -i 's/importlib-metadata >= 6.0, < 8.8.0/importlib-metadata >= 6.0/' pyproje
 %pyproject_buildrequires
 
 %files -f %{pyproject_files}
-%license LICENSE
 %doc README.rst
+%license LICENSE
 
 %changelog
 %autochangelog
