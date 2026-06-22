@@ -7,18 +7,18 @@
 %define qt6_version 6.8.0
 
 %define rname knotifyconfig
-# Full KF6 version (e.g. 6.26.0)
+# Full KF6 version (e.g. 6.27.0)
 %{!?_kf6_version: %global _kf6_version %{version}}
 
 Name:           kf6-knotifyconfig
-Version:        6.26.0
+Version:        6.27.0
 Release:        %autorelease
 Summary:        Configuration dialog for desktop notifications
 License:        LGPL-2.1-or-later
 URL:            https://www.kde.org
 VCS:            git:https://invent.kde.org/frameworks/knotifyconfig.git
-#!RemoteAsset:  sha256:062e22f48a1da485d42ef56b37db1fc502f5f9305871483627d218f357560a28
-Source:         https://download.kde.org/stable/frameworks/6.26/%{rname}-%{version}.tar.xz
+#!RemoteAsset:  sha256:81861316d615e7e5ff07143c1d58d9b52cadc5e02ab38c8f2677c01f71e51f26
+Source:         https://download.kde.org/stable/frameworks/6.27/%{rname}-%{version}.tar.xz
 BuildSystem:    cmake
 
 BuildOption(conf):  -DBUILD_TESTING=OFF
