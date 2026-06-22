@@ -41,6 +41,9 @@ BuildRequires:  nasm
 0002-mh_sha1_murmur3_x64_128-add-an-mh_sha1_murmur3_x64_1.patch
 # https://github.com/intel/isa-l_crypto/pull/177
 0003-sha1_mb-add-an-sha1_mb-assembly-implementation-with-.patch
+# Unsubmit PR
+0004-aes-Add-C-AES-software-implementations-for-RISC-V.patch
+0005-aes-riscv64-add-RISC-V-Zvk-AES-implementation-for-AE.patch
 
 %description
 ISA-L_crypto is a collection of optimized low-level functions
