@@ -14,18 +14,18 @@
 %bcond jxl 1
 %bcond jp2 1
 
-# Full KF6 version (e.g. 6.26.0)
+# Full KF6 version (e.g. 6.27.0)
 %{!?_kf6_version: %global _kf6_version %{version}}
 
 Name:           kf6-kimageformats
-Version:        6.26.0
+Version:        6.27.0
 Release:        %autorelease
 Summary:        Image format plugins for Qt
 License:        LGPL-2.1-or-later
 URL:            https://www.kde.org
 VCS:            git:https://invent.kde.org/frameworks/kimageformats.git
-#!RemoteAsset:  sha256:c192552ee1831fd5e09af4e3633bb24726dfb4031170c4285024683bedaf9972
-Source:         https://download.kde.org/stable/frameworks/6.26/%{rname}-%{version}.tar.xz
+#!RemoteAsset:  sha256:6a9f40936ba946279063cbdaea473b9eb735b53047b0124c88aca7db17ccabac
+Source:         https://download.kde.org/stable/frameworks/6.27/%{rname}-%{version}.tar.xz
 BuildSystem:    cmake
 
 BuildOption(conf):  -DBUILD_TESTING=OFF
@@ -75,7 +75,7 @@ image formats.
 
 %package        eps
 Summary:        EPS image format plugin for Qt
-Requires:       ghostscript
+Recommends:     ghostscript
 
 %description    eps
 This plugin provides support for the EPS document format for QtGui. As
@@ -101,6 +101,7 @@ to provide additional image format plugins for QtGui.
 %if %{with exr}
 %{_kf6_plugindir}/imageformats/kimg_exr.so
 %endif
+%{_kf6_plugindir}/imageformats/kimg_ff.so
 %{_kf6_plugindir}/imageformats/kimg_hdr.so
 %if %{with heif}
 %{_kf6_plugindir}/imageformats/kimg_heif.so
