@@ -8,18 +8,18 @@
 
 %define rname kxmlgui
 
-# Full KF6 version (e.g. 6.26.0)
+# Full KF6 version (e.g. 6.27.0)
 %{!?_kf6_version: %global _kf6_version %{version}}
 
 Name:           kf6-kxmlgui
-Version:        6.26.0
+Version:        6.27.0
 Release:        %autorelease
 Summary:        Framework for managing menu and toolbar actions
 License:        LGPL-2.1-or-later AND GPL-2.0-or-later
 URL:            https://www.kde.org
-VCS:            git:https://invent.kde.org/frameworks/kxmlgui
-#!RemoteAsset:  sha256:4383855cea5a7f9a269c72dda15490b8d70c1d23d17950963937332fc5d6b7a0
-Source:         https://download.kde.org/stable/frameworks/6.26/%{rname}-%{version}.tar.xz
+VCS:            git:https://invent.kde.org/frameworks/kxmlgui.git
+#!RemoteAsset:  sha256:36d5c9cf8a851a63c1064d6a9987e961c0860ebd1396cda99119e570847df721
+Source:         https://download.kde.org/stable/frameworks/6.27/%{rname}-%{version}.tar.xz
 BuildSystem:    cmake
 
 BuildOption(conf):  -DBUILD_TESTING=OFF
