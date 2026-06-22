@@ -13,12 +13,12 @@
 %define _lto_cflags %{nil}
 
 Name:           isa-l_crypto
-Version:        2.26
+Version:        2.26.1
 Release:        %autorelease
 Summary:        Intelligent Storage Acceleration Library with crypto
 License:        BSD-3-Clause
 URL:            https://github.com/intel/isa-l_crypto
-#!RemoteAsset:  sha256:60f7f50637df86f39fe698653a4e3de41ed3e0953f5bff294f19572492c2ee19
+#!RemoteAsset:  sha256:dd83e3da8e589d15ff475ac727b38c8cba48d2e82465fa58de2b5d9fefcd682b
 Source0:        https://github.com/intel/isa-l_crypto/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildSystem:    autotools
 
