@@ -27,13 +27,13 @@
 %endif
 
 Name:           ffmpeg
-Version:        8.1.1
+Version:        8.1.2
 Release:        %autorelease
 Summary:        A complete solution to record, convert and stream audio and video
 License:        GPL-3.0-or-later
 URL:            https://ffmpeg.org/
 VCS:            git:https://git.ffmpeg.org/ffmpeg.git
-#!RemoteAsset:  sha256:b6863adde98898f42602017462871b5f6333e65aec803fdd7a6308639c52edf3
+#!RemoteAsset:  sha256:464beb5e7bf0c311e68b45ae2f04e9cc2af88851abb4082231742a74d97b524c
 Source0:        https://ffmpeg.org/releases/ffmpeg-%{version}.tar.xz
 Source1:        enable_decoders
 Source2:        enable_encoders
