@@ -13,13 +13,13 @@
 %{!?_plasma6_version: %define _plasma6_version %(echo %{_plasma6_bugfix} | awk -F. '{print $1"."$2}')}
 
 Name:           plasma-pa
-Version:        6.6.5
+Version:        6.7.1
 Release:        %autorelease
 Summary:        The Plasma Volume Manager
 License:        GPL-2.0-or-later
 URL:            https://www.kde.org
 VCS:            git:https://invent.kde.org/plasma/plasma-pa.git
-#!RemoteAsset:  sha256:caa7828ca80e6671bd491ad5d443cc72257ff4b2538de2e800b71dd0b8dc53a9
+#!RemoteAsset:  sha256:9740b99cef0e45b9ce1302ab4010370052bfe3dbaee6db75cbf467c10d30ebc8
 Source:         https://invent.kde.org/plasma/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz
 BuildSystem:    cmake
 
