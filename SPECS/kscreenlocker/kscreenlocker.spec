@@ -15,13 +15,13 @@
 %{!?_plasma6_version: %define _plasma6_version %(echo %{_plasma6_bugfix} | awk -F. '{print $1"."$2}')}
 
 Name:           kscreenlocker
-Version:        6.6.5
+Version:        6.7.1
 Release:        %autorelease
 Summary:        Library and components for secure lock screen architecture
 License:        GPL-2.0-or-later
 URL:            https://www.kde.org
 VCS:            git:https://invent.kde.org/plasma/kscreenlocker.git
-#!RemoteAsset:  sha256:212613c8104f9bb3837dfbdb0f3890168681783236e69b9c04939966e1724f49
+#!RemoteAsset:  sha256:7555a26dfd985310faa2753c4d3eba9591b56045ab4a73efd8b6249b241d9661
 Source:         https://invent.kde.org/plasma/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz
 Source1:        kde
 Source2:        kde-fingerprint
@@ -57,6 +57,7 @@ BuildRequires:  cmake(Qt6Quick) >= %{qt6_version}
 BuildRequires:  cmake(Qt6Test) >= %{qt6_version}
 BuildRequires:  cmake(Qt6Widgets) >= %{qt6_version}
 BuildRequires:  pkgconfig(wayland-client)
+BuildRequires:  pkgconfig(wayland-protocols) >= 1.46
 BuildRequires:  pkgconfig(wayland-server)
 BuildRequires:  pkgconfig(x11)
 BuildRequires:  pkgconfig(xcb)
