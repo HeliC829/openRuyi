@@ -108,12 +108,6 @@ rm -f  %{buildroot}%{_libdir}/pkgconfig/arrow-testing.pc
 export PARQUET_TEST_DATA=%{_builddir}/parquet-testing/data
 export ARROW_TEST_DATA=%{_builddir}/arrow-testing/data
 
-%ifarch riscv64
-# RISC-V FMIN/FMAX choose the non-NaN operand when only one operand is NaN,
-# while these tests expect NaN propagation for floating min/max.
-export GTEST_FILTER='-TestFloatingMinMaxKernel/0.Floats:TestFloatingMinMaxKernel/1.Floats'
-%endif
-
 %files
 %doc %{_datadir}/doc/arrow/NOTICE.txt
 %doc %{_datadir}/doc/arrow/README.md
