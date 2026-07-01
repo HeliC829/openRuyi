@@ -13,13 +13,13 @@
 %{!?_plasma6_version: %define _plasma6_version %(echo %{_plasma6_bugfix} | awk -F. '{print $1"."$2}')}
 
 Name:           plasma-sdk
-Version:        6.6.5
+Version:        6.7.1
 Release:        %autorelease
 Summary:        Plasma SDK
 License:        GPL-2.0-only AND LGPL-2.0-or-later
 URL:            https://www.kde.org
 VCS:            git:https://invent.kde.org/plasma/plasma-sdk.git
-#!RemoteAsset:  sha256:44af1aee2fa2ed505fdf89b8ab75796b500f91815ff45a528290909b62611dde
+#!RemoteAsset:  sha256:3d5e8980ef066eb5405cb5be1e000e89e72e17da3a1124fffbaf022d3d3d0c14
 Source:         https://invent.kde.org/plasma/%{name}/-/archive/v%{version}/%{name}-v%{version}.tar.gz
 BuildSystem:    cmake
 
@@ -108,9 +108,6 @@ rm -rf $RPM_BUILD_ROOT%{_datadir}/locale/*@*
 %{_kf6_plasmadir}/shells/org.kde.plasma.plasmoidviewershell/
 %dir %{_kf6_plugindir}/kf6/ktexteditor/
 %{_kf6_plugindir}/kf6/ktexteditor/iconexplorerplugin.so
-%dir %{_kf6_sharedir}/kpackage/
-%dir %{_kf6_sharedir}/kpackage/genericqml
-%{_kf6_sharedir}/kpackage/genericqml/org.kde.plasma.themeexplorer/
 %{_mandir}/man1/kqml.1%{?ext_man}
 %{_mandir}/man1/plasmaengineexplorer.1%{?ext_man}
 %{_mandir}/man1/plasmoidviewer.1%{?ext_man}
