@@ -21,6 +21,8 @@ BuildSystem:    golangmodules
 
 # https://sources.debian.org/src/golang-github-prometheus-procfs/0.19.2-1/debian/patches/0001-Fix-testdata-paths.patch
 Patch2000:      2000-Fix-testdata-paths.patch
+# https://github.com/prometheus/procfs/pull/841
+Patch2001:      2001-report-raw-values-in-parse-errors.patch
 
 BuildOption(prep):  -n %{_name}-%{commit_id}
 
