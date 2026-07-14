@@ -7,7 +7,7 @@
 Name:           potrace
 Version:        1.16
 Release:        %autorelease
-Summary:        TeX Live architecture-dependent binaries
+Summary:        Transforming bitmaps into vector graphics
 License:        GPL-2.0-or-later AND LGPL-2.0-or-later
 URL:            http://potrace.sourceforge.net
 # VCS: No VCS link available
