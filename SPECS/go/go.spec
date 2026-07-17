@@ -27,6 +27,8 @@
 %global gohostarch riscv64
 %if "%{openruyi_riscv_arch}" == "-march=rva23u64"
 %global goriscv64 rva23u64
+%else
+%global goriscv64 rva20u64
 %endif
 %endif
 
