@@ -25,6 +25,9 @@
 %endif
 %ifarch riscv64
 %global gohostarch riscv64
+%if "%{openruyi_riscv_arch}" == "-march=rva23u64"
+%global goriscv64 rva23u64
+%endif
 %endif
 
 # we are shipping the full contents of src in the data subpackage, which
@@ -126,6 +129,9 @@ tar -xf %{SOURCE2} -C %{_builddir}/%{name}-bootstrap --strip-components=1
 export GOROOT_FINAL=%{_libdir}/%{name}
 export GOHOSTOS=linux
 export GOHOSTARCH=%{gohostarch}
+%ifarch riscv64
+export GORISCV64=%{goriscv64}
+%endif
 %if %{with bootstrap}
 export GOROOT_BOOTSTRAP=%{_builddir}/%{name}-bootstrap
 %else
@@ -173,6 +179,9 @@ export GOROOT_FINAL=%{_libdir}/%{name}/
 export PATH="%{buildroot}%{_libdir}/%{name}/bin:$PATH"
 export GOTOOLDIR="%{buildroot}%{_libdir}/%{name}/pkg/tool/linux_%{gohostarch}"
 export GO_TEST_TIMEOUT_SCALE=20
+%ifarch riscv64
+export GORISCV64=%{goriscv64}
+%endif
 pushd src
 ./run.bash --no-rebuild -v -v -v -k -run "!(cmd/cgo/internal/testsanitizers|syscall)"
 popd
