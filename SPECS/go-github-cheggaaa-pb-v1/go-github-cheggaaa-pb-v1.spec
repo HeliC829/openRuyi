@@ -10,12 +10,12 @@
 %define go_test_exclude github.com/cheggaaa/pb/v3
 
 Name:           go-github-cheggaaa-pb-v1
-Version:        1.0.29
+Version:        1.0.30
 Release:        %autorelease
 Summary:        Console progress bar for Golang
 License:        BSD-3-Clause
 URL:            https://github.com/cheggaaa/pb
-#!RemoteAsset
+#!RemoteAsset:  sha256:60be48135bf8bf0e9c59cb8c5e4adf11997c2b92a57b86d5d1e33a563583a576
 Source0:        https://github.com/cheggaaa/pb/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
@@ -41,4 +41,4 @@ Terminal progress bar for Go
 %{go_sys_gopath}/%{go_import_path}
 
 %changelog
-%{?autochangelog}
+%autochangelog
