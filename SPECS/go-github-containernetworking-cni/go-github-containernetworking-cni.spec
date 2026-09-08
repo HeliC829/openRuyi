@@ -10,12 +10,12 @@
 %define go_test_ignore_failure 1
 
 Name:           go-github-containernetworking-cni
-Version:        1.1.2
+Version:        1.3.1
 Release:        %autorelease
 Summary:        CNI library for container networking
 License:        Apache-2.0
 URL:            https://github.com/containernetworking/cni
-#!RemoteAsset:  sha256:7d4bcaf83acdd54b3dc216f7aa5b5e1b32cb797d9c6af601a2c26b97470ed743
+#!RemoteAsset:  sha256:98903a1993617c8692bc35cdbd1ed9577f1ea044fa476b0f378566ba8e52e56c
 Source0:        https://github.com/containernetworking/cni/archive/refs/tags/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
