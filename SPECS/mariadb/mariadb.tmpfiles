@@ -1,2 +1,0 @@
-d /run/mysql 0755 mysql mysql -
-x /var/tmp/mysql.*
