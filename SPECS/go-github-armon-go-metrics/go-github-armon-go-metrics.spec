@@ -17,12 +17,12 @@
 }
 
 Name:           go-github-armon-go-metrics
-Version:        0.5.4
+Version:        0.6.1
 Release:        %autorelease
 Summary:        Metrics instrumentation library for Go
 License:        MIT
 URL:            https://github.com/armon/go-metrics
-#!RemoteAsset:  sha256:f7646f26c37d299018248f4ee67cf464396b9bec2192389a85c7826575b64560
+#!RemoteAsset:  sha256:6c854e114356093864f23a9e37aef1464d8437c812215133489d16909f1ac8fc
 Source0:        https://github.com/armon/go-metrics/archive/refs/tags/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
