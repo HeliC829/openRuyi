@@ -7,12 +7,12 @@
 %define go_import_path  github.com/alecthomas/assert/v2
 
 Name:           go-github-alecthomas-assert-v2
-Version:        2.7.0
+Version:        2.11.0
 Release:        %autorelease
 Summary:        Generic assertion library for Go tests
 License:        MIT
 URL:            https://github.com/alecthomas/assert
-#!RemoteAsset:  sha256:d63d2e624eacec470459b275db0b6725010bc02c2d99e7e1ac70fbb40cda7697
+#!RemoteAsset:  sha256:56f776f1d5e1888ef35b4c01ae96dd7d47f706911288a774b5bc199dcec734da
 Source0:        https://github.com/alecthomas/assert/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
