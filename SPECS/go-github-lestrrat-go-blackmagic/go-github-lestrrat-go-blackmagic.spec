@@ -7,12 +7,12 @@
 %define go_import_path  github.com/lestrrat-go/blackmagic
 
 Name:           go-github-lestrrat-go-blackmagic
-Version:        1.0.2
+Version:        1.0.4
 Release:        %autorelease
 Summary:        Reflection helpers for assigning typed optional values
 License:        MIT
 URL:            https://github.com/lestrrat-go/blackmagic
-#!RemoteAsset:  sha256:213493da84c672867385cc05dc4ebce3c4c16f5b0e376986dbddd3274a8bc686
+#!RemoteAsset:  sha256:42d4353dd4d4879ab5c3a4d42bc406d29f6c5c33b15b4ec20b287db94da21e0c
 Source0:        https://github.com/lestrrat-go/blackmagic/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

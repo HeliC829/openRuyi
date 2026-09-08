@@ -7,12 +7,12 @@
 %define go_import_path  github.com/henvic/httpretty
 
 Name:           go-github-henvic-httpretty
-Version:        0.1.4
+Version:        0.2.0
 Release:        %autorelease
 Summary:        Prints your HTTP requests pretty on your terminal screen
 License:        MIT
 URL:            https://github.com/henvic/httpretty
-#!RemoteAsset:  sha256:ed8ea43508c568d24317d67a31adb625be452eec49f35a95f8fd95f313484c99
+#!RemoteAsset:  sha256:b73dfcf0acb79f515e4671a58f44dbfb2329435bbf56c274910bfcd1268a6767
 Source0:        https://github.com/henvic/httpretty/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

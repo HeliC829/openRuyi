@@ -7,12 +7,12 @@
 %define go_import_path  github.com/itchyny/timefmt-go
 
 Name:           go-github-itchyny-timefmt-go
-Version:        0.1.5
+Version:        0.1.8
 Release:        %autorelease
 Summary:        Efficient strftime and strptime implementation for Go
 License:        MIT
 URL:            https://github.com/itchyny/timefmt-go
-#!RemoteAsset:  sha256:158ee59ce39ad65b7078bc354b266d0d08eabdb529cb54e78f0b158dbd836bf4
+#!RemoteAsset:  sha256:e2cfd4d9a90f95b01b636f425cbd4a5b94e5f98aac331a84e3e6c6a0c8c37be6
 Source0:        https://github.com/itchyny/timefmt-go/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

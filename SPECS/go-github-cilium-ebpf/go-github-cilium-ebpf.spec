@@ -9,12 +9,12 @@
 %define go_test_ignore_failure 1
 
 Name:           go-github-cilium-ebpf
-Version:        0.9.1
+Version:        0.22.0
 Release:        %autorelease
 Summary:        Go library for eBPF programs
 License:        MIT
 URL:            https://github.com/cilium/ebpf
-#!RemoteAsset:  sha256:6168f783d204bf45dcd4b56cacc5f04e6ac1e4936d75270758efa5b973deb2de
+#!RemoteAsset:  sha256:82be23c4cab66f0911a6ff4ed225a0abd9a05c51475f0098b8d8d0ad1490631a
 Source0:        https://github.com/cilium/ebpf/archive/refs/tags/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

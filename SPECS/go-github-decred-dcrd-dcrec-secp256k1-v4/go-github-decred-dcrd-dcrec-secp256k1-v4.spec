@@ -8,12 +8,12 @@
 %define upstream_tag    dcrec/secp256k1/v%{version}
 
 Name:           go-github-decred-dcrd-dcrec-secp256k1-v4
-Version:        4.4.0
+Version:        4.4.1
 Release:        %autorelease
 Summary:        secp256k1 elliptic curve operations for Go
 License:        ISC
 URL:            https://github.com/decred/dcrd
-#!RemoteAsset:  sha256:2aafb9662b96070d350f3399f09c35974529e55f6ef8364a3c8ee7c6455510d6
+#!RemoteAsset:  sha256:5e30712b49e4c9460c4e0647d7b3e7aa5e88854b83b59d2432cd6e9948008253
 Source0:        https://github.com/decred/dcrd/archive/refs/tags/%{upstream_tag}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

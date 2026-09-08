@@ -7,12 +7,12 @@
 %define go_import_path  github.com/gofrs/flock
 
 Name:           go-github-gofrs-flock
-Version:        0.13.0
+Version:        0.13.1
 Release:        %autorelease
 Summary:        Thread-safe file locking library for Go
 License:        BSD-3-Clause
 URL:            https://github.com/gofrs/flock
-#!RemoteAsset:  sha256:b65b14c43f82d61a0ffd2121ceaf2c4d0d85b13f0468e28127aa736b305d38df
+#!RemoteAsset:  sha256:b513db6e7cbebe001a24cddc2e063d21409f15b55d28915f7c626c708f9f792e
 Source0:        https://github.com/gofrs/flock/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

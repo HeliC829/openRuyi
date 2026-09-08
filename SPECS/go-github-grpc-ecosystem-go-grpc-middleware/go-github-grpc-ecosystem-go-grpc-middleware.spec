@@ -7,12 +7,12 @@
 %define go_import_path  github.com/grpc-ecosystem/go-grpc-middleware
 
 Name:           go-github-grpc-ecosystem-go-grpc-middleware
-Version:        1.3.0
+Version:        1.4.0
 Release:        %autorelease
 Summary:        gRPC middleware for Go
 License:        Apache-2.0
 URL:            https://github.com/grpc-ecosystem/go-grpc-middleware
-#!RemoteAsset:  sha256:c9b908202c05a7f821b03ee49cd678e7e71469519054629770e0565d78275cbc
+#!RemoteAsset:  sha256:3f99f997771775ea72edd4bd44f48bfc5c869b3f4f4107c8a45aa4635ce98ac1
 Source0:        https://github.com/grpc-ecosystem/go-grpc-middleware/archive/refs/tags/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

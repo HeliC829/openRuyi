@@ -7,12 +7,12 @@
 %define go_import_path  github.com/Azure/go-ntlmssp
 
 Name:           go-github-azure-go-ntlmssp
-Version:        0.1.0
+Version:        0.1.1
 Release:        %autorelease
 Summary:        NTLM/Negotiate authentication over HTTP for Go
 License:        MIT
 URL:            https://github.com/Azure/go-ntlmssp
-#!RemoteAsset:  sha256:5351c31c0b7fa73201b89f4cf7e1488d1ad5c4c2d9ed66d5e92b3dcd4c8ca21e
+#!RemoteAsset:  sha256:9c4d159972a7bde756522e008484e8aa352007151d19baea9db4598f95be628c
 Source0:        https://github.com/Azure/go-ntlmssp/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

@@ -7,12 +7,12 @@
 %define go_import_path  github.com/ebitengine/purego
 
 Name:           go-github-ebitengine-purego
-Version:        0.10.2
+Version:        0.11.0
 Release:        %autorelease
 Summary:        Call C functions from Go without cgo
 License:        Apache-2.0
 URL:            https://github.com/ebitengine/purego
-#!RemoteAsset:  sha256:f3606dbb92f4639b0529efe59ba34715d144d519e228b86886bdc990e862646f
+#!RemoteAsset:  sha256:7245f11bc20e48bf99d1267457eee7fedd1193090cabf98222ce62cc17b32278
 Source0:        https://github.com/ebitengine/purego/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
