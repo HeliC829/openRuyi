@@ -14,12 +14,12 @@
 }
 
 Name:           go-github-grpc-ecosystem-go-grpc-middleware-v2
-Version:        2.3.3
+Version:        2.3.4
 Release:        %autorelease
 Summary:        Collection of gRPC middleware interceptors for Go
 License:        Apache-2.0
 URL:            https://github.com/grpc-ecosystem/go-grpc-middleware
-#!RemoteAsset:  sha256:653cae72dbba078a04eb6eda0e8b330b3832a5794af28829c32a965aa26a29d0
+#!RemoteAsset:  sha256:c0b837e6062f5e7fc289b34c68f133a76760bde82b190361c2c5fe64b520f62f
 Source0:        https://github.com/grpc-ecosystem/go-grpc-middleware/archive/refs/tags/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
