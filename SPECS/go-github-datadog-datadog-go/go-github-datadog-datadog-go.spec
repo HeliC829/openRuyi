@@ -8,12 +8,12 @@
 %define go_import_path  github.com/DataDog/datadog-go
 
 Name:           go-github-datadog-datadog-go
-Version:        3.2.0
+Version:        4.8.3
 Release:        %autorelease
 Summary:        Go DogStatsD client library for Datadog
 License:        MIT
 URL:            https://github.com/DataDog/datadog-go
-#!RemoteAsset:  sha256:0bcedc94ee42e08997a53753a091ff3465f87cd9c156a59d0516b0f6bfbd2eb1
+#!RemoteAsset:  sha256:0053a6b391abda1f494b858a23575fcbdd218666dd8050249074ad3f0a1dd3b5
 Source0:        https://github.com/DataDog/datadog-go/archive/refs/tags/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
