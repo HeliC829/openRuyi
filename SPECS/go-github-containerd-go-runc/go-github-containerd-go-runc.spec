@@ -7,12 +7,12 @@
 %define go_import_path  github.com/containerd/go-runc
 
 Name:           go-github-containerd-go-runc
-Version:        1.0.0
+Version:        1.2.1
 Release:        %autorelease
 Summary:        Go bindings for runc
 License:        Apache-2.0
 URL:            https://github.com/containerd/go-runc
-#!RemoteAsset:  sha256:c9c1219a63ce0ab7eb3cd2e09bbb6c848dffefbae676dc0087dc1bd45caaa9c0
+#!RemoteAsset:  sha256:fabd6004cae9413c9c17cce0eaaa6251ee099f289fd5446bd34a814470ab9e6b
 Source0:        https://github.com/containerd/go-runc/archive/refs/tags/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
