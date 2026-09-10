@@ -512,7 +512,7 @@ EOF
 chmod +x dotnet-rpm-build.sh
 
 VERBOSE=1 retry_until_success $max_attempts \
-    timeout 8h \
+    timeout 12h \
     ./dotnet-rpm-build.sh
 
 %install
