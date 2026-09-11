@@ -8,12 +8,12 @@
 %define go_import_path  github.com/andybalholm/brotli
 
 Name:           go-github-andybalholm-brotli
-Version:        1.2.3
+Version:        1.2.4
 Release:        %autorelease
 Summary:        Pure Go Brotli encoder and decoder
 License:        MIT
 URL:            https://github.com/andybalholm/brotli
-#!RemoteAsset:  sha256:d685cde143dd1ff9234dc1be9f2f3aa4be4f45c4825a2c6bb0354d96ea66f060
+#!RemoteAsset:  sha256:d0b77d230a01e4181d046251242fb61f0012ceea03b7b13e0c2f88afde10dabb
 Source0:        https://github.com/andybalholm/brotli/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
