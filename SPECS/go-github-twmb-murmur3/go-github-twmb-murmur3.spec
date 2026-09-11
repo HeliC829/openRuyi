@@ -7,12 +7,12 @@
 %define go_import_path  github.com/twmb/murmur3
 
 Name:           go-github-twmb-murmur3
-Version:        1.1.8
+Version:        1.2.0
 Release:        %autorelease
 Summary:        MurmurHash3 implementation for Go
 License:        BSD-3-Clause
 URL:            https://github.com/twmb/murmur3
-#!RemoteAsset:  sha256:afa51249308db62b5a2d4610b7c30cd41dc4906777211d8d8b09250875a668aa
+#!RemoteAsset:  sha256:51efbe1fcb424cd820cd149474a371640bff462f490bc4110d4f21f100b2a8c9
 Source0:        https://github.com/twmb/murmur3/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
