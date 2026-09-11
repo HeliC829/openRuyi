@@ -12,12 +12,12 @@
 %define go_test_include %{go_import_path}
 
 Name:           go-github-googlecloudplatform-opentelemetry-operations-go-internal-cloudmock
-Version:        0.61.0
+Version:        0.62.0
 Release:        %autorelease
 Summary:        Cloud mock helpers for OpenTelemetry Google Cloud tests
 License:        Apache-2.0
 URL:            https://github.com/GoogleCloudPlatform/opentelemetry-operations-go
-#!RemoteAsset:  sha256:4e9de46001c20c67d063a93a6befa888266d3a1703ad3ebd277323bb0e7c0a85
+#!RemoteAsset:  sha256:c7e0723dd0743c2b89bf107ce908d7766e2f9b5af3e62a996aebcdf39ceb2d1a
 Source0:        https://github.com/GoogleCloudPlatform/opentelemetry-operations-go/archive/refs/tags/internal/cloudmock/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
