@@ -8,12 +8,12 @@
 %define go_import_path  github.com/brianvoe/gofakeit/v7
 
 Name:           go-github-brianvoe-gofakeit-v7
-Version:        7.15.0
+Version:        7.17.0
 Release:        %autorelease
 Summary:        Random fake data generator written in go
 License:        MIT
 URL:            https://github.com/brianvoe/gofakeit
-#!RemoteAsset:  sha256:c49fd88c590694cf1672849bdd519ec0ffd4f214954201edce38acc7e363dee3
+#!RemoteAsset:  sha256:abbfb861275ae1c5260df118ed39a8e24c9798860cc1a1ebb08c27c84447521d
 Source0:        https://github.com/brianvoe/gofakeit/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
