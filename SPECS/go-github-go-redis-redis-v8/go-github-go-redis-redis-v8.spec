@@ -19,12 +19,12 @@
 }
 
 Name:           go-github-go-redis-redis-v8
-Version:        8.11.4
+Version:        8.11.5
 Release:        %autorelease
 Summary:        Redis client for Go
 License:        BSD-2-Clause
 URL:            https://github.com/go-redis/redis
-#!RemoteAsset:  sha256:e3cfdf1e21616fadc17014f22cc6f4259cbd2c2d4e5a1c1643c66b677bbdb55d
+#!RemoteAsset:  sha256:759f661163df84782dd950716428b374cdbbab221f47b6fb4df4e52975291a49
 Source0:        https://github.com/go-redis/redis/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
