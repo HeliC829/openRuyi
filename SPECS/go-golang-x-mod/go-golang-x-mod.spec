@@ -10,13 +10,13 @@
 %define go_test_exclude golang.org/x/mod/zip
 
 Name:           go-golang-x-mod
-Version:        0.40.0
+Version:        0.41.0
 Release:        %autorelease
 Summary:        Go module mechanics libraries
 License:        BSD-3-Clause
 URL:            https://golang.org/x/mod
 VCS:            git:https://github.com/golang/mod
-#!RemoteAsset:  sha256:7c2b16183613743eeede534808e90e0cf2d882d7132c4a7fd0a0a7a045653077
+#!RemoteAsset:  sha256:6b3e97e35a13b92c2d61ffebe2896afd91cb1cb667a3177a5ef5173b258d19e3
 Source0:        https://github.com/golang/mod/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
