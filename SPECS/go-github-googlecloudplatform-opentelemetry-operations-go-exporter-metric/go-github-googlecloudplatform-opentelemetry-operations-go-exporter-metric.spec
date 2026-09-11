@@ -13,12 +13,12 @@
 %define go_test_exclude %{go_import_path}
 
 Name:           go-github-googlecloudplatform-opentelemetry-operations-go-exporter-metric
-Version:        0.61.0
+Version:        0.62.0
 Release:        %autorelease
 Summary:        Google Cloud Monitoring metric exporter for OpenTelemetry
 License:        Apache-2.0
 URL:            https://github.com/GoogleCloudPlatform/opentelemetry-operations-go
-#!RemoteAsset:  sha256:527344ac1fd98bd0d451e5ac37be6ca4c4aee618362c4cee7077b832795133eb
+#!RemoteAsset:  sha256:a6fae3974bd416025cc469762db31ab707818b4674b9d93336f13805b03cd2e8
 Source0:        https://github.com/GoogleCloudPlatform/opentelemetry-operations-go/archive/refs/tags/exporter/metric/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
