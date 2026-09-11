@@ -32,13 +32,13 @@
 }
 
 Name:           go-golang-x-tools
-Version:        0.49.0
+Version:        0.50.0
 Release:        %autorelease
 Summary:        Various packages and tools that support the Go programming language
 License:        BSD-3-Clause
 URL:            https://golang.org/x/tools
 VCS:            git:https://github.com/golang/tools
-#!RemoteAsset:  sha256:df7f087706730d85ced76f5f2e3d1a51703de3beb305acc72d1170d405f5a21e
+#!RemoteAsset:  sha256:22d397e6b0a3040aae4fbc6fccb7738b31575a86b754b8604892353f195368a2
 Source0:        https://github.com/golang/tools/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 #!RemoteAsset:  sha256:7c7d1718dd80c6fed01597c3a4789ce373386c865531b62da656e2eff2f9ab29
 Source1:        https://github.com/golang/telemetry/archive/config/v0.119.0.tar.gz#/telemetry-config-v0.119.0.tar.gz
