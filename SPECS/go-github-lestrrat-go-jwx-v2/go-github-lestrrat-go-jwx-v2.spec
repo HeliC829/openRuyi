@@ -7,12 +7,12 @@
 %define go_import_path  github.com/lestrrat-go/jwx/v2
 
 Name:           go-github-lestrrat-go-jwx-v2
-Version:        2.1.4
+Version:        2.1.7
 Release:        %autorelease
 Summary:        JOSE JWT, JWS, JWE and JWK toolkit for Go
 License:        MIT
 URL:            https://github.com/lestrrat-go/jwx
-#!RemoteAsset:  sha256:11f1f629bb4c05651ec90b75ddbed77fca53a76a6c34e0bf158aca44475c6781
+#!RemoteAsset:  sha256:e23c66d3f7ea521501967bdab89b2d6ee4e6f311a2b484af3fd07cc614a6195a
 Source0:        https://github.com/lestrrat-go/jwx/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
