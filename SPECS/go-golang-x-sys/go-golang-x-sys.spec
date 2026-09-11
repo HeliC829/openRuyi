@@ -11,13 +11,13 @@
 %define go_test_ignore_failure 1
 
 Name:           go-golang-x-sys
-Version:        0.47.0
+Version:        0.48.0
 Release:        %autorelease
 Summary:        Go packages for low-level interaction with the operating system
 License:        BSD-3-Clause
 URL:            https://golang.org/x/sys
 VCS:            git:https://github.com/golang/sys
-#!RemoteAsset:  sha256:85733c6da0f8db2f380a4487f6229d44affcb69d7d4fc0e102b53214a248b14d
+#!RemoteAsset:  sha256:687396efb3a2f3903c04f8b8fd012e2f11549e4ac8cd9ec23ef1fa7ef1e074a3
 Source0:        https://github.com/golang/sys/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
