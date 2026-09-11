@@ -14,12 +14,12 @@
 }
 
 Name:           go-github-mymmrac-telego
-Version:        1.7.0
+Version:        1.12.1
 Release:        %autorelease
 Summary:        Telegram Bot API library for Go
 License:        MIT
 URL:            https://github.com/mymmrac/telego
-#!RemoteAsset:  sha256:3fdaddfb2906a4eac8c227352c9c893d56a1264334c87922073d07a150437ce7
+#!RemoteAsset:  sha256:209a05d3e0549fe3739e549476ac620133cb63aafc2f061949dd5da7f5029a94
 Source0:        https://github.com/mymmrac/telego/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
