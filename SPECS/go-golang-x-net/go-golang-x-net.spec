@@ -15,13 +15,13 @@
 }
 
 Name:           go-golang-x-net
-Version:        0.58.0
+Version:        0.59.0
 Release:        %autorelease
 Summary:        Go supplementary network libraries
 License:        BSD-3-Clause
 URL:            https://golang.org/x/net
 VCS:            git:https://github.com/golang/net
-#!RemoteAsset:  sha256:ebdf5119e472856e8ad8063994def0f816d0683b6a5e819d268a772b74a786a1
+#!RemoteAsset:  sha256:afff518f5041aa143356d90cf37817c3778740643191b1d6d45f7822e1663289
 Source0:        https://github.com/golang/net/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
