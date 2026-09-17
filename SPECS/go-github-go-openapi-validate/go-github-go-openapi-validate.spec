@@ -8,12 +8,12 @@
 %define go_import_path  github.com/go-openapi/validate
 
 Name:           go-github-go-openapi-validate
-Version:        0.25.2
+Version:        1.0.0
 Release:        %autorelease
 Summary:        OpenAPI 2.0 and JSON Schema validation toolkit
 License:        Apache-2.0
 URL:            https://github.com/go-openapi/validate
-#!RemoteAsset:  sha256:af3d105d584acc9c2516b385c59c30b306677d391cde3e97d65a8613fde39c29
+#!RemoteAsset:  sha256:66c4260691292f41b39019a77f1f4b1e6bf0995fe7ccbb03d632e0a92c4c2c49
 Source0:        https://github.com/go-openapi/validate/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

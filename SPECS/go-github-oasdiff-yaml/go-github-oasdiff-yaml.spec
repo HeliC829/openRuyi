@@ -11,12 +11,12 @@
 Name:           go-github-oasdiff-yaml
 # v0.1.0 changed go.mod to github.com/invopop/yaml; keep the latest tag that
 # still provides github.com/oasdiff/yaml for kin-openapi.
-Version:        0.1.0
+Version:        0.1.1
 Release:        %autorelease
 Summary:        A better way to marshal and unmarshal YAML in Golang
 License:        MIT
 URL:            https://github.com/oasdiff/yaml
-#!RemoteAsset:  sha256:b1438248ce1379452f909068703cf5080ddcfb69de2604f5a5eb6d492b5b5ddd
+#!RemoteAsset:  sha256:078bcb77d9d76eac253e37641a466d51847ecdf6b67f6eb62235b306e19e05f1
 Source0:        https://github.com/oasdiff/yaml/archive/refs/tags/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

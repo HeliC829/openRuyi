@@ -27,12 +27,12 @@
 }
 
 Name:           go-googlecloud-go-auth
-Version:        0.20.0
+Version:        0.23.2
 Release:        %autorelease
 Summary:        Authentication support for Google Cloud Go
 License:        Apache-2.0
 URL:            https://github.com/googleapis/google-cloud-go
-#!RemoteAsset:  sha256:31d2fd0e0f3e4010e5776e7c8be92688995a200a43f8dfc5004ff3c12892e527
+#!RemoteAsset:  sha256:352f92a36fb3ed1b18160ea5858a6210db091c74161e378928125df5de41ea8f
 Source0:        https://github.com/googleapis/google-cloud-go/archive/refs/tags/auth/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

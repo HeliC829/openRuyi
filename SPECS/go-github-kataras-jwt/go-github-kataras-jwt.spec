@@ -8,12 +8,12 @@
 %define go_import_path  github.com/kataras/jwt
 
 Name:           go-github-kataras-jwt
-Version:        0.1.17
+Version:        0.3.0
 Release:        %autorelease
 Summary:        A fast and simple JWT implementation for Go
 License:        MIT
 URL:            https://github.com/kataras/jwt
-#!RemoteAsset
+#!RemoteAsset:  sha256:93e1f91685aa6d345778e87d134d522dfedc60983630a94c3381093a11be918d
 Source0:        https://github.com/kataras/jwt/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
@@ -36,4 +36,4 @@ you may find in other libraries.
 %{go_sys_gopath}/%{go_import_path}
 
 %changelog
-%{?autochangelog}
+%autochangelog

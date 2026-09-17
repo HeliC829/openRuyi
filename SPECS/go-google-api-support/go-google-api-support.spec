@@ -17,12 +17,12 @@
 }
 
 Name:           go-google-api-support
-Version:        0.297.0
+Version:        0.298.0
 Release:        %autorelease
 Summary:        Bootstrap support packages for google.golang.org/api
 License:        Apache-2.0
 URL:            https://github.com/googleapis/google-api-go-client
-#!RemoteAsset:  sha256:badf4fce9c37b452bcc0e69ce4efd740841364d3a6ad0b90d2fe6d684c80c39b
+#!RemoteAsset:  sha256:8de6d0a73b64ada85ad4d5fdcf75006525fbdecd6c527d79b5fc0cbfb6c3df06
 Source0:        https://github.com/googleapis/google-api-go-client/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

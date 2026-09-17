@@ -7,12 +7,12 @@
 %define go_import_path  github.com/containerd/go-cni
 
 Name:           go-github-containerd-go-cni
-Version:        1.1.9
+Version:        1.1.14
 Release:        %autorelease
 Summary:        Generic CNI library for Go
 License:        Apache-2.0
 URL:            https://github.com/containerd/go-cni
-#!RemoteAsset:  sha256:c0ad26845675d473e130452a6f4c9eed7f91dab56c0d12f0c7f97711f9a918a1
+#!RemoteAsset:  sha256:eb666f953bf1e23b5385acbdbb76a0e9b29fd5927c506e9e45fc08aac517013c
 Source0:        https://github.com/containerd/go-cni/archive/refs/tags/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

@@ -8,12 +8,12 @@
 %define go_import_path  github.com/hetznercloud/hcloud-go/v2
 
 Name:           go-github-hetznercloud-hcloud-go-v2
-Version:        2.47.0
+Version:        2.48.0
 Release:        %autorelease
 Summary:        A Go library for the Hetzner Cloud API
 License:        MIT
 URL:            https://github.com/hetznercloud/hcloud-go
-#!RemoteAsset:  sha256:8cd7f2b1829da414f10da13555f669c21de73ec48ecdffa8f5b43eb966e2fc1a
+#!RemoteAsset:  sha256:2d781c5e7672b53b1c86cdebbaf01f48f289152446c70e039022998b44749027
 Source0:        https://github.com/hetznercloud/hcloud-go/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

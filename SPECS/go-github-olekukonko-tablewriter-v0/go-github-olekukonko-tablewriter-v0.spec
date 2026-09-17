@@ -8,12 +8,12 @@
 %define go_import_path  github.com/olekukonko/tablewriter
 
 Name:           go-github-olekukonko-tablewriter-v0
-Version:        0.0.5
+Version:        1.1.5
 Release:        %autorelease
 Summary:        ASCII table in golang
 License:        MIT
 URL:            https://github.com/olekukonko/tablewriter
-#!RemoteAsset
+#!RemoteAsset:  sha256:c2ab361419bd4307c3b52d4b1348b9db1140ca805ce2393aad4a21a858fca748
 Source0:        https://github.com/olekukonko/tablewriter/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
@@ -46,4 +46,4 @@ This is the legacy version of tablewriter.
 %{go_sys_gopath}/%{go_import_path}
 
 %changelog
-%{?autochangelog}
+%autochangelog

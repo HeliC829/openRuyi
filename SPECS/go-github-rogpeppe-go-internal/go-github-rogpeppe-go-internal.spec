@@ -8,12 +8,12 @@
 %define go_import_path  github.com/rogpeppe/go-internal
 
 Name:           go-github-rogpeppe-go-internal
-Version:        1.14.1
+Version:        1.16.0
 Release:        %autorelease
 Summary:        Selected Go-internal packages factored out from the standard library
 License:        BSD-3-Clause
 URL:            https://github.com/rogpeppe/go-internal
-#!RemoteAsset:  sha256:7e54f6d0f002a4904f150e29417515b286ff3b0bbde8e1a01082cbb5178132cb
+#!RemoteAsset:  sha256:78662c2e70976573ee61da4a050d1f10ca495ab35791b7be14d09badab28192f
 Source0:        https://github.com/rogpeppe/go-internal/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 # https://salsa.debian.org/go-team/packages/golang-github-rogpeppe-go-internal/-/blob/0f60076977a5f66c5f557820c009eb0b3d647b01/debian/0001-Allow-TestSimple-cover-to-PASS.patch
 Source1:        2000-Allow-TestSimple-cover-to-PASS.patch

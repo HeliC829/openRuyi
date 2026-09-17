@@ -8,12 +8,12 @@
 %define go_import_path  github.com/phuslu/log
 
 Name:           go-github-phuslu-log
-Version:        1.0.128
+Version:        1.0.133
 Release:        %autorelease
 Summary:        Structured logging library for Go
 License:        MIT
 URL:            https://github.com/phuslu/log
-#!RemoteAsset:  sha256:8eb76436563c9981c1ff0bea268498ba6aa986212c948f11ab751572519a9148
+#!RemoteAsset:  sha256:4d4c9fc81954f30d940bfda8650793d48e138623cf886d097f356ed337d9e3ef
 Source0:        https://github.com/phuslu/log/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

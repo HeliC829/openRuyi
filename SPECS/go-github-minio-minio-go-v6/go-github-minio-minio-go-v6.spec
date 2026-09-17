@@ -7,12 +7,12 @@
 %define go_import_path  github.com/minio/minio-go/v6
 
 Name:           go-github-minio-minio-go-v6
-Version:        6.0.46
+Version:        6.0.57
 Release:        %autorelease
 Summary:        MinIO Go client SDK for S3 compatible object storage
 License:        Apache-2.0
 URL:            https://github.com/minio/minio-go
-#!RemoteAsset:  sha256:e855dae328eac30c4ec7523ab9a9b7affc6d8b1606a8885666c40f65db268290
+#!RemoteAsset:  sha256:a0d5f602fae761d7b7ff6f5d880a9998c311eb04ee2752ab46fe1012583d3f3f
 Source0:        https://github.com/minio/minio-go/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

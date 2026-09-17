@@ -8,12 +8,12 @@
 %define go_import_path  github.com/circonus-labs/circonus-gometrics
 
 Name:           go-github-circonus-labs-circonus-gometrics
-Version:        1.2.0
+Version:        2.3.1
 Release:        %autorelease
 Summary:        Metrics reporting implementation for Circonus
 License:        BSD-3-Clause
 URL:            https://github.com/circonus-labs/circonus-gometrics
-#!RemoteAsset:  sha256:23ab14e6b4db910c15ab2dc23b1cab7b54ba1ec2dd1082eb7763bbe9b6d64171
+#!RemoteAsset:  sha256:605c0ce0b305d1dd7bd55d13779f56a5f4579b3968583c21a554287dfcd0b41e
 Source0:        https://github.com/circonus-labs/circonus-gometrics/archive/refs/tags/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

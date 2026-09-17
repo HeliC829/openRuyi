@@ -8,13 +8,13 @@
 %define go_import_path  github.com/modelcontextprotocol/go-sdk
 
 Name:           go-github-modelcontextprotocol-go-sdk
-Version:        1.7.0
+Version:        1.8.0
 Release:        %autorelease
 Summary:        Official Go SDK for the Model Context Protocol
 License:        Apache-2.0 AND MIT AND CC-BY-4.0
 URL:            https://github.com/modelcontextprotocol/go-sdk
 VCS:            git:https://github.com/modelcontextprotocol/go-sdk.git
-#!RemoteAsset:  sha256:8e69ae9e258c0bb011d820d106ddfb6e9103126a2072e85978ce40525e6b01b4
+#!RemoteAsset:  sha256:599b37a9ab31483dafe309ee0aeb9574f45bce85b9f8b18d4c0eb95f10945f66
 Source0:        https://github.com/modelcontextprotocol/go-sdk/archive/refs/tags/v%{version}.tar.gz#/go-sdk-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

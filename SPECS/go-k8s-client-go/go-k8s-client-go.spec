@@ -23,12 +23,12 @@
 }
 
 Name:           go-k8s-client-go
-Version:        0.36.2
+Version:        0.37.0
 Release:        %autorelease
 Summary:        Kubernetes client libraries for Go
 License:        Apache-2.0
 URL:            https://github.com/kubernetes/client-go
-#!RemoteAsset:  sha256:916216f9cf446f556bf7b74361c2c7a58c2e7eaeecad0d7862220fca965c7b49
+#!RemoteAsset:  sha256:867dde5bf06cd8a7d300720bcc69a69bda545e57f3173233cde00498d1088f38
 Source0:        https://github.com/kubernetes/client-go/archive/refs/tags/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

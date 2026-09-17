@@ -8,12 +8,12 @@
 %define go_import_path  github.com/gobwas/glob
 
 Name:           go-github-gobwas-glob
-Version:        0.2.3
+Version:        1.0.0
 Release:        %autorelease
 Summary:        Go glob
 License:        MIT
 URL:            https://github.com/gobwas/glob
-#!RemoteAsset:  sha256:325026fc78bcebcf31151b6e060f4e1c3321b04ded3dab63b63610b323c10850
+#!RemoteAsset:  sha256:c9a0c70b666b19250f5a5b8294b3915148801f2678588c7c0eb17b5d699fb224
 Source0:        https://github.com/gobwas/glob/archive/refs/tags/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

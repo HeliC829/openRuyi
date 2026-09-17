@@ -8,12 +8,12 @@
 %define go_import_path  github.com/go-openapi/analysis
 
 Name:           go-github-go-openapi-analysis
-Version:        0.25.0
+Version:        1.0.0
 Release:        %autorelease
 Summary:        OpenAPI 2.0 specification analysis toolkit
 License:        Apache-2.0
 URL:            https://github.com/go-openapi/analysis
-#!RemoteAsset:  sha256:d510d6b98d916668e6deebfa9f61afe284384240603fc0bae7044eae19c979e2
+#!RemoteAsset:  sha256:58bfadb198069425f8abe5dbddaf1f72b6c1ffb0debaa233a85b79f5c23f01ae
 Source0:        https://github.com/go-openapi/analysis/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

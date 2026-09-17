@@ -8,12 +8,12 @@
 %define go_import_path  maunium.net/go/mautrix
 
 Name:           go-maunium-go-mautrix
-Version:        0.26.3
+Version:        0.31.0
 Release:        %autorelease
 Summary:        Go framework for the Matrix protocol
 License:        MPL-2.0 AND Apache-2.0 AND BSD-3-Clause
 URL:            https://github.com/mautrix/go
-#!RemoteAsset:  sha256:a9ae03675d9ce87a3b83e4efa37252d3cf3e57ef4a8c2b19cdfddf999e51af1f
+#!RemoteAsset:  sha256:f5dfd0c4e3fdb1cf3ef074a4c598cfe1555592eaab60218b231f307837ad0735
 Source0:        https://github.com/mautrix/go/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

@@ -10,7 +10,7 @@
 %define commit_id c47d69cf462f804ff58ca63c61a8fb2aed76587e
 
 Name:           go-rsc-pdf
-Version:        0.1.0+git20260106.c47d69c
+Version:        0.1.1
 Release:        %autorelease
 Summary:        Golang library that provides a reader for the PDF format
 License:        BSD-3-Clause
@@ -40,4 +40,4 @@ exposed by this package.
 %{go_sys_gopath}/%{go_import_path}
 
 %changelog
-%{?autochangelog}
+%autochangelog

@@ -10,13 +10,13 @@
 %define go_import_path  golang.org/x/image
 
 Name:           go-golang-x-image
-Version:        0.43.0
+Version:        0.46.0
 Release:        %autorelease
 Summary:        Go supplementary image libraries
 License:        BSD-3-Clause
 URL:            https://golang.org/x/image
 VCS:            git:https://github.com/golang/image
-#!RemoteAsset:  sha256:ef01fe3167ddd606600c2c95ae6f892cb48a881b65da991516ec7a9b0b7324e4
+#!RemoteAsset:  sha256:ba04758ab83a5788f96dfe05bfc348978e9e39702ba087d8dabf9cdfe04e28b4
 Source0:        https://github.com/golang/image/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

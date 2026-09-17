@@ -9,12 +9,12 @@
 %define go_source_subdir v2
 
 Name:           go-github-pborman-getopt-v2
-Version:        2.1.0
+Version:        2.2.0
 Release:        %autorelease
 Summary:        Getopt-style option parsing for Go
 License:        BSD-3-Clause
 URL:            https://github.com/pborman/getopt
-#!RemoteAsset:  sha256:00056fa164b1bf217eb249f5733c76fd6e18f3f55ae269286695705243f48fe2
+#!RemoteAsset:  sha256:4f39b0787219884aa270456ccc463e62627e289e99e74355fffc35d30e525f3e
 Source0:        https://github.com/pborman/getopt/archive/refs/tags/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

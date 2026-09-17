@@ -8,12 +8,12 @@
 %define go_import_path  github.com/olekukonko/ll
 
 Name:           go-github-olekukonko-ll
-Version:        0.1.3
+Version:        0.1.8
 Release:        %autorelease
 Summary:        Simple logging for Development
 License:        MIT
 URL:            https://github.com/olekukonko/ll
-#!RemoteAsset
+#!RemoteAsset:  sha256:76f192ec1c0be8c094b53006865104d5f42e5c775d1eeb9d0b8bd5649e1382f8
 Source0:        https://github.com/olekukonko/ll/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
@@ -60,4 +60,4 @@ Key Features
 %{go_sys_gopath}/%{go_import_path}
 
 %changelog
-%{?autochangelog}
+%autochangelog

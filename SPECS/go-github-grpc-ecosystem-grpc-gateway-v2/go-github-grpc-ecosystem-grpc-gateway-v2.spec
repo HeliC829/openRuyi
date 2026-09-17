@@ -8,12 +8,12 @@
 %define go_import_path  github.com/grpc-ecosystem/grpc-gateway/v2
 
 Name:           go-github-grpc-ecosystem-grpc-gateway-v2
-Version:        2.29.0
+Version:        2.30.0
 Release:        %autorelease
 Summary:        gRPC to JSON proxy generator for Go
 License:        BSD-3-Clause
 URL:            https://github.com/grpc-ecosystem/grpc-gateway
-#!RemoteAsset:  sha256:c067650666440981109965953c4636cb08a556d0986ad4861167fec4553d8d74
+#!RemoteAsset:  sha256:b295533cd9db895b201bf9f99bda14cf132b6636769724518109a0919d916f6b
 Source0:        https://github.com/grpc-ecosystem/grpc-gateway/archive/refs/tags/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

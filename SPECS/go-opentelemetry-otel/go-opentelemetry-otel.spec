@@ -17,12 +17,12 @@
 }
 
 Name:           go-opentelemetry-otel
-Version:        1.44.0
+Version:        1.46.0
 Release:        %autorelease
 Summary:        OpenTelemetry API for Go
 License:        Apache-2.0
 URL:            https://github.com/open-telemetry/opentelemetry-go
-#!RemoteAsset:  sha256:fc1c8d58df26300576a8acbc6d53d07477784c656fd22018e86540a4392407d4
+#!RemoteAsset:  sha256:994e4a5ff6dc5f6f22a1aa109fb086e7ff6afefd7319b1ea53b1bd934e955d34
 Source0:        https://github.com/open-telemetry/opentelemetry-go/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

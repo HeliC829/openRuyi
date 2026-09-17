@@ -10,12 +10,12 @@
 %define go_test_ignore_failure 1
 
 Name:           go-k8s-component-base
-Version:        0.36.0
+Version:        0.37.0
 Release:        %autorelease
 Summary:        Common functionality for Kubernetes core components
 License:        Apache-2.0
 URL:            https://github.com/kubernetes/component-base
-#!RemoteAsset:  sha256:6b5fb4602554e3d5564815895428c514dab0df25c7f445780c7092e620b03971
+#!RemoteAsset:  sha256:e90cdcdb24275a57dec81cf43d5657146847dc9690d57ff058951804710fd1c5
 Source0:        https://github.com/kubernetes/component-base/archive/refs/tags/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

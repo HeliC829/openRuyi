@@ -8,13 +8,13 @@
 %define go_import_path  go.uber.org/mock
 
 Name:           go-uber-mock
-Version:        0.4.0
+Version:        0.6.0
 Release:        %autorelease
 Summary:        Mocking framework for Go
 License:        Apache-2.0
 URL:            https://github.com/uber/mock
 VCS:            git:https://github.com/uber/mock.git
-#!RemoteAsset:  sha256:30f28caf179b14a3a4f0ed28135904728e1bf61d78ba5fc4b89a36e301dd621b
+#!RemoteAsset:  sha256:e315da02f11069f4e9688054cf8dba86535318ea28ab7a2fe144c5e6a859e329
 Source0:        https://github.com/uber/mock/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

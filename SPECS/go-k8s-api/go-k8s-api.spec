@@ -9,12 +9,12 @@
 %define go_import_path  k8s.io/api
 
 Name:           go-k8s-api
-Version:        0.36.2
+Version:        0.37.0
 Release:        %autorelease
 Summary:        Canonical Kubernetes API definitions for Go
 License:        Apache-2.0
 URL:            https://github.com/kubernetes/api
-#!RemoteAsset:  sha256:f2c49f57a0da3aa37bf5caf6fe735a054cf994c0f44c77b3a2893e9d0340f1f8
+#!RemoteAsset:  sha256:3f29318501ad5e799087bab4841867ef8f98ba7d112002f57c1aff5c0e13f0b4
 Source0:        https://github.com/kubernetes/api/archive/refs/tags/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

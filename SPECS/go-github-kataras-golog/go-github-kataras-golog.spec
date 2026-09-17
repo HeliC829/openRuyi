@@ -8,12 +8,12 @@
 %define go_import_path  github.com/kataras/golog
 
 Name:           go-github-kataras-golog
-Version:        0.1.15
+Version:        0.2.0
 Release:        %autorelease
 Summary:        A high-performant Logging Foundation for Go Applications. X3 faster than the rest leveled loggers.
 License:        BSD-3-Clause
 URL:            https://github.com/kataras/golog
-#!RemoteAsset
+#!RemoteAsset:  sha256:305ee635a1e96eb57b9695103b7b86d7f9865e674fbf8e279cdbc65e41ac93bd
 Source0:        https://github.com/kataras/golog/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
@@ -33,4 +33,4 @@ logger written in Go Programming Language (https://go.dev).
 %{go_sys_gopath}/%{go_import_path}
 
 %changelog
-%{?autochangelog}
+%autochangelog

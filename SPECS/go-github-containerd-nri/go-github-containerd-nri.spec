@@ -23,12 +23,12 @@
 }
 
 Name:           go-github-containerd-nri
-Version:        0.12.0
+Version:        0.12.3
 Release:        %autorelease
 Summary:        Node Resource Interface
 License:        Apache-2.0
 URL:            https://github.com/containerd/nri
-#!RemoteAsset:  sha256:6f0d3af7ba2420cbcbe72e468833bc146f359942810e13aaaf86939a4ca53991
+#!RemoteAsset:  sha256:e9445a2e6cecfba14052f23c9ccc8b4573088b5cb7ad5f8833a97c845962c400
 Source0:        https://github.com/containerd/nri/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
