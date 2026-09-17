@@ -1,3 +1,0 @@
-d /run/clamav 0755 vscan vscan -
-d /var/lib/clamav 0755 vscan vscan -
-d /var/log/clamav 0755 vscan vscan -
