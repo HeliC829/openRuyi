@@ -7,12 +7,12 @@
 %define go_import_path  goftp.io/server/v2
 
 Name:           go-goftp-server-v2
-Version:        2.0.1
+Version:        2.0.3
 Release:        %autorelease
 Summary:        Extensible FTP server framework for Go
 License:        MIT
 URL:            https://gitea.com/goftp/server
-#!RemoteAsset:  sha256:f720bdc94324e5b35c711a5cb78d28cdda4bb422b04dc1b486a1ba392432df36
+#!RemoteAsset:  sha256:e623afedc1b85320283300888e841f62795fbe552034648ff1dac4b375b13d6b
 Source0:        https://gitea.com/goftp/server/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

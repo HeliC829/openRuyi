@@ -7,12 +7,12 @@
 %define go_import_path  github.com/vbauerster/mpb/v8
 
 Name:           go-github-vbauerster-mpb-v8
-Version:        8.9.3
+Version:        8.16.2
 Release:        %autorelease
 Summary:        Multi progress bars for terminal applications
 License:        Unlicense
 URL:            https://github.com/vbauerster/mpb
-#!RemoteAsset:  sha256:36f93a4919f8f99e05751d96ebe66291c36f74b18a2706dac9f16f5a1ac5b465
+#!RemoteAsset:  sha256:c001844ac852eecad546f0bd664d1abd46f7ea1eb6e92c90c5e60d2dbc0c5521
 Source0:        https://github.com/vbauerster/mpb/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

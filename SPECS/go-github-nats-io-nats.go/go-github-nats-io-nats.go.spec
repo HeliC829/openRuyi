@@ -7,12 +7,12 @@
 %define go_import_path  github.com/nats-io/nats.go
 
 Name:           go-github-nats-io-nats.go
-Version:        1.41.2
+Version:        1.54.0
 Release:        %autorelease
 Summary:        Go client for the NATS messaging system
 License:        Apache-2.0
 URL:            https://github.com/nats-io/nats.go
-#!RemoteAsset:  sha256:72a933638244f93cc78294e469d46c15078c07e0c37f0c455afce1fd20791cb2
+#!RemoteAsset:  sha256:c1fa8a89facae4f0820948382b4663495df4cd324d067725132d8ffa099ab411
 Source0:        https://github.com/nats-io/nats.go/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

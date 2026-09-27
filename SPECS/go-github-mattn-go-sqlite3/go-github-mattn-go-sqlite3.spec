@@ -8,12 +8,12 @@
 %define go_import_path  github.com/mattn/go-sqlite3
 
 Name:           go-github-mattn-go-sqlite3
-Version:        1.14.34
+Version:        1.14.52
 Release:        %autorelease
 Summary:        SQLite3 driver for Go
 License:        MIT
 URL:            https://github.com/mattn/go-sqlite3
-#!RemoteAsset:  sha256:a395599973f2f9d511731d1b2b9fb4c110636b24c155f6ffb1fbc8551f75fbf6
+#!RemoteAsset:  sha256:2f775dc697c4e3b53fad106a6db17c585a801d0c4db61c9b62a684a886b367bf
 Source0:        https://github.com/mattn/go-sqlite3/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

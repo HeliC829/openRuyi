@@ -22,12 +22,12 @@
 }
 
 Name:           go-github-spiffe-go-spiffe-v2
-Version:        2.6.0
+Version:        2.8.2
 Release:        %autorelease
 Summary:        SPIFFE library for Go
 License:        Apache-2.0
 URL:            https://github.com/spiffe/go-spiffe
-#!RemoteAsset:  sha256:3eb3fc58ee4c038c3074593ad8ae7a44e51141edaa7c981081d134f601bdb169
+#!RemoteAsset:  sha256:b69992444903945ea87cbf9fa4357a9cf1d2bfba9d0ae6d0d1fbf06113d78c63
 Source0:        https://github.com/spiffe/go-spiffe/archive/refs/tags/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

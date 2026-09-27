@@ -8,12 +8,12 @@
 %define go_import_path  github.com/containerd/log
 
 Name:           go-github-containerd-log
-Version:        0.1.0
+Version:        0.2.0
 Release:        %autorelease
 Summary:        Context-aware logging package for containerd
 License:        Apache-2.0
 URL:            https://github.com/containerd/log
-#!RemoteAsset:  sha256:bfe14fa56ab57783e3ee827351e5704b04870cfb2a4aa03a13a7b2b81cc56c61
+#!RemoteAsset:  sha256:cf5bc961b0f85429560058ce3ea416d61ed7808a4e741fb905f8e50fc48a692c
 Source0:        https://github.com/containerd/log/archive/refs/tags/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

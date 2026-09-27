@@ -8,13 +8,13 @@
 %define go_import_path  github.com/jsdelivr/globalping-cli
 
 Name:           go-github-jsdelivr-globalping-cli
-Version:        1.5.1
+Version:        1.6.0
 Release:        %autorelease
 Summary:        Command-line client and Go library for Globalping
 License:        MPL-2.0
 URL:            https://github.com/jsdelivr/globalping-cli
 VCS:            git:https://github.com/jsdelivr/globalping-cli.git
-#!RemoteAsset:  sha256:235c96480e66b23c1393a5da56f1456908399207948300f1202b6fb335b71550
+#!RemoteAsset:  sha256:9228d8f6f270f3a515a681e14d14baa545095f131e1d3b6f3b4f047f859e7eea
 Source0:        https://github.com/jsdelivr/globalping-cli/archive/refs/tags/v%{version}.tar.gz#/globalping-cli-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

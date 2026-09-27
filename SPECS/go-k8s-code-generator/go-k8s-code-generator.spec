@@ -12,12 +12,12 @@
 }
 
 Name:           go-k8s-code-generator
-Version:        0.36.2
+Version:        0.37.1
 Release:        %autorelease
 Summary:        Kubernetes code generation libraries
 License:        Apache-2.0
 URL:            https://github.com/kubernetes/code-generator
-#!RemoteAsset:  sha256:c8e656c57b1a4d05c90157ee214f55cff94b6d9f3b5c84b50fcb657b61f37621
+#!RemoteAsset:  sha256:cdbcf48016ba9c928aa1f770f2621b32ffe506f1d5b76aabaf71dad2473d7fb5
 Source0:        https://github.com/kubernetes/code-generator/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

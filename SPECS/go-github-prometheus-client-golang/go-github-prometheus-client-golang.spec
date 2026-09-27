@@ -14,7 +14,7 @@
 }
 
 Name:           go-github-prometheus-client-golang
-Version:        1.23.2+git20260717.78262a7
+Version:        1.24.1
 Release:        %autorelease
 Summary:        Prometheus instrumentation library for Go applications
 License:        Apache-2.0

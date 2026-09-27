@@ -10,12 +10,12 @@
 %define go_source_subdir detectors/gcp
 
 Name:           go-opentelemetry-contrib-detectors-gcp
-Version:        1.44.0
+Version:        1.46.0
 Release:        %autorelease
 Summary:        GCP resource detector for OpenTelemetry Go
 License:        Apache-2.0
 URL:            https://github.com/open-telemetry/opentelemetry-go-contrib
-#!RemoteAsset:  sha256:a48c7daaa91c703fc9845cf2b3bb25e89ff4b50797312bdd61530f5911aa5ad5
+#!RemoteAsset:  sha256:7286f5a68461c292c7dc57a27c02bdc14db092d25892aea2ada1e6ea6cc3bcd1
 Source0:        https://github.com/open-telemetry/opentelemetry-go-contrib/archive/refs/tags/detectors/gcp/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

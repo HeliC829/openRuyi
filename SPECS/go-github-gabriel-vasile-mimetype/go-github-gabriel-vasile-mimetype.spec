@@ -8,12 +8,12 @@
 %define go_import_path  github.com/gabriel-vasile/mimetype
 
 Name:           go-github-gabriel-vasile-mimetype
-Version:        1.4.13
+Version:        1.4.15
 Release:        %autorelease
 Summary:        A fast Golang library for media type and file extension detection, based on magic numbers
 License:        MIT
 URL:            https://github.com/gabriel-vasile/mimetype
-#!RemoteAsset:  sha256:0c0e8a26877f29ccb21d367086c6ac9ad00baec1dd65593d9163aa2c51751633
+#!RemoteAsset:  sha256:a5b97adc8fe0ef7ba6b97b0bc3fac32b3cf025d724cf2c95e742b717ccf0eb6e
 Source0:        https://github.com/gabriel-vasile/mimetype/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

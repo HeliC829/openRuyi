@@ -7,12 +7,12 @@
 %define go_import_path  github.com/montanaflynn/stats
 
 Name:           go-github-montanaflynn-stats
-Version:        0.7.1
+Version:        0.12.7
 Release:        %autorelease
 Summary:        Statistical functions for Go
 License:        MIT
 URL:            https://github.com/montanaflynn/stats
-#!RemoteAsset:  sha256:97e9258173992d3caee6f7d7ac175d559dfc086388ad6c65fde439b808e1b725
+#!RemoteAsset:  sha256:da38706603fce9345062d156e1d2ac6b1598108675d305cf2220bd12af4bd413
 Source0:        https://github.com/montanaflynn/stats/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

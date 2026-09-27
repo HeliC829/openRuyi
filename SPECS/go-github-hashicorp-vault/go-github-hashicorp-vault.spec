@@ -8,12 +8,12 @@
 
 # Vault's API is an independently tagged MPL-2.0 module in the monorepo.
 Name:           go-github-hashicorp-vault
-Version:        1.14.0
+Version:        1.23.0
 Release:        %autorelease
 Summary:        Go API client for HashiCorp Vault
 License:        MPL-2.0
 URL:            https://github.com/hashicorp/vault
-#!RemoteAsset:  sha256:c652e3a6f43f6886e91f7e6889d0fcfc1a3377c77ce23ac78c27d9f2718f82d4
+#!RemoteAsset:  sha256:3c63ed5e2f7459dc1b63ef4746b202ec79244af4e7bac82c892a265f7edc0495
 Source0:        https://github.com/hashicorp/vault/archive/refs/tags/api/v%{version}.tar.gz#/%{_name}-api-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

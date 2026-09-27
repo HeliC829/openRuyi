@@ -7,12 +7,12 @@
 %define go_import_path  github.com/eclipse/paho.mqtt.golang
 
 Name:           go-github-eclipse-paho.mqtt.golang
-Version:        1.5.0
+Version:        1.5.1
 Release:        %autorelease
 Summary:        Eclipse Paho MQTT 3.1/3.1.1 client for Go
 License:        EPL-2.0 AND BSD-3-Clause
 URL:            https://github.com/eclipse/paho.mqtt.golang
-#!RemoteAsset:  sha256:7ccfa07cd9440900759678cb085e57b7d0dc665164602e5ecc64531296560366
+#!RemoteAsset:  sha256:2f14a71301110c4ed81d70d82dd00a3b79c0a16c22f93b9541f30ab82b7d3682
 Source0:        https://github.com/eclipse/paho.mqtt.golang/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

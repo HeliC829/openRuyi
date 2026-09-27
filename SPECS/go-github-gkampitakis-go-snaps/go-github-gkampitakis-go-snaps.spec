@@ -9,12 +9,12 @@
 %define go_import_path  github.com/gkampitakis/go-snaps
 
 Name:           go-github-gkampitakis-go-snaps
-Version:        0.5.22
+Version:        0.5.23
 Release:        %autorelease
 Summary:        Snapshot testing library for Go
 License:        MIT
 URL:            https://github.com/gkampitakis/go-snaps
-#!RemoteAsset:  sha256:9d933869757da87b2e1897275c594945b746ce356abb25c58800af4c7a52e893
+#!RemoteAsset:  sha256:1df3e465541b316f3bb4d97d89eb66d08ed14a8062233c855c705a5f622e02a8
 Source0:        https://github.com/gkampitakis/go-snaps/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

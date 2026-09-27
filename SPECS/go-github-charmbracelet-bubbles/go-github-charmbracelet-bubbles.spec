@@ -7,12 +7,12 @@
 %define go_import_path  github.com/charmbracelet/bubbles
 
 Name:           go-github-charmbracelet-bubbles
-Version:        0.20.0
+Version:        1.0.0
 Release:        %autorelease
 Summary:        TUI components for Bubble Tea
 License:        MIT
 URL:            https://github.com/charmbracelet/bubbles
-#!RemoteAsset:  sha256:e5571e3fa42de49c50f9387d7f0f3491192adaa7b676905d72b5357fbef10883
+#!RemoteAsset:  sha256:58d874c98995369287cfe80b2b256816946126b3302b5fdc2ac64f3137c201c8
 Source0:        https://github.com/charmbracelet/bubbles/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

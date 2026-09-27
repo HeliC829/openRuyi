@@ -7,12 +7,12 @@
 %define go_import_path  github.com/IBM/sarama
 
 Name:           go-github-ibm-sarama
-Version:        1.45.1
+Version:        1.61.0
 Release:        %autorelease
 Summary:        Go client for Apache Kafka
 License:        MIT
 URL:            https://github.com/IBM/sarama
-#!RemoteAsset:  sha256:4e7cf2db71952e261c3076df830a15a95b42203aedca83f6bea5d64a32e85ab1
+#!RemoteAsset:  sha256:ac954c4e4b89cf724c324e5f654f24d00b5a1044003b66f8881a06434a78c025
 Source0:        https://github.com/IBM/sarama/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

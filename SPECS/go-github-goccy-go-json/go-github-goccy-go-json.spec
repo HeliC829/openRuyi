@@ -8,12 +8,12 @@
 %define go_import_path  github.com/goccy/go-json
 
 Name:           go-github-goccy-go-json
-Version:        0.10.6
+Version:        0.11.0
 Release:        %autorelease
 Summary:        Fast JSON encoder and decoder for Go
 License:        MIT
 URL:            https://github.com/goccy/go-json
-#!RemoteAsset:  sha256:808f1c7fa10eaafda552f4709cac2ecc953dcda6a144050756c81a8e24d0a8c1
+#!RemoteAsset:  sha256:0c2832b8699c0c73fb9e598f61d259d76ec4ab0b71e245c5ce13b41fa47f4462
 Source0:        https://github.com/goccy/go-json/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

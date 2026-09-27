@@ -8,12 +8,12 @@
 %define go_import_path  github.com/go-openapi/runtime
 
 Name:           go-github-go-openapi-runtime
-Version:        0.29.4
+Version:        0.33.2
 Release:        %autorelease
 Summary:        Runtime client and server components for go-openapi
 License:        Apache-2.0
 URL:            https://github.com/go-openapi/runtime
-#!RemoteAsset:  sha256:03bdf4c2e67a920ada0adfea67512b299af05c2f5b960d0a8d3020fd997c5c59
+#!RemoteAsset:  sha256:3da4bb9d0b74c4835642e3db83371597fec49e6b12159cb8740a91386680a748
 Source0:        https://github.com/go-openapi/runtime/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

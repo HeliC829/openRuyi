@@ -7,12 +7,12 @@
 %define go_import_path  github.com/cli/go-gh/v2
 
 Name:           go-github-cli-go-gh-v2
-Version:        2.16.0
+Version:        2.16.1
 Release:        %autorelease
 Summary:        Go module for authentication and configuration of the GitHub CLI
 License:        MIT
 URL:            https://github.com/cli/go-gh
-#!RemoteAsset:  sha256:b1ce167ff3541917d35ad43877a54ea44cda891b5c470b3c44dbad33aeccb995
+#!RemoteAsset:  sha256:a748d44bf41a4c645204ecddda9162fbb78d54f57ab9692e890338deca13cd63
 Source0:        https://github.com/cli/go-gh/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

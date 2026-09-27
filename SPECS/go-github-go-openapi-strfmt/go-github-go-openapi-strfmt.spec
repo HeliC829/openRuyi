@@ -13,12 +13,12 @@
 %global go_test_exclude_glob */enable/mongodb*
 
 Name:           go-github-go-openapi-strfmt
-Version:        0.26.3
+Version:        0.27.2
 Release:        %autorelease
 Summary:        openapi toolkit common string formats
 License:        Apache-2.0
 URL:            https://github.com/go-openapi/strfmt
-#!RemoteAsset:  sha256:ff2a3ca0bcc0db76c710f1377ba023b2ef79c2f882141f8995da3d6d35d66654
+#!RemoteAsset:  sha256:a987dda628ce70988daa8e35f34020d0184358e3ceabc811863dbf51c33532d5
 Source0:        https://github.com/go-openapi/strfmt/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

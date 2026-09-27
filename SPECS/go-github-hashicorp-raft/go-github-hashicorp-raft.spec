@@ -7,12 +7,12 @@
 %define go_import_path  github.com/hashicorp/raft
 
 Name:           go-github-hashicorp-raft
-Version:        1.3.11
+Version:        1.8.0
 Release:        %autorelease
 Summary:        Raft consensus library for Go
 License:        MPL-2.0
 URL:            https://github.com/hashicorp/raft
-#!RemoteAsset:  sha256:f3d98dad1a64bc962348da0f5ffce349f2a701d5c1c06ed3dc8ccc1b7a1ad8c2
+#!RemoteAsset:  sha256:3db7490c6d8376355792c5b37a792784847153d39b8792441425c3392e9b1ac5
 Source0:        https://github.com/hashicorp/raft/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

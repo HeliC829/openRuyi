@@ -15,12 +15,12 @@
 }
 
 Name:           go-k8s-apimachinery
-Version:        0.36.2
+Version:        0.37.1
 Release:        %autorelease
 Summary:        Shared Kubernetes API machinery for Go
 License:        Apache-2.0
 URL:            https://github.com/kubernetes/apimachinery
-#!RemoteAsset:  sha256:10fe89c116f303013cc123ff5b4f4a40c55a4d4c89d39e30da0278bb3284b674
+#!RemoteAsset:  sha256:adaec3a75435a230f9b443d680aa9166470d5583bc971b81e95957b5d3728ae7
 Source0:        https://github.com/kubernetes/apimachinery/archive/refs/tags/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

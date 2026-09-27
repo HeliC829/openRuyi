@@ -9,12 +9,12 @@
 %define go_test_ignore_failure 1
 
 Name:           go-github-minio-pkg-v3
-Version:        3.1.3
+Version:        3.11.0
 Release:        %autorelease
 Summary:        Shared MinIO helper libraries for Go
 License:        AGPL-3.0-only
 URL:            https://github.com/minio/pkg
-#!RemoteAsset:  sha256:cebd58674c85b381b6ffa6c789117925ce3a6f0b4e6e8f5fdc7a0fd9dbce002c
+#!RemoteAsset:  sha256:362db1226212f206314a8dc7cb0e06b960b5b623b89bd89af9cf329c51146ddc
 Source0:        https://github.com/minio/pkg/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

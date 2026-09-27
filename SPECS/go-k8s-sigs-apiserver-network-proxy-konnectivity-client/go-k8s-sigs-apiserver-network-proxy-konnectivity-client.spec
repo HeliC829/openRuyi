@@ -13,12 +13,12 @@
 }
 
 Name:           go-k8s-sigs-apiserver-network-proxy-konnectivity-client
-Version:        0.34.0
+Version:        0.37.0
 Release:        %autorelease
 Summary:        Kubernetes API server network proxy
 License:        Apache-2.0
 URL:            https://github.com/kubernetes-sigs/apiserver-network-proxy
-#!RemoteAsset:  sha256:bf660c8f0f580f8ff1b52eac821bfb233bfd58d32416b133a6d75644288cb05f
+#!RemoteAsset:  sha256:8c80e831a1133eb070b3203bcc9971b747e02cb784407c4d67c53e8b161308e9
 Source0:        https://github.com/kubernetes-sigs/apiserver-network-proxy/archive/konnectivity-client/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

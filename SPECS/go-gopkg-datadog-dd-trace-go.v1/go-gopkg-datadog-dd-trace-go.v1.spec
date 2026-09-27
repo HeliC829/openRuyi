@@ -9,12 +9,12 @@
 %define go_test_exclude_glob %{go_import_path}/contrib*
 
 Name:           go-gopkg-datadog-dd-trace-go.v1
-Version:        1.33.0
+Version:        1.74.8
 Release:        %autorelease
 Summary:        Datadog tracing and profiling libraries for Go
 License:        Apache-2.0 OR BSD-3-Clause
 URL:            https://github.com/DataDog/dd-trace-go
-#!RemoteAsset:  sha256:0e0ae7ddae2468ae06204db48bd64505c59e33de961f74300385f06c4c1af701
+#!RemoteAsset:  sha256:0aa50b4a76baf294d78101a7e6bf09a7ed8347fbd3cba1759472f250e135a0fb
 Source0:        https://github.com/DataDog/dd-trace-go/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

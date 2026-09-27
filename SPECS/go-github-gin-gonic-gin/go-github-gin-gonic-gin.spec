@@ -8,12 +8,12 @@
 %define go_import_path  github.com/gin-gonic/gin
 
 Name:           go-github-gin-gonic-gin
-Version:        1.8.1
+Version:        1.12.0
 Release:        %autorelease
 Summary:        Gin is a high-performance HTTP web framework written in Go. It provides a Martini-like API but with significantly better performance—up to 40 times faster—thanks to httprouter. Gin is designed for building REST APIs, web applications, and microservices.
 License:        MIT
 URL:            https://github.com/gin-gonic/gin
-#!RemoteAsset:  sha256:9f6a9a6c2b96c323902d8ee1728152bafdf1894130554a93af5d3f1807c0403b
+#!RemoteAsset:  sha256:c4210a179c9f129462eafcbd4d6d6dfe9559597be32c09041c1c9f797fa558bc
 Source0:        https://github.com/gin-gonic/gin/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

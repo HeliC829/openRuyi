@@ -8,12 +8,12 @@
 %define tests_commit    0c3b64965f538d6ca92243af0d091c5798aaa92e
 
 Name:           go-github-huml-lang-go-huml
-Version:        0.3.0
+Version:        0.3.1
 Release:        %autorelease
 Summary:        Parser and encoder for Human-oriented Markup Language
 License:        MIT
 URL:            https://github.com/huml-lang/go-huml
-#!RemoteAsset:  sha256:c8d97d3d336f1c1f357b659a7e698ba35921495832d83e65df5dab4f7118131e
+#!RemoteAsset:  sha256:bb9696252dd12a73ce8cd709ff4ab0cfbfdd378d6b88edc4fd614bd96244696b
 Source0:        https://github.com/huml-lang/go-huml/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 #!RemoteAsset:  sha256:82ab05f9710deb4526f8ddbc42c4e7ad4f2407269cf2f748557f4caa87c00804
 Source1:        https://github.com/huml-lang/tests/archive/%{tests_commit}.tar.gz#/%{_name}-tests-%{tests_commit}.tar.gz

@@ -8,12 +8,12 @@
 %define go_import_path  github.com/emersion/go-smtp
 
 Name:           go-github-emersion-go-smtp
-Version:        0.24.0
+Version:        0.25.0
 Release:        %autorelease
 Summary:        SMTP client and server library for Go
 License:        MIT
 URL:            https://github.com/emersion/go-smtp
-#!RemoteAsset:  sha256:f6f49bac639a9fd59d7a8b56895f0cdaecaf007e78a75ac76ba2f7ee0ef65b45
+#!RemoteAsset:  sha256:f6452bfada3b939bb0f5c4167775a5dd6a364b93a060b49f6ab3a4213bbbf4f8
 Source0:        https://github.com/emersion/go-smtp/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

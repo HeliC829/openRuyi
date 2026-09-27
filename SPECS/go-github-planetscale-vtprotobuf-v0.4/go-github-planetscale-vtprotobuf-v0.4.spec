@@ -10,12 +10,12 @@
 %define go_test_exclude github.com/planetscale/vtprotobuf/conformance
 
 Name:           go-github-planetscale-vtprotobuf-v0.4
-Version:        0.4.0
+Version:        0.6.0
 Release:        %autorelease
 Summary:        Protocol buffer compiler plugin for optimized Go code
 License:        BSD-3-Clause
 URL:            https://github.com/planetscale/vtprotobuf
-#!RemoteAsset:  sha256:b7335c741afc07885144bead9ca902cb6fcfca667668f0ad1af6ce310fc3ca32
+#!RemoteAsset:  sha256:93ed5268bb2bbfe8c3aef008ba6d977a921b2ec62e7e78c762a8c1ae45c5a49c
 Source0:        https://github.com/planetscale/vtprotobuf/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules

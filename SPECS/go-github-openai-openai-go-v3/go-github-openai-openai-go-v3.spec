@@ -15,12 +15,12 @@
 }
 
 Name:           go-github-openai-openai-go-v3
-Version:        3.22.0
+Version:        3.66.0
 Release:        %autorelease
 Summary:        Go client library for the OpenAI REST API
 License:        Apache-2.0
 URL:            https://github.com/openai/openai-go
-#!RemoteAsset:  sha256:57be417b0904fc46e8d56f140bfb925adb8709f514a1d247974b8da4192a2ae1
+#!RemoteAsset:  sha256:03c34ce48d3c57eb731dbfd7247927665eb9515e2b709bc886a664e21bbe5608
 Source0:        https://github.com/openai/openai-go/archive/v%{version}.tar.gz#/%{_name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildSystem:    golangmodules
