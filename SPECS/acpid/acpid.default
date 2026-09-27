@@ -1,4 +1,0 @@
-# Options to pass to acpid
-#
-# OPTIONS are appended to the acpid command-line
-#OPTIONS=""

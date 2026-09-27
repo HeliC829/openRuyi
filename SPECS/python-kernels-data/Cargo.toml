@@ -1,3 +1,0 @@
-[workspace]
-members = ["kernels-data", "kernels-data/bindings/python"]
-resolver = "2"
