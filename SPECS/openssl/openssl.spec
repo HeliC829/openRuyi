@@ -17,13 +17,13 @@
 %global _test_target test
 
 Name:           openssl
-Version:        3.6.3
+Version:        3.6.5
 Release:        %autorelease
 Summary:        Cryptography and SSL/TLS Toolkit
 License:        Apache-2.0
 URL:            https://www.openssl.org/
 VCS:            git:https://github.com/openssl/openssl.git
-#!RemoteAsset:  sha256:243a86649cf6f23eeb6a2ff2456e09e5d77dd9018a54d3d96b0c6bdd6ba6c7f1
+#!RemoteAsset:  sha256:a2157c2830efdec3788939b00c9b0638306d3f0bbb76dc4832ee503bb397df98
 Source:         https://www.openssl.org/source/%{name}-%{version}.tar.gz
 BuildSystem:    autotools
 
