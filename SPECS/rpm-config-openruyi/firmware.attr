@@ -1,2 +1,0 @@
-%__firmware_provides	%{_rpmconfigdir}/firmware.prov
-%__firmware_path	%{_firmwaredir}
