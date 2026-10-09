@@ -50,13 +50,13 @@
   /usr/lib/rpm/brp-compress
 
 Name:           go
-Version:        1.27.1
+Version:        1.27.2
 Release:        %autorelease
 Summary:        The Go Programming Language toolchain
 License:        BSD-3-Clause
 URL:            https://go.dev/
 VCS:            git:https://github.com/golang/go
-#!RemoteAsset:  sha256:4e408abae126d916b6164627193f2c54f0e3ca1312d693b86db45f862ab238b1
+#!RemoteAsset:  sha256:03495da2ba64894d40f5c4992e49454fa78b50690604ff92b6afff5081b76e62
 Source0:        https://go.dev/dl/%{name}%{version}.src.tar.gz
 #!RemoteAsset:  sha256:5c2c3b16caefa1d968a94c1daca04a7ca301a496d9b086e17ad77bb81393f053
 Source1:        https://go.dev/dl/%{name}1.26.5.linux-amd64.tar.gz
